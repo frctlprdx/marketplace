@@ -12,26 +12,32 @@ class CartController extends Controller
     {
         // Cek apakah user sudah login
         if (!Auth::check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please login to access the cart',
-            ], 401); // Mengembalikan response dengan status 401 Unauthorized
+            return redirect('/login'); // Redirect ke login jika user belum login
         }
 
-        // Jika user sudah login, ambil data cart
-        $carts = Cart::with('product') // Mengambil relasi product
-                    ->join('users', 'carts.user_id', '=', 'users.id') // Join dengan tabel users
-                    ->join('products', 'carts.product_id', '=', 'products.id') // Join dengan tabel products
-                    ->where('carts.user_id', Auth::id()) // Filter berdasarkan user_id
-                    ->select('carts.*', 'users.name as user_name', 'products.name as product_name') // Ambil data yang dibutuhkan
-                    ->get();
+        // Cek role user
+        $user = Auth::user();
         
-        // Mengembalikan data cart jika sudah login
-        return response()->json([
-            'success' => true,
-            'data' => $carts,
-        ]);
-    }
+        if ($user->role == 'customer') {
+            // Tampilkan cart untuk customer
+            $carts = Cart::with('product')
+                        ->join('users', 'carts.user_id', '=', 'users.id')
+                        ->join('products', 'carts.product_id', '=', 'products.id')
+                        ->where('carts.user_id', $user->id)
+                        ->select('carts.*', 'users.name as user_name', 'products.name as product_name')
+                        ->get();
+            return response()->json([
+                'success' => true,
+                'data' => $carts,
+            ]);
+        } elseif ($user->role == 'seller') {
+            // Tampilkan halaman seller
+            return redirect()->route('seller.index'); // Redirect ke halaman dashboard seller
+        } else {
+            return redirect('/unauthorized'); // Halaman error jika role tidak dikenali
+        }
+    }                           
+
 
 
 }

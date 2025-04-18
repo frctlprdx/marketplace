@@ -17,11 +17,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index'); //Main Page
+Route::get('/unauthorized', function () {
+    return view('unauthorized'); // Atau redirect ke halaman tertentu
+});
+
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    // Route untuk customer
+    Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index');
 
-    Route::get(uri: '/cart', action: [CartController::class, 'index'])->name('cart.index'); // Cart Page
+    // Route untuk seller
 });
+
