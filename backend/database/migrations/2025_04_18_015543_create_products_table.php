@@ -15,11 +15,12 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->text('deskripsi')->nullable();
-            $table->integer('stok');
-            $table->decimal('harga', 10, 2);
-            $table->string('gambar')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // penjual
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->integer('stocks');
+            $table->decimal('price', 10, 2);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
