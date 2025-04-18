@@ -22,4 +22,9 @@ class Cart extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function getTotalPriceAttribute()
+    {
+        return $this->quantity * $this->product->price;
+    }
 }

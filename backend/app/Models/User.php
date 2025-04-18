@@ -12,11 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -26,38 +21,39 @@ class User extends Authenticatable
         'phone_number',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Relasi ke cart
-     */
     public function carts()
     {
         return $this->hasMany(Cart::class);
     }
 
-    /**
-     * Relasi ke transaksi
-     */
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
     }
+
+    // Menambahkan akses role untuk kontrol lebih
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSeller()
+    {
+        return $this->role === 'seller';
+    }
+
+    public function isCustomer()
+    {
+        return $this->role === 'customer';
+    }
 }
+
