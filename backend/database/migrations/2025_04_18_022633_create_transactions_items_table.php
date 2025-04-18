@@ -19,6 +19,7 @@ class CreateTransactionsItemsTable extends Migration
             $table->foreignId('product_id')->constrained();
             $table->integer('amount');
             $table->decimal('price', 10, 2);
+            $table->timestamps();  // Menambahkan created_at dan updated_at
         });
     }
 

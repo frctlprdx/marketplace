@@ -20,6 +20,7 @@ class CreatePaymentsTable extends Migration
             $table->string('status'); // paid, failed, etc.
             $table->string('external_id'); // dari payment gateway
             $table->timestamp('paid_at')->nullable();
+            $table->timestamps(); 
         });
     }
 
