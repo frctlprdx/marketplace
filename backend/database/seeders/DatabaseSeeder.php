@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             TransactionsTableSeeder::class,
             TransactionItemsTableSeeder::class,
             PaymentsTableSeeder::class,
+            WishlistSeeder::class,
         ]);
     }
 }

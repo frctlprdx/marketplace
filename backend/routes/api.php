@@ -4,6 +4,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,17 +17,39 @@ Route::get('/unauthorized', function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
     Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index');
-    // Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
-    // Route::get('/profile', [ProfileController::class, 'index'])->middleware('role:customer')->name('profile.index');
+    Route::post('/cart', [CartController::class, 'store'])->middleware('role:customer')->name('cart.store');
+    Route::put('/cart/{id}', [CartController::class, 'update'])->middleware('role:customer')->name('cart.update');
+    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy');
+
+    Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store');
+    Route::put('/wishlist/{id}', [WishlistController::class, 'update'])->middleware('role:customer')->name('wishlist.update');
+
+    Route::get('/profile', [UserController::class, 'indexuser'])->middleware('role:customer')->name('profile.index');
+    Route::put('/profile/{id}', [UserController::class, 'update'])->middleware('role:customer')->name('profile.update');
+
     Route::get('/transactionhistory', [TransactionController::class, 'historyindex'])->middleware('role:customer')->name('transaction.index');
+    Route::post('/transactionhistory', [TransactionController::class, 'store'])->middleware('role:customer')->name('transaction.store');
+    Route::put('/transactionhistory/{id}', [TransactionController::class, 'update'])->middleware('role:customer')->name('transaction.update');
+    Route::delete('/transactionhistory/{id}', [TransactionController::class, 'destroy'])->middleware('role:customer')->name('transaction.destroy');
+
     Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->middleware('role:customer')->name('transaction.item');
 
     // Route untuk seller)
-    Route::get('/sellerpage', function () {
-        return view('sellerpage');
-    })->middleware('role:seller')->name('seller.page');
+    Route::get('/allusers', [UserController::class, 'indexall'])->middleware('role:seller')->name('users.index');
+    Route::post('/user', [UserController::class, 'store'])->middleware('role:seller')->name('user.store');
+    Route::put('/user/{id}', [UserController::class, 'update'])->middleware('role:seller')->name('user.update');
+    Route::delete('/user/{id}', [UserController::class, 'destroy'])->middleware('role:seller')->name('user.destroy');
+
+    Route::get('/sellerpage', [ProductController::class, 'index'])->middleware('role:seller')->name('seller.page');
+    Route::post('/product', [ProductController::class, 'store'])->middleware('role:seller')->name('product.store');
+    Route::put('/product/{id}', [ProductController::class, 'update'])->middleware('role:seller')->name('product.update');
+    Route::delete('/product/{id}', [ProductController::class, 'destroy'])->middleware('role:seller')->name('product.destroy');
+
     Route::get('/payments', [PaymentController::class, 'index'])->middleware('role:seller')->name('payments.index');
+
     Route::get('/sellertransactionpage', [TransactionController::class, 'sellerindex'])->middleware('role:seller')->name('seller.transaction.index');
+
     Route::get('/sellertransactionitempage/{id}', [TransactionController::class, 'sellertransactionitem'])->middleware('role:seller')->name('seller.transaction.item');
 });
 
