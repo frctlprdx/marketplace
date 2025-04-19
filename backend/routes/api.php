@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index'); //Main Page
 Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
 Route::get('/unauthorized', function () {
     return view('unauthorized'); // Atau redirect ke halaman tertentu
 });

@@ -10,36 +10,39 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     // Validasi inputan
-    //     $request->validate([
-    //         'email' => 'required|string|email',
-    //         'password' => 'required|string|min:8',
-    //     ]);
+    public function login(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:8',
+        ]);
 
-    //     // Cek apakah kredensial valid
-    //     if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-    //         $user = Auth::user();
-            
-    //         // Cek role dan buat token
-    //         $token = $user->createToken('marketplace')->plainTextToken;
+        // Ambil status "remember_me" dari request
+        $remember = $request->has('remember_me') && $request->remember_me; // Mengambil status "remember_me" dari request
 
-    //         // Kembalikan response dengan token dan role
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'User logged in successfully',
-    //             'token' => $token,
-    //             'role' => $user->role, // Kembalikan role
-    //         ]);
-    //     }
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
+            $user = Auth::user();
 
-    //     // Jika gagal login
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => 'Invalid credentials',
-    //     ], 401);
-    // }
+            $token = $user->createToken('YourAppName')->plainTextToken;
+
+            // Mengembalikan response dengan token dan role
+            return response()->json([
+                'success' => true,
+                'message' => 'User logged in successfully',
+                'token' => $token,
+                'role' => $user->role,
+            ]);
+        }
+
+        // Jika gagal login
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials',
+        ], 401);
+    }
+
+
 
     public function register(Request $request)
     {
