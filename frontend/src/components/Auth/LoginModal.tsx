@@ -25,7 +25,9 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
     try {
       const response = await axios.post("http://localhost:8000/api/login", data);
       console.log("Login successful", response.data);
-      onClose(); // Close the modal after successful login
+      localStorage.setItem("user", JSON.stringify(response.data.user)); // atau token jika pakai token
+      window.dispatchEvent(new Event("login")); // Trigger event agar navbar update
+      onClose(); // tutup modal
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors); // Set errors to be displayed

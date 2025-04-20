@@ -24,7 +24,7 @@ class UserController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
             $user = Auth::user();
 
-            $token = $user->createToken('YourAppName')->plainTextToken;
+            $token = $user->createToken('marketplace')->plainTextToken;
 
             // Mengembalikan response dengan token dan role
             return response()->json([
