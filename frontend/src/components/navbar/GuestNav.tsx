@@ -10,7 +10,7 @@ const GuestNav = () => {
 
   return (
     <>
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center space-x-2 sm:space-x-4">
         <button className="text-black text-2xl sm:text-4xl hover:text-orange-500"><AiOutlineHeart /></button>
           <button className="text-black text-2xl sm:text-4xl hover:text-orange-500"><AiOutlineShoppingCart /></button>
           <button className="text-[15px] font-medium text-white bg-orange-500 hover:bg-orange-600 px-4 py-1 rounded-full" onClick={() => setShowLogin(true)}>

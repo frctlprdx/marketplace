@@ -23,14 +23,14 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="w-screen h-16 bg-white shadow px-6 flex items-center justify-between">
+    <div className="w-screen h-16 bg-white shadow px-2 sm:px-6 flex items-center justify-between">
       <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1">Etsy</div>
 
-      <div className="flex-1 mx-6">
+      <div className="flex-1 mx-2 sm:mx-12">
         <input
           type="text"
           placeholder="Search for anything"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-2 sm:px-6 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
 

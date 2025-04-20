@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import logo from "../../assets/logo.jpg";
 
 const Showcase = () => {
   return (
@@ -18,7 +19,6 @@ const Showcase = () => {
             key={i}
             className={
               [
-                // Apply specific layout rules per item
                 i === 0 && "col-span-2 row-span-2 sm:col-span-2 sm:row-span-2",
                 i === 1 && "col-span-2 row-span-1 sm:col-span-2 sm:row-span-1",
                 i === 2 && "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1",
@@ -26,13 +26,21 @@ const Showcase = () => {
                 i === 4 && "col-span-4 row-span-1 sm:col-span-2 sm:row-span-1",
                 i === 5 && "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1",
                 i === 6 && "col-span-2 row-span-1 sm:col-span-4 sm:row-span-1",
-              ].filter(Boolean).join(" ") + " bg-gray-300 rounded-[30px]"
+              ]
+                .filter(Boolean)
+                .join(" ") + " bg-gray-300 rounded-[30px] overflow-hidden"
             }
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
-          />
+          >
+            <img
+              // src={logo}
+              alt={`Produk ${i + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
         ))}
       </div>
     </div>
