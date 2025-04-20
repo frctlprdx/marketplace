@@ -3,6 +3,8 @@ import Navbar from './components/Navbar/NavbarComponent'
 import HeroSection from './components/Hero/HeroSection'
 import Showcase from './components/showcase/Showcase'
 import Location from './components/Location/Location'
+import Partner from './components/PartnerComponents/Partner'
+import Review from './components/ReviewComponents/Review'
 
 function App() {
   return (
@@ -18,6 +20,12 @@ function App() {
         </div>
         <div>
           <Location />
+        </div>
+        <div>
+          <Partner />
+        </div>
+        <div>
+          <Review />
         </div>
       </div>
   )
