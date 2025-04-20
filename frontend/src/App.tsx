@@ -1,7 +1,8 @@
 import './App.css'
-import Navbar from './components/navbar/Navbar'
-import HeroSection from './components/hero/HeroSection'
+import Navbar from './components/Navbar/NavbarComponent'
+import HeroSection from './components/Hero/HeroSection'
 import Showcase from './components/showcase/Showcase'
+import Location from './components/Location/Location'
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
         </div>
         <div>
           <Showcase />
+        </div>
+        <div>
+          <Location />
         </div>
       </div>
   )

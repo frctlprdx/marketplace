@@ -24,7 +24,7 @@ const Navbar = () => {
 
   return (
     <div className="w-screen h-16 bg-white shadow px-6 flex items-center justify-between">
-      <div className="text-xl font-bold text-orange-600">Etsy</div>
+      <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1">Etsy</div>
 
       <div className="flex-1 mx-6">
         <input
