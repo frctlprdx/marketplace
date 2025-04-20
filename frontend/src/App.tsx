@@ -1,6 +1,7 @@
 import './App.css'
 import Navbar from './components/navbar/Navbar'
 import HeroSection from './components/hero/HeroSection'
+import Showcase from './components/showcase/Showcase'
 
 function App() {
   return (
@@ -11,8 +12,8 @@ function App() {
         <div>
           <HeroSection />
         </div>
-        <div className='h-[10000px] w-screen bg-black'>
-
+        <div>
+          <Showcase />
         </div>
       </div>
   )
