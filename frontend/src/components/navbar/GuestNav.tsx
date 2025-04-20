@@ -1,7 +1,7 @@
 import { useState } from "react"
 import LoginModal from "../Auth/LoginModal";
 import RegisterModal from "../Auth/RegisterModal";
-import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
 
 
 const GuestNav = () => {
