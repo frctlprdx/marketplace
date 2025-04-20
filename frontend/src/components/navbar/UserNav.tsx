@@ -1,3 +1,6 @@
+import { AiOutlineHeart, AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai";
+
+
 const UserNav = () => {
 
   const handleLogout = () => {
@@ -7,9 +10,9 @@ const UserNav = () => {
 
   return (
     <div className="flex items-center space-x-4">
-        <button className="text-gray-700 text-xl sm:text-2xl hover:text-black">❤️</button>
-        <button className="text-gray-700 text-xl sm:text-2xl hover:text-black">🛒</button>
-        <button onClick={handleLogout} className="text-gray-700 text-xl sm:text-2xl hover:text-black">👤</button>
+        <button className="text-black text-xl sm:text-2xl hover:text-orange-500"> <AiOutlineHeart /></button>
+        <button className="text-black text-xl sm:text-2xl hover:text-orange-500"><AiOutlineShoppingCart /></button>
+        <button onClick={handleLogout} className="text-black text-xl sm:text-2xl hover:text-orange-500"> <AiOutlineUser /></button>
     </div>
   );
 }

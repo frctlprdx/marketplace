@@ -1,6 +1,7 @@
 import Modal from "../Modals/Modal";
 import { useState } from "react";
 import axios from "axios";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 interface Props {
   onClose: () => void;
@@ -12,6 +13,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); // State untuk "Ingat Saya"
   const [errors, setErrors] = useState<any>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +31,11 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       window.dispatchEvent(new Event("login")); // Trigger event agar navbar update
       onClose(); // tutup modal
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors); // Set errors to be displayed
+      if (error.response && error.response.data) {
+        const data = error.response.data;
+        setErrors(data.errors || { general: [data.message || "Terjadi kesalahan."] });
       } else {
-        console.error("Unknown error", error);
+        setErrors({ general: ["Terjadi kesalahan yang tidak diketahui."] });
       }
     }
   };
@@ -50,22 +53,23 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
-          {/* Display email error */}
-          {errors.email && (
-            <p className="text-sm text-red-500 text-center">{errors.email[0]}</p>
-          )}
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            required
-          />
-          {/* Display password error */}
-          {errors.password && (
-            <p className="text-sm text-red-500 text-center">{errors.password[0]}</p>
-          )}
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+            >
+              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+            </button>
+          </div>
 
           {/* Remember Me Checkbox */}
           <div className="flex items-center space-x-2">
@@ -85,6 +89,17 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
             Login
           </button>
         </form>
+        {/* Display email error */}
+        {errors.email && (
+          <p className="text-sm text-red-500 text-center">{errors.email[0]}</p>
+        )}
+        {/* Display password error */}
+        {errors.password && (
+          <p className="text-sm text-red-500 text-center">{errors.password[0]}</p>
+        )}
+        {errors.general && (
+          <p className="text-sm text-red-500 text-center">Gagal login. Periksa kembali email dan password Anda.</p>
+        )}
         <p className="text-sm text-center mt-4">
           Belum punya akun?{" "}
           <button onClick={onSwitchToRegister} className="text-orange-600 hover:underline">

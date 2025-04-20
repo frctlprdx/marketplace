@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import Modal from "../Modals/Modal";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
 
 interface Props {
   onClose: () => void;
@@ -15,7 +17,8 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmationPassword, setShowConfirmationPassword] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,28 +90,46 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
           )}
 
           {/* Input for Password */}
+          <div className="relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
+          <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+            >
+              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+            </button>
+          </div>
           {/* Display Password Error */}
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password[0]}</p>
           )}
 
           {/* Input for Confirm Password */}
+          <div className="relative">
           <input
-            type="password"
+            type={showConfirmationPassword ? "text" : "password"}
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
+          <button
+              type="button"
+              onClick={() => setShowConfirmationPassword(!showConfirmationPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+          >
+            {showConfirmationPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+          </button>
+          </div>
 
           {/* Hidden role input */}
           <input type="hidden" value="customer" />
