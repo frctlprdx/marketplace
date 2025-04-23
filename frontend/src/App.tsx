@@ -1,33 +1,24 @@
 import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from './components/Navbar/NavbarComponent'
-import HeroSection from './components/Hero/HeroSection'
-import Showcase from './components/showcase/Showcase'
-import Location from './components/Location/Location'
-import Partner from './components/PartnerComponents/Partner'
-import Review from './components/ReviewComponents/Review'
+import Home from './pages/Home'
+import Product from './pages/Product';
 
 function App() {
   return (
+    <Router>
       <div className='w-screen'>
         <div className='sticky sticky top-0 z-50'>
-          <Navbar />
+            <Navbar />
         </div>
-        <div>
-          <HeroSection />
-        </div>
-        <div>
-          <Showcase />
-        </div>
-        <div>
-          <Location />
-        </div>
-        <div>
-          <Partner />
-        </div>
-        <div>
-          <Review />
+        <div className='w-screen'>
+          <Routes>
+            <Route path='/' element={<Home />}></Route>
+            <Route path='/product' element={<Product />}></Route>
+          </Routes>
         </div>
       </div>
+    </Router>
   )
 }
 
