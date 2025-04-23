@@ -25,7 +25,10 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8000/api/login", data);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        data
+      );
       console.log("Login successful", response.data);
       localStorage.setItem("user", JSON.stringify(response.data.user)); // atau token jika pakai token
       window.dispatchEvent(new Event("login")); // Trigger event agar navbar update
@@ -33,7 +36,9 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
     } catch (error: any) {
       if (error.response && error.response.data) {
         const data = error.response.data;
-        setErrors(data.errors || { general: [data.message || "Terjadi kesalahan."] });
+        setErrors(
+          data.errors || { general: [data.message || "Terjadi kesalahan."] }
+        );
       } else {
         setErrors({ general: ["Terjadi kesalahan yang tidak diketahui."] });
       }
@@ -67,7 +72,11 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
             >
-              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
             </button>
           </div>
 
@@ -95,14 +104,21 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
         )}
         {/* Display password error */}
         {errors.password && (
-          <p className="text-sm text-red-500 text-center">{errors.password[0]}</p>
+          <p className="text-sm text-red-500 text-center">
+            {errors.password[0]}
+          </p>
         )}
         {errors.general && (
-          <p className="text-sm text-red-500 text-center">Gagal login. Periksa kembali email dan password Anda.</p>
+          <p className="text-sm text-red-500 text-center">
+            Gagal login. Periksa kembali email dan password Anda.
+          </p>
         )}
         <p className="text-sm text-center mt-4">
           Belum punya akun?{" "}
-          <button onClick={onSwitchToRegister} className="text-orange-600 hover:underline">
+          <button
+            onClick={onSwitchToRegister}
+            className="text-orange-600 hover:underline"
+          >
             Register
           </button>
         </p>

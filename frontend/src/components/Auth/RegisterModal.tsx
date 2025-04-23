@@ -3,7 +3,6 @@ import axios from "axios";
 import Modal from "../Modals/Modal";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-
 interface Props {
   onClose: () => void;
   onSwitchToLogin: () => void;
@@ -18,7 +17,8 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmationPassword, setShowConfirmationPassword] = useState(false);
+  const [showConfirmationPassword, setShowConfirmationPassword] =
+    useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       });
       return;
     }
-  
+
     // Menghapus error jika password valid
     setErrors((prevErrors) => {
       const { confirm_password, ...rest } = prevErrors;
@@ -49,7 +49,10 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8000/api/register", data);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/register`,
+        data
+      );
       console.log("Registration successful", response.data);
       onClose();
     } catch (error: any) {
@@ -58,7 +61,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       } else {
         console.error("Unknown error", error);
       }
-    }    
+    }
   };
 
   return (
@@ -91,20 +94,24 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
 
           {/* Input for Password */}
           <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            required
-          />
-          <button
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+            />
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
             >
-              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
             </button>
           </div>
           {/* Display Password Error */}
@@ -114,21 +121,27 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
 
           {/* Input for Confirm Password */}
           <div className="relative">
-          <input
-            type={showConfirmationPassword ? "text" : "password"}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            required
-          />
-          <button
+            <input
+              type={showConfirmationPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+            />
+            <button
               type="button"
-              onClick={() => setShowConfirmationPassword(!showConfirmationPassword)}
+              onClick={() =>
+                setShowConfirmationPassword(!showConfirmationPassword)
+              }
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
-          >
-            {showConfirmationPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
-          </button>
+            >
+              {showConfirmationPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
+            </button>
           </div>
 
           {/* Hidden role input */}
@@ -159,7 +172,9 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
           )}
           {/* Display Confirm Password Error */}
           {errors.confirm_password && (
-            <p className="text-sm text-red-500 text-center">{errors.confirm_password[0]}</p>
+            <p className="text-sm text-red-500 text-center">
+              {errors.confirm_password[0]}
+            </p>
           )}
           <button
             type="submit"
@@ -170,7 +185,10 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
         </form>
         <p className="text-sm text-center mt-4">
           Sudah punya akun?{" "}
-          <button onClick={onSwitchToLogin} className="text-orange-600 hover:underline">
+          <button
+            onClick={onSwitchToLogin}
+            className="text-orange-600 hover:underline"
+          >
             Login
           </button>
         </p>
