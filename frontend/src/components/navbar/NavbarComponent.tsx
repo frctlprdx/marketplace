@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import GuestNav from "./GuestNav";
 import UserNav from "./UserNav";
 
@@ -10,12 +11,12 @@ const Navbar = () => {
       const user = localStorage.getItem("user");
       setIsLoggedIn(!!user);
     };
-  
+
     checkLogin(); // jalankan sekali saat mount
-  
+
     window.addEventListener("login", checkLogin);
     window.addEventListener("logout", checkLogin);
-  
+
     return () => {
       window.removeEventListener("login", checkLogin);
       window.removeEventListener("logout", checkLogin);
@@ -24,7 +25,11 @@ const Navbar = () => {
 
   return (
     <div className="w-screen h-16 bg-white shadow px-2 sm:px-6 flex items-center justify-between">
-      <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1">Etsy</div>
+      <Link to="/">
+        <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1 cursor-pointer">
+          Etsy
+        </div>
+      </Link>
 
       <div className="flex-1 mx-2 sm:mx-12">
         <input
@@ -34,9 +39,7 @@ const Navbar = () => {
         />
       </div>
 
-      <div>
-        {isLoggedIn ? <UserNav /> : <GuestNav />}
-      </div>
+      <div>{isLoggedIn ? <UserNav /> : <GuestNav />}</div>
     </div>
   );
 };

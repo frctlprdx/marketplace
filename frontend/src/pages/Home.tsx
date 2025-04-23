@@ -8,29 +8,29 @@ import Footer from "../components/Footer/Footer";
 
 const Home = () => {
   return (
-    <div className='w-screen'>
-        <div>
-          <HeroSection />
-        </div>
-        <div>
-          <Showcase />
-        </div>
-        <div>
-          <Review />
-        </div>
-        <div>
-          <FAQ /> 
-        </div>
-        <div>
-          <Location />
-        </div>
-        <div>
-          <Footer />
-        </div>
-        {/* <div>
+    <div className="w-screen">
+      <div>
+        <HeroSection />
+      </div>
+      <div>
+        <Showcase />
+      </div>
+      <div>
+        <Review />
+      </div>
+      <div>
+        <FAQ />
+      </div>
+      <div>
+        <Location />
+      </div>
+      <div>
+        <Footer />
+      </div>
+      {/* <div>
           <Partner />
         </div> */}
-      </div>
+    </div>
   );
-}
+};
 export default Home;

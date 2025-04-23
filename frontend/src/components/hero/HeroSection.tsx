@@ -1,4 +1,5 @@
 import { motion, useAnimation } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { useInView } from "framer-motion";
 
@@ -6,6 +7,11 @@ const HeroSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref);
   const controls = useAnimation();
+
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/product");
+  };
 
   useEffect(() => {
     if (inView) {
@@ -20,7 +26,7 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1] }, 
+      transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
 
@@ -43,7 +49,10 @@ const HeroSection = () => {
           veritatis sint ad ea ab nemo.
         </p>
         <div className="mt-6 flex justify-center">
-          <button className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300">
+          <button
+            className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300"
+            onClick={handleClick}
+          >
             Lihat Produk
           </button>
         </div>

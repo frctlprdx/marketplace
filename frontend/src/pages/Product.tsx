@@ -4,5 +4,5 @@ const Product = () => {
       <p>Halaman Produk</p>
     </div>
   );
-}
+};
 export default Product;
