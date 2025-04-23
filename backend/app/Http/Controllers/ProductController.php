@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     public function index()
-    {
-        $products = Product::all();
+{
+    $products = Product::inRandomOrder()->limit(7)->get();
 
-        // Kembalikan data produk dalam format JSON
-        return response()->json($products);
-    }
+    return response()->json($products);
+}
+
 }

@@ -50,7 +50,7 @@ const HeroSection = () => {
         </p>
         <div className="mt-6 flex justify-center">
           <button
-            className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300"
+            className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 cursor-pointer"
             onClick={handleClick}
           >
             Lihat Produk
