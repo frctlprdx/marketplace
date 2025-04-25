@@ -9,7 +9,8 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ProductController::class, 'index'])->name('products.index'); //Main Page
+Route::get('/products', [ProductController::class, 'index'])->name('products.index'); //Main Page
+Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
