@@ -39,6 +39,12 @@ class Product extends Model
         $this->stocks -= $quantity;
         $this->save();
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
 }
 
 

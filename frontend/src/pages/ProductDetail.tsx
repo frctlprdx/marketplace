@@ -156,7 +156,7 @@ const ProductDetail = () => {
       </div>
 
       {/* Comments Section */}
-      <div className="max-w-7xl mx-auto mt-10 px-4 shadow-xl rounded-xl h-screen">
+      <div className="max-w-7xl mx-auto mt-10 px-4 shadow-xl rounded-xl">
         {/* Isi komen */}
         coba
       </div>
