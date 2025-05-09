@@ -34,6 +34,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       // Simpan token dan user_id ke localStorage
       localStorage.setItem("user", JSON.stringify(response.data.user)); // Menyimpan user data lengkap jika perlu
       localStorage.setItem("user_id", response.data.user_id); // Menyimpan hanya user_id
+      localStorage.setItem("role", response.data.role); // Simpan role
       window.dispatchEvent(new Event("login"));
       onClose(); // Tutup modal setelah login
     } catch (error) {

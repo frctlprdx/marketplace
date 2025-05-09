@@ -24,18 +24,29 @@ const UserNav = () => {
   const handleClickWishlist = () => {
     // Mengambil user_id dari localStorage
     const userId = localStorage.getItem("user_id");
+    const role = localStorage.getItem("role");
 
     // Cek apakah user_id ada, jika ada baru navigasi
-    if (userId) {
+    if (userId && role === "customer") {
       console.log("User ID:", userId); // Menampilkan user_id di console
+      console.log("Role:", role); // Menampilkan role di console
       navigate(`/wishlist?user_id=${userId}`);
     } else {
-      console.log("User ID tidak ditemukan di localStorage");
+      console.log("User ID atau role tidak ditemukan di localStorage");
+      // Bisa menampilkan pesan atau redirect ke halaman lain jika role bukan customer
     }
   };
 
   const handleClickCart = () => {
-    navigate("/cart");
+    const userId = localStorage.getItem("user_id");
+
+    // Cek apakah user_id ada, jika ada baru navigasi
+    if (userId) {
+      console.log("User ID:", userId); // Menampilkan user_id di console
+      navigate(`/cart?user_id=${userId}`);
+    } else {
+      console.log("User ID tidak ditemukan di localStorage");
+    }
   };
 
   return (

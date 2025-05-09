@@ -15,6 +15,7 @@ Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 
+
 Route::get('/unauthorized', function () {
     return view('unauthorized'); // Atau redirect ke halaman tertentu
 });
