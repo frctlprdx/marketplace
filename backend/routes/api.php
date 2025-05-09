@@ -13,8 +13,6 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
-Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-
 
 Route::get('/unauthorized', function () {
     return view('unauthorized'); // Atau redirect ke halaman tertentu
@@ -27,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cart/{id}', [CartController::class, 'update'])->middleware('role:customer')->name('cart.update');
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy');
 
+    Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store');
     Route::put('/wishlist/{id}', [WishlistController::class, 'update'])->middleware('role:customer')->name('wishlist.update');
 

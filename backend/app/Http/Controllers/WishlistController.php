@@ -9,18 +9,33 @@ class WishlistController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil user_id dari request
-        $userId = $request->input('user_id');
+        try {
+            $user = $request->user(); // Mendapatkan pengguna yang sedang login
+            // Cek apakah user memiliki role 'customer'
+            if ($user->role !== 'customer') {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
 
-        // Lakukan join antara tabel 'wishlists' dan 'products' berdasarkan product_id dan filter berdasarkan user_id
-        $wishlists = DB::table('wishlists')
-            ->join('products', 'wishlists.product_id', '=', 'products.id') // Menggabungkan tabel 'wishlists' dengan 'products'
-            ->where('wishlists.user_id', $userId) // Filter berdasarkan user_id
-            ->select('wishlists.*', 'products.*') // Pilih semua kolom dari wishlists dan products
-            ->get();
+            $userId = $request->input('user_id');
 
-        return response()->json($wishlists);
+            // Cek apakah user_id diterima
+            if (!$userId) {
+                return response()->json(['error' => 'user_id is required'], 400);
+            }
+
+            $wishlists = DB::table('wishlists')
+                ->join('products', 'wishlists.product_id', '=', 'products.id')
+                ->where('wishlists.user_id', $userId)
+                ->select('wishlists.*', 'products.*')
+                ->get();
+
+            return response()->json($wishlists);
+        } catch (\Exception $e) {
+            // Menangkap dan menampilkan error
+            return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+        }
     }
+
 
 
 }

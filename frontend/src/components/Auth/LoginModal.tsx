@@ -31,7 +31,11 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       );
       console.log("Login successful", response.data);
 
+      // Periksa apakah token ada dalam respons
+      console.log("Token from response:", response.data.token); // Debugging
+
       // Simpan token dan user_id ke localStorage
+      localStorage.setItem("user_token", response.data.token); // Menyimpan token
       localStorage.setItem("user", JSON.stringify(response.data.user)); // Menyimpan user data lengkap jika perlu
       localStorage.setItem("user_id", response.data.user_id); // Menyimpan hanya user_id
       localStorage.setItem("role", response.data.role); // Simpan role
@@ -40,7 +44,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
     } catch (error) {
       console.error("Login error", error);
     }
-  };
+  };  
 
   return (
     <Modal onClose={onClose}>

@@ -25,11 +25,13 @@ const UserNav = () => {
     // Mengambil user_id dari localStorage
     const userId = localStorage.getItem("user_id");
     const role = localStorage.getItem("role");
+    const userToken = localStorage.getItem("user_token");
 
     // Cek apakah user_id ada, jika ada baru navigasi
     if (userId && role === "customer") {
       console.log("User ID:", userId); // Menampilkan user_id di console
       console.log("Role:", role); // Menampilkan role di console
+      console.log("User Token:", userToken); // Menampilkan user_token di console
       navigate(`/wishlist?user_id=${userId}`);
     } else {
       console.log("User ID atau role tidak ditemukan di localStorage");

@@ -16,17 +16,46 @@ const Wishlist = () => {
     if (userId) {
       // Lakukan fetch wishlist berdasarkan user_id yang didapatkan
       const fetchWishlist = async () => {
+        const userId = localStorage.getItem("user_id");
+        const userToken = localStorage.getItem("user_token");
+
+        // Cek apakah userToken ada
+        console.log("User Token:", userToken); // Cek apakah token ada
+        if (!userToken) {
+          console.log("Token tidak ditemukan");
+          return; // Hentikan eksekusi jika token tidak ada
+        }
+
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`
+            `${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+                "Content-Type": "application/json",
+              },
+            }
           );
+
+          console.log("Response Status:", response.status); // Cek status dari server
+
           if (!response.ok) {
+            const errorDetails = await response.text();
+            console.log("Error Details:", errorDetails); // Cek error yang dikirim oleh server
             throw new Error("Failed to fetch wishlist");
           }
+
           const data = await response.json();
+          console.log("Data from API:", data); // Cek data yang diterima dari API
           setWishlist(data);
-        } catch (error: any) {
-          setError(error.message);
+        } catch (error) {
+          if (error instanceof Error) {
+            console.log("Error:", error.message); // Cek error yang terjadi
+          } else {
+            console.log("Error:", error); // Handle unknown error type
+          }
+          setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
           setLoading(false);
         }
