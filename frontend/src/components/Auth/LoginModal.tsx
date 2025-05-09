@@ -15,13 +15,13 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
   const [errors, setErrors] = useState<any>({});
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const data = {
       email,
       password,
-      remember_me: rememberMe, // Kirim status "Ingat Saya"
+      remember_me: rememberMe,
     };
 
     try {
@@ -30,18 +30,14 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
         data
       );
       console.log("Login successful", response.data);
-      localStorage.setItem("user", JSON.stringify(response.data.user)); // atau token jika pakai token
-      window.dispatchEvent(new Event("login")); // Trigger event agar navbar update
-      onClose(); // tutup modal
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        const data = error.response.data;
-        setErrors(
-          data.errors || { general: [data.message || "Terjadi kesalahan."] }
-        );
-      } else {
-        setErrors({ general: ["Terjadi kesalahan yang tidak diketahui."] });
-      }
+
+      // Simpan token dan user_id ke localStorage
+      localStorage.setItem("user", JSON.stringify(response.data.user)); // Menyimpan user data lengkap jika perlu
+      localStorage.setItem("user_id", response.data.user_id); // Menyimpan hanya user_id
+      window.dispatchEvent(new Event("login"));
+      onClose(); // Tutup modal setelah login
+    } catch (error) {
+      console.error("Login error", error);
     }
   };
 

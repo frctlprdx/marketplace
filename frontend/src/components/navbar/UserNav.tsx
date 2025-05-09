@@ -22,8 +22,16 @@ const UserNav = () => {
   const navigate = useNavigate();
 
   const handleClickWishlist = () => {
-    const userId = "1"; // Ganti dengan cara untuk mendapatkan user_id yang sedang aktif
-    navigate(`/wishlist?user_id=${userId}`);
+    // Mengambil user_id dari localStorage
+    const userId = localStorage.getItem("user_id");
+
+    // Cek apakah user_id ada, jika ada baru navigasi
+    if (userId) {
+      console.log("User ID:", userId); // Menampilkan user_id di console
+      navigate(`/wishlist?user_id=${userId}`);
+    } else {
+      console.log("User ID tidak ditemukan di localStorage");
+    }
   };
 
   const handleClickCart = () => {
