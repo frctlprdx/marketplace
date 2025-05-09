@@ -22,7 +22,8 @@ const UserNav = () => {
   const navigate = useNavigate();
 
   const handleClickWishlist = () => {
-    navigate("/wishlist");
+    const userId = "1"; // Ganti dengan cara untuk mendapatkan user_id yang sedang aktif
+    navigate(`/wishlist?user_id=${userId}`);
   };
 
   const handleClickCart = () => {

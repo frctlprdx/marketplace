@@ -1,33 +1,39 @@
+import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  // Simulasi user_id yang sedang aktif (bisa menggunakan context atau localStorage)
-  const userId = "1"; // Ganti dengan logika untuk mendapatkan user_id yang aktif
+  const location = useLocation();
+
+  // Ambil user_id dari query string
+  const queryParams = new URLSearchParams(location.search);
+  const userId = queryParams.get("user_id");
 
   useEffect(() => {
-    // Ambil wishlist berdasarkan user_id
-    const fetchWishlist = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch wishlist");
+    if (userId) {
+      // Lakukan fetch wishlist berdasarkan user_id yang didapatkan
+      const fetchWishlist = async () => {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch wishlist");
+          }
+          const data = await response.json();
+          setWishlist(data);
+        } catch (error: any) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
         }
-        const data = await response.json();
-        setWishlist(data);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchWishlist();
+      fetchWishlist();
+    }
   }, [userId]);
 
   if (loading) {
