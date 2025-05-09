@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoIosHeart,IoIosHeartEmpty } from "react-icons/io";
 
 const Product = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const [hoverHeart, setHoverHeart] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products`)
@@ -56,16 +60,40 @@ const Product = () => {
             {products.length === 0 ? (
               <p className="text-gray-500">Produk tidak ditemukan...</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 cursor-pointer">
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
+                    className="relative group border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
                   >
+                    {/* Heart button muncul saat hover */}
+                    <button
+                      className="absolute top-3 right-3 text-orange-500 opacity-0 group-hover:opacity-100 transition"
+                      onClick={(e) => {
+                        e.stopPropagation(); // mencegah navigate saat klik heart
+                        alert(`Ditambahkan ke wishlist: ${product.name}`);
+                      }}
+                      onMouseEnter={() => setHoverHeart(true)}
+                      onMouseLeave={() => setHoverHeart(false)}
+                    >
+                      {hoverHeart ? (
+                        <IoIosHeart
+                          size={40}
+                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3"
+                        />
+                      ) : (
+                        <IoIosHeartEmpty
+                          size={40}
+                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3"
+                        />
+                      )}
+                    </button>
+
                     <img
                       src={product.image}
                       alt={product.name}
                       className="h-48 w-full object-cover rounded mb-4"
+                      onClick={() => navigate(`/productdetail/${product.id}`)}
                     />
                     <h3 className="text-lg font-semibold">{product.name}</h3>
                     <p className="text-orange-600 font-bold mt-2">

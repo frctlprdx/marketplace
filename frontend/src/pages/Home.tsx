@@ -1,7 +1,6 @@
 import HeroSection from "../components/Hero/HeroSection";
 import Showcase from "../components/showcase/Showcase";
 import Location from "../components/Location/Location";
-import Partner from "../components/PartnerComponents/Partner";
 import Review from "../components/ReviewComponents/Review";
 import FAQ from "../components/FAQ/FAQ";
 import Footer from "../components/Footer/Footer";
@@ -27,9 +26,6 @@ const Home = () => {
       <div>
         <Footer />
       </div>
-      {/* <div>
-          <Partner />
-        </div> */}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Heart, ShoppingCart } from "lucide-react";
+import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -8,6 +9,8 @@ const ProductDetail = () => {
   const [dots, setDots] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [hoverCart, setHoverCart] = useState(false);
+  const [hoverWishlist, setHoverWishlist] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/products/${id}`)
@@ -143,14 +146,26 @@ const ProductDetail = () => {
           </div>
 
           <button
-            className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-full transition"
+            className="flex items-center justify-center border border-transparent gap-2 bg-orange-500 hover:bg-white hover:text-orange-500 hover:border hover:border-orange-500 text-white font-semibold py-3 px-6 rounded-full transition"
+            onMouseEnter={() => setHoverCart(true)}
+            onMouseLeave={() => setHoverCart(false)}
             onClick={() => alert("Product added to cart!")}
           >
-            <ShoppingCart size={20} /> + Keranjang
+            {hoverCart ? (
+              <FaShoppingCart size={20} />
+            ) : (
+              <FiShoppingCart size={20} />
+            )}{" "}
+            + Keranjang
           </button>
 
-          <button className="flex items-center justify-center gap-2 border border-orange-500 text-orange-500 hover:bg-orange-50 font-semibold py-3 rounded-full transition">
-            <Heart size={20} /> Wishlist
+          <button
+            className="flex items-center justify-center gap-2 border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-3 px-6 rounded-full transition"
+            onMouseEnter={() => setHoverWishlist(true)}
+            onMouseLeave={() => setHoverWishlist(false)}
+          >
+            {hoverWishlist ? <FaHeart size={20} /> : <FiHeart size={20} />}{" "}
+            Wishlist
           </button>
         </div>
       </div>

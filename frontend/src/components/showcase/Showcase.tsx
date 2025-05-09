@@ -32,19 +32,19 @@ const Showcase = () => {
               className={
                 [
                   i === 0 &&
-                    "col-span-2 row-span-2 sm:col-span-2 sm:row-span-2",
+                    "col-span-2 row-span-2 sm:col-span-2 sm:row-span-2 shadow-md border",
                   i === 1 &&
-                    "col-span-2 row-span-1 sm:col-span-2 sm:row-span-1",
+                    "col-span-2 row-span-1 sm:col-span-2 sm:row-span-1 shadow-md border",
                   i === 2 &&
-                    "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1",
+                    "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1 shadow-md border",
                   i === 3 &&
-                    "col-span-4 row-span-2 sm:col-span-1 sm:row-span-2",
+                    "col-span-4 row-span-2 sm:col-span-1 sm:row-span-2 shadow-md border",
                   i === 4 &&
-                    "col-span-4 row-span-1 sm:col-span-2 sm:row-span-1",
+                    "col-span-4 row-span-1 sm:col-span-2 sm:row-span-1 shadow-md border",
                   i === 5 &&
-                    "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1",
+                    "col-span-2 row-span-1 sm:col-span-1 sm:row-span-1 shadow-md border",
                   i === 6 &&
-                    "col-span-2 row-span-1 sm:col-span-4 sm:row-span-1",
+                    "col-span-2 row-span-1 sm:col-span-4 sm:row-span-1 shadow-md border",
                 ]
                   .filter(Boolean)
                   .join(" ") +

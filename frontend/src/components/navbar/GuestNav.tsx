@@ -1,12 +1,15 @@
 import { useState } from "react";
 import LoginModal from "../Auth/LoginModal";
 import RegisterModal from "../Auth/RegisterModal";
-import { AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
+import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 
 const GuestNav = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [hoverHeart, setHoverHeart] = useState(false);
+  const [hoverCart, setHoverCart] = useState(false);
 
   const handleProtectedClick = () => {
     setShowAlert(true);
@@ -17,15 +20,20 @@ const GuestNav = () => {
       <div className="flex items-center space-x-2 sm:space-x-4">
         <button
           className="text-black text-2xl sm:text-3xl hover:text-orange-500"
+          onMouseEnter={() => setHoverHeart(true)}
+          onMouseLeave={() => setHoverHeart(false)}
           onClick={handleProtectedClick}
         >
-          <AiOutlineHeart />
+          {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
+
         <button
           className="text-black text-2xl sm:text-3xl hover:text-orange-500"
+          onMouseEnter={() => setHoverCart(true)}
+          onMouseLeave={() => setHoverCart(false)}
           onClick={handleProtectedClick}
         >
-          <AiOutlineShoppingCart />
+          {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
         </button>
         <button
           className="text-[15px] font-medium text-white bg-orange-500 hover:bg-orange-600 px-4 py-1 rounded-full"
