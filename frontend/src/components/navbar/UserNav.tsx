@@ -16,7 +16,10 @@ const UserNav = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    window.location.reload(); // refresh biar navbar update
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user_token"); // jika kamu simpan token juga
+    window.location.href = "/"; // redirect ke halaman awal
   };
 
   const navigate = useNavigate();
@@ -41,13 +44,18 @@ const UserNav = () => {
 
   const handleClickCart = () => {
     const userId = localStorage.getItem("user_id");
+    const role = localStorage.getItem("role");
+    const userToken = localStorage.getItem("user_token");
 
     // Cek apakah user_id ada, jika ada baru navigasi
-    if (userId) {
+    if (userId && role === "customer") {
       console.log("User ID:", userId); // Menampilkan user_id di console
+      console.log("Role:", role); // Menampilkan role di console
+      console.log("User Token:", userToken); // Menampilkan user_token di console
       navigate(`/cart?user_id=${userId}`);
     } else {
-      console.log("User ID tidak ditemukan di localStorage");
+      console.log("User ID atau role tidak ditemukan di localStorage");
+      // Bisa menampilkan pesan atau redirect ke halaman lain jika role bukan customer
     }
   };
 

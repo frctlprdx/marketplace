@@ -44,7 +44,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
     } catch (error) {
       console.error("Login error", error);
     }
-  };  
+  };
 
   return (
     <Modal onClose={onClose}>
