@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store');
-    Route::put('/wishlist/{id}', [WishlistController::class, 'update'])->middleware('role:customer')->name('wishlist.update');
+    Route::delete('/wishlist', [WishlistController::class, 'destroy'])->middleware('role:customer')->name('wishlist.destroy');
 
     Route::get('/profile', [UserController::class, 'indexuser'])->middleware('role:customer')->name('profile.index');
     Route::put('/profile/{id}', [UserController::class, 'update'])->middleware('role:customer')->name('profile.update');

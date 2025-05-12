@@ -1,18 +1,80 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosHeart,IoIosHeartEmpty } from "react-icons/io";
+import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import axios from "axios";
 
 const Product = () => {
   const [products, setProducts] = useState<any[]>([]);
-  const [hoverHeart, setHoverHeart] = useState(false);
+  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("user_id");
+  const token = localStorage.getItem("user_token");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/products`)
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err));
+    // Fetch produk
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/products`)
+      .then((res) => setProducts(res.data))
+      .catch(console.error);
+
+    // Fetch wishlist user
+    if (userId && token) {
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          const ids = res.data.map((item: any) => item.product_id);
+          setWishlistIds(ids);
+        })
+        .catch(console.error);
+    }
   }, []);
+
+  const handleWishlist = (productId: number) => {
+    if (!userId || !token) return;
+
+    const isInWishlist = wishlistIds.includes(productId);
+
+    if (isInWishlist) {
+      // Hapus dari wishlist
+      axios
+        .delete(`${import.meta.env.VITE_API_URL}/wishlist`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            user_id: userId,
+            product_id: productId,
+          },
+        })
+        .then(() => {
+          setWishlistIds((prev) => prev.filter((id) => id !== productId));
+        })
+        .catch(console.error);
+    } else {
+      // Tambahkan ke wishlist
+      axios
+        .post(
+          `${import.meta.env.VITE_API_URL}/wishlist`,
+          {
+            user_id: userId,
+            product_id: productId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then(() => {
+          setWishlistIds((prev) => [...prev, productId]);
+        })
+        .catch(console.error);
+    }
+  };
 
   return (
     <div>
@@ -64,27 +126,25 @@ const Product = () => {
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="relative group border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
+                    className="relative group border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col group"
                   >
                     {/* Heart button muncul saat hover */}
                     <button
-                      className="absolute m-2 text-orange-500 opacity-0 group-hover:opacity-100 transition"
+                      className="absolute m-2 text-orange-500"
                       onClick={(e) => {
-                        e.stopPropagation(); // mencegah navigate saat klik heart
-                        alert(`Ditambahkan ke wishlist: ${product.name}`);
+                        e.stopPropagation();
+                        handleWishlist(product.id);
                       }}
-                      onMouseEnter={() => setHoverHeart(true)}
-                      onMouseLeave={() => setHoverHeart(false)}
                     >
-                      {hoverHeart ? (
+                      {wishlistIds.includes(product.id) ? (
                         <IoIosHeart
                           size={40}
-                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3"
+                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
                         />
                       ) : (
                         <IoIosHeartEmpty
                           size={40}
-                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3"
+                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
                         />
                       )}
                     </button>

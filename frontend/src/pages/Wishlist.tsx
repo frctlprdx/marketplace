@@ -1,7 +1,8 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { IoIosHeart } from "react-icons/io";
+import axios from "axios";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState<any[]>([]);
@@ -77,6 +78,41 @@ const Wishlist = () => {
   if (error) {
     return <p>Error: {error}</p>;
   }
+  const handleRemoveFromWishlist = async (productId: number) => {
+    const userId = localStorage.getItem("user_id");
+    const userToken = localStorage.getItem("user_token");
+
+    if (!userId || !userToken) {
+      alert("Anda belum login!");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/wishlist`,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+            "Content-Type": "application/json",
+          },
+          data: {
+            user_id: userId,
+            product_id: productId,
+          },
+        }
+      );
+
+      console.log("Deleted:", response.data);
+
+      // Hapus dari state lokal
+      setWishlist((prev) =>
+        prev.filter((item) => item.product_id !== productId)
+      );
+    } catch (error: any) {
+      console.error("Gagal menghapus wishlist:", error.response?.data || error);
+      alert("Gagal menghapus wishlist");
+    }
+  };
 
   return (
     <div>
@@ -93,7 +129,9 @@ const Wishlist = () => {
       </div>
       <div>
         {wishlist.length === 0 ? (
-          <p>Your wishlist is empty.</p>
+          <div className="max-w-7xl mx-auto px-4 items-center justify-center flex flex-col h-screen">
+            <p className="text-3xl">Your wishlist is empty.</p>
+          </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-xl font-semibold mb-4">
@@ -110,6 +148,10 @@ const Wishlist = () => {
                   <div className="w-full h-1/2">
                     <IoIosHeart
                       size={40}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Biar tidak navigate ke product detail
+                        handleRemoveFromWishlist(item.product_id);
+                      }}
                       className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
                     />
                     <img

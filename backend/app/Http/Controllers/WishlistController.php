@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Wishlist;
 
 class WishlistController extends Controller
 {
@@ -36,6 +37,44 @@ class WishlistController extends Controller
             return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $exists = Wishlist::where('user_id', $validated['user_id'])
+            ->where('product_id', $validated['product_id'])
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Already in wishlist'], 200);
+        }
+
+        Wishlist::create([
+            'user_id' => $validated['user_id'],
+            'product_id' => $validated['product_id'],
+        ]);
+
+        return response()->json(['message' => 'Added to wishlist'], 201);
+    }
+
+
+    public function destroy(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $productId = $request->input('product_id');
+
+        Wishlist::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->delete();
+
+        return response()->json(['message' => 'Wishlist item deleted']);
+    }
+
+    
 
 
 
