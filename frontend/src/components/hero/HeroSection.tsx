@@ -43,10 +43,7 @@ const HeroSection = () => {
           Selamat Datang
         </h1>
         <p className="text-justify leading-relaxed">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Suscipit
-          quia illo pariatur quaerat libero natus ullam nulla repellat
-          architecto praesentium recusandae obcaecati nobis exercitationem,
-          veritatis sint ad ea ab nemo.
+          Marketplace Untuk Anda Menjual Barang dan Jasa Secara Online``
         </p>
         <div className="mt-6 flex justify-center">
           <button

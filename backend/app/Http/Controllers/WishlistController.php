@@ -25,8 +25,9 @@ class WishlistController extends Controller
 
             $wishlists = DB::table('wishlists')
                 ->join('products', 'wishlists.product_id', '=', 'products.id')
+                ->join('users', 'wishlists.user_id', '=', 'users.id')
                 ->where('wishlists.user_id', $userId)
-                ->select('wishlists.*', 'products.*')
+                ->select('wishlists.*', 'products.*', 'users.name as user_name')
                 ->get();
 
             return response()->json($wishlists);

@@ -12,6 +12,7 @@ class Product extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'category_id',  
         'description',
         'stocks',
         'price',
@@ -43,6 +44,11 @@ class Product extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
 }

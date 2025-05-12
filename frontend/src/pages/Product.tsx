@@ -68,7 +68,7 @@ const Product = () => {
                   >
                     {/* Heart button muncul saat hover */}
                     <button
-                      className="absolute top-3 right-3 text-orange-500 opacity-0 group-hover:opacity-100 transition"
+                      className="absolute m-2 text-orange-500 opacity-0 group-hover:opacity-100 transition"
                       onClick={(e) => {
                         e.stopPropagation(); // mencegah navigate saat klik heart
                         alert(`Ditambahkan ke wishlist: ${product.name}`);

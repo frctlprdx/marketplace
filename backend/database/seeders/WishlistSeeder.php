@@ -11,19 +11,14 @@ class WishlistSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::all();
-        $products = Product::all();
+        Wishlist::create([
+            'user_id' => 1,
+            'product_id' => 1,
+        ]);
 
-        // Seed 2 wishlist item untuk setiap user
-        foreach ($users as $user) {
-            $wishlistProducts = $products->random(2);
-
-            foreach ($wishlistProducts as $product) {
-                Wishlist::create([
-                    'user_id' => $user->id,
-                    'product_id' => $product->id,
-                ]);
-            }
-        }
+        Wishlist::create([
+            'user_id' => 1,
+            'product_id' => 2,
+        ]);
     }
 }
