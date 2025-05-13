@@ -20,10 +20,9 @@ Route::get('/unauthorized', function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
-        Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index');
+    Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->middleware('role:customer')->name('cart.store');
-    Route::put('/cart/{id}', [CartController::class, 'update'])->middleware('role:customer')->name('cart.update');
-    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy');
+    Route::delete('/cart', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store');

@@ -127,7 +127,7 @@ const Wishlist = () => {
       <div>
         {wishlist.length === 0 ? (
           <div className="max-w-7xl mx-auto px-4 items-center justify-center flex flex-col h-screen">
-            <p className="text-3xl pb-12">Your wishlist is empty.</p>
+            <p className="text-3xl pb-12">Wishlist Kosong.</p>
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4">

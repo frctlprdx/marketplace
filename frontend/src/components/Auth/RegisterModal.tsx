@@ -56,8 +56,12 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       console.log("Registration successful", response.data);
       onClose();
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors); // Menyimpan errors dari backend ke state errors
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setErrors(error.response.data.message); // <- gunakan message di sini
       } else {
         console.error("Unknown error", error);
       }
@@ -105,7 +109,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2  text-orange-500"
             >
               {showPassword ? (
                 <AiOutlineEyeInvisible size={20} />
@@ -134,7 +138,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
               onClick={() =>
                 setShowConfirmationPassword(!showConfirmationPassword)
               }
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500"
             >
               {showConfirmationPassword ? (
                 <AiOutlineEyeInvisible size={20} />

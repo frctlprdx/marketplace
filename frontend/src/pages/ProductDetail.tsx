@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiShoppingCart, FiCheck } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
 
@@ -14,6 +14,8 @@ const ProductDetail = () => {
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [notifMessage, setNotifMessage] = useState<string | null>(null);
   const [showNotif, setShowNotif] = useState(false);
+  const [cartIds, setCartIds] = useState<number[]>([]);
+  const [cartLoading, setCartLoading] = useState(false);
 
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
@@ -42,6 +44,55 @@ const ProductDetail = () => {
         console.error("Failed to fetch wishlist:", err);
       });
   }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/cart`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const ids = res.data.map((item: any) => Number(item.product_id));
+        setCartIds(ids);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch cart:", err);
+      });
+  }, [token]);
+
+  const handleCart = async () => {
+    if (!userId || !token || !product) {
+      setNotifMessage("Login terlebih dahulu untuk menambahkan ke keranjang");
+      setShowNotif(true);
+      return;
+    }
+
+    const pid = Number(product.id);
+    const isInCart = cartIds.includes(pid);
+    setCartLoading(true);
+
+    try {
+      if (isInCart) {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/cart`, {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { user_id: userId, product_id: pid },
+        });
+        setCartIds((prev) => prev.filter((id) => id !== pid));
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/cart`,
+          { user_id: userId, product_id: pid, quantity },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setCartIds((prev) => [...prev, pid]);
+      }
+    } catch (err) {
+      console.error("Cart toggle error:", err);
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   const handleWishlist = async () => {
     if (!userId || !token || !product) {
@@ -210,8 +261,22 @@ const ProductDetail = () => {
           </div>
 
           <div className="flex items-center gap-4 justify-center">
-            <button className="w-12 h-12 flex items-center justify-center border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white rounded-full transition">
-              <FiShoppingCart size={20} />
+            <button
+              onClick={handleCart}
+              disabled={cartLoading}
+              className={`w-12 h-12 flex items-center justify-center border transition rounded-full ${
+                cartIds.includes(product.id)
+                  ? "bg-orange-500 text-white border-orange-500 hover:shadow-xl"
+                  : "bg-white text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
+              }`}
+            >
+              {cartLoading ? (
+                <div className="w-6 h-6 border-4 border-t-4 border-white rounded-full animate-spin"></div>
+              ) : cartIds.includes(product.id) ? (
+                <FiCheck size={20} />
+              ) : (
+                <FiShoppingCart size={20} />
+              )}
             </button>
 
             <button
@@ -231,6 +296,9 @@ const ProductDetail = () => {
                 <IoIosHeartEmpty size={24} />
               )}
             </button>
+          </div>
+          <div className="w-full bg-orange-500 p-3 rounded-xl text-center text-white hover:shadow-xl hover:bg-orange-600">
+            Checkout Barang
           </div>
         </div>
       </div>
