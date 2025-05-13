@@ -133,18 +133,19 @@ const Product = () => {
                       className="absolute m-2 text-orange-500"
                       onClick={(e) => {
                         e.stopPropagation();
+                        console.log("Wishlist clicked", product.id);
                         handleWishlist(product.id);
                       }}
                     >
                       {wishlistIds.includes(product.id) ? (
                         <IoIosHeart
                           size={40}
-                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
+                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
                         />
                       ) : (
                         <IoIosHeartEmpty
                           size={40}
-                          className="bg-white hover:bg-orange-500 hover:text-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
+                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
                         />
                       )}
                     </button>

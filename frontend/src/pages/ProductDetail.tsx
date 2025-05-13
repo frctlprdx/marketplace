@@ -26,17 +26,20 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!userId || !token) return;
+    if (!token) return;
+
     axios
-      .get(`${import.meta.env.VITE_API_URL}/wishlist/${userId}`, {
+      .get(`${import.meta.env.VITE_API_URL}/wishlist`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         const ids = res.data.map((item: any) => Number(item.product_id));
         setWishlistIds(ids);
       })
-      .catch(console.error);
-  }, [userId, token]);
+      .catch((err) => {
+        console.error("Failed to fetch wishlist:", err);
+      });
+  }, [token]);
 
   const handleWishlist = async () => {
     if (!userId || !token || !product) return;
@@ -195,14 +198,14 @@ const ProductDetail = () => {
               disabled={wishlistLoading}
               className={`w-12 h-12 flex items-center justify-center border border-orange-500 ${
                 wishlistIds.includes(product.id)
-                  ? "bg-orange-500 text-white"
+                  ? "bg-white text-orange-500"
                   : "text-orange-500"
               } hover:bg-orange-500 hover:text-white rounded-full transition`}
             >
               {wishlistIds.includes(product.id) ? (
                 <IoIosHeart size={20} />
               ) : (
-                <IoIosHeartEmpty size={20} />
+                <IoIosHeartEmpty size={20}/>
               )}
             </button>
           </div>
