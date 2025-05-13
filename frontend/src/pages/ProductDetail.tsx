@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { FiShoppingCart } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -42,7 +43,19 @@ const ProductDetail = () => {
   }, [token]);
 
   const handleWishlist = async () => {
-    if (!userId || !token || !product) return;
+    if (!userId || !token || !product) {
+      console.log("belum login")
+      toast.error("Login terlebih dahulu untuk menambahkan ke wishlist", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        theme: "light",
+      });
+      return;
+    }
 
     const pid = Number(product.id);
     const isWished = wishlistIds.includes(pid);
@@ -205,7 +218,7 @@ const ProductDetail = () => {
               {wishlistIds.includes(product.id) ? (
                 <IoIosHeart size={20} />
               ) : (
-                <IoIosHeartEmpty size={20}/>
+                <IoIosHeartEmpty size={20} />
               )}
             </button>
           </div>

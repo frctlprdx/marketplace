@@ -1,33 +1,30 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { IoIosHeart } from "react-icons/io";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState<any[]>([]);
+  const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
   const location = useLocation();
 
-  // Ambil user_id dari query string
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("user_id");
 
   useEffect(() => {
     if (userId) {
-      // Lakukan fetch wishlist berdasarkan user_id yang didapatkan
       const fetchWishlist = async () => {
         const userId = localStorage.getItem("user_id");
         const userToken = localStorage.getItem("user_token");
 
-        // Cek apakah userToken ada
-        console.log("User Token:", userToken); // Cek apakah token ada
         if (!userToken) {
           console.log("Token tidak ditemukan");
-          return; // Hentikan eksekusi jika token tidak ada
+          return;
         }
 
         try {
@@ -42,26 +39,20 @@ const Wishlist = () => {
             }
           );
 
-          console.log("Response Status:", response.status); // Cek status dari server
-
           if (!response.ok) {
             const errorDetails = await response.text();
-            console.log("Error Details:", errorDetails); // Cek error yang dikirim oleh server
+            console.log("Error Details:", errorDetails);
             throw new Error("Failed to fetch wishlist");
           }
 
           const data = await response.json();
-          console.log("Data from API:", data); // Cek data yang diterima dari API
           setWishlist(data);
         } catch (error) {
           if (error instanceof Error) {
-            console.log("Error:", error.message); // Cek error yang terjadi
+            setError(error.message);
           } else {
-            console.log("Error:", error); // Handle unknown error type
+            setError("An unknown error occurred");
           }
-          setError(
-            error instanceof Error ? error.message : "An unknown error occurred"
-          );
         } finally {
           setLoading(false);
         }
@@ -71,21 +62,16 @@ const Wishlist = () => {
     }
   }, [userId]);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
   const handleRemoveFromWishlist = async (productId: number) => {
     const userId = localStorage.getItem("user_id");
     const userToken = localStorage.getItem("user_token");
 
     if (!userId || !userToken) {
-      alert("Anda belum login!");
+      toast.error("Anda belum login!");
       return;
     }
+
+    setRemovingProductIds((prev) => [...prev, productId]);
 
     try {
       const response = await axios.delete(
@@ -102,17 +88,28 @@ const Wishlist = () => {
         }
       );
 
-      console.log("Deleted:", response.data);
+      toast.success("Item berhasil dihapus dari wishlist!");
 
-      // Hapus dari state lokal
-      setWishlist((prev) =>
-        prev.filter((item) => item.product_id !== productId)
-      );
+      setTimeout(() => {
+        setWishlist((prev) =>
+          prev.filter((item) => item.product_id !== productId)
+        );
+        setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
+      }, 300); // delay untuk animasi
     } catch (error: any) {
       console.error("Gagal menghapus wishlist:", error.response?.data || error);
-      alert("Gagal menghapus wishlist");
+      toast.error("Gagal menghapus wishlist");
+      setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <div>
@@ -130,7 +127,7 @@ const Wishlist = () => {
       <div>
         {wishlist.length === 0 ? (
           <div className="max-w-7xl mx-auto px-4 items-center justify-center flex flex-col h-screen">
-            <p className="text-3xl">Your wishlist is empty.</p>
+            <p className="text-3xl pb-12">Your wishlist is empty.</p>
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4">
@@ -142,17 +139,21 @@ const Wishlist = () => {
               {wishlist.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-lg hover:shadow-2xl p-4 flex flex-col h-120 group hover:border"
+                  className={`rounded-lg hover:shadow-2xl p-4 flex flex-col h-120 group hover:border transition-opacity duration-300 ${
+                    removingProductIds.includes(item.product_id)
+                      ? "opacity-0 scale-95"
+                      : "opacity-100"
+                  }`}
                   onClick={() => navigate(`/productdetail/${item.id}`)}
                 >
-                  <div className="w-full h-1/2">
+                  <div className="w-full h-1/2 relative">
                     <IoIosHeart
                       size={40}
                       onClick={(e) => {
-                        e.stopPropagation(); // Biar tidak navigate ke product detail
+                        e.stopPropagation();
                         handleRemoveFromWishlist(item.product_id);
                       }}
-                      className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
+                      className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
                     />
                     <img
                       className="w-full h-full object-cover rounded-md"
@@ -175,6 +176,7 @@ const Wishlist = () => {
           </div>
         )}
       </div>
+      <ToastContainer position="top-center" autoClose={1500} />
     </div>
   );
 };

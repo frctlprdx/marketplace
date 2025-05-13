@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Product = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -11,13 +13,11 @@ const Product = () => {
   const token = localStorage.getItem("user_token");
 
   useEffect(() => {
-    // Fetch produk
     axios
       .get(`${import.meta.env.VITE_API_URL}/products`)
       .then((res) => setProducts(res.data))
       .catch(console.error);
 
-    // Fetch wishlist user
     if (userId && token) {
       axios
         .get(`${import.meta.env.VITE_API_URL}/wishlist?user_id=${userId}`, {
@@ -34,12 +34,14 @@ const Product = () => {
   }, []);
 
   const handleWishlist = (productId: number) => {
-    if (!userId || !token) return;
+    if (!userId || !token) {
+      toast.error("Login terlebih dahulu!");
+      return;
+    }
 
     const isInWishlist = wishlistIds.includes(productId);
 
     if (isInWishlist) {
-      // Hapus dari wishlist
       axios
         .delete(`${import.meta.env.VITE_API_URL}/wishlist`, {
           headers: {
@@ -55,7 +57,6 @@ const Product = () => {
         })
         .catch(console.error);
     } else {
-      // Tambahkan ke wishlist
       axios
         .post(
           `${import.meta.env.VITE_API_URL}/wishlist`,
@@ -91,10 +92,8 @@ const Product = () => {
       </div>
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
-          {/* Left Filter - 2/7 */}
           <aside className="lg:col-span-2 bg-white rounded-xl shadow p-4 h-fit sticky top-24">
             <h2 className="text-lg font-semibold mb-4">Filter Produk</h2>
-            {/* Tambahkan filter kategori, harga, rating, dll */}
             <div className="space-y-2">
               <div>
                 <label className="block text-sm text-gray-600">Kategori</label>
@@ -116,7 +115,6 @@ const Product = () => {
             </div>
           </aside>
 
-          {/* Right Product Grid - 5/7 */}
           <section className="lg:col-span-5">
             <h2 className="text-xl font-bold mb-6">Daftar Produk</h2>
             {products.length === 0 ? (
@@ -126,26 +124,24 @@ const Product = () => {
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="relative group border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col group"
+                    className="relative group border rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
                   >
-                    {/* Heart button muncul saat hover */}
                     <button
                       className="absolute m-2 text-orange-500"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log("Wishlist clicked", product.id);
                         handleWishlist(product.id);
                       }}
                     >
                       {wishlistIds.includes(product.id) ? (
                         <IoIosHeart
                           size={40}
-                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
+                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
                         />
                       ) : (
                         <IoIosHeartEmpty
                           size={40}
-                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
+                          className="bg-white hover:shadow-xl rounded-full p-3 opacity-0 group-hover:opacity-100 transition duration-300"
                         />
                       )}
                     </button>
@@ -170,6 +166,8 @@ const Product = () => {
           </section>
         </div>
       </div>
+      {/* Toast container untuk menampilkan notifikasi */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
 };

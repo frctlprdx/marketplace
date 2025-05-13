@@ -43,7 +43,7 @@ const HeroSection = () => {
           Selamat Datang
         </h1>
         <p className="text-justify leading-relaxed">
-          Marketplace Untuk Anda Menjual Barang dan Jasa Secara Online``
+          Marketplace Untuk Anda Menjual Barang dan Jasa Secara Online
         </p>
         <div className="mt-6 flex justify-center">
           <button
