@@ -129,7 +129,7 @@ const ProductDetail = () => {
       {/* Main Detail */}
       <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-[2fr_3fr_1.5fr] gap-10">
         {/* Image */}
-        <div className="flex flex-col items-center shadow-xl rounded-lg overflow-hidden mx-4 sm:mx-0">
+        <div className="flex flex-col items-center shadow-xl rounded-lg overflow-hidden mx-8 sm:mx-0">
           <img
             src={product.image || "/placeholder.jpg"}
             alt={product.name}
@@ -138,7 +138,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Description */}
-        <div className="flex flex-col gap-4 px-4">
+        <div className="flex flex-col gap-4 px-8">
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <div className="text-sm text-gray-600">Stok: {product.stocks}</div>
           <p className="text-2xl text-orange-600 font-semibold">
@@ -183,7 +183,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Checkout */}
-        <div className="bg-white shadow-md rounded-lg p-6 flex flex-col gap-6 h-fit">
+        <div className="bg-white shadow-md rounded-lg px-8 pb-4 flex flex-col gap-6 h-fit">
           <div className="flex flex-col gap-2">
             <span className="text-gray-700">Jumlah</span>
             <div className="flex items-center gap-3">
@@ -219,8 +219,8 @@ const ProductDetail = () => {
               disabled={wishlistLoading}
               className={`w-12 h-12 flex items-center justify-center border border-orange-500 ${
                 wishlistIds.includes(product.id)
-                  ? "bg-white text-orange-500"
-                  : "text-white bg-orange-500"
+                  ? "bg-white text-orange-500 hover:shadow-xl"
+                  : "bg-white text-orange-500 hover:shadow-xl"
               } rounded-full transition`}
             >
               {wishlistLoading ? (

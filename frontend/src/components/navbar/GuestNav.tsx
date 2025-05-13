@@ -19,7 +19,7 @@ const GuestNav = () => {
     <>
       <div className="flex items-center space-x-2 sm:space-x-4">
         <button
-          className="text-black text-2xl sm:text-3xl hover:text-orange-500"
+          className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
           onMouseEnter={() => setHoverHeart(true)}
           onMouseLeave={() => setHoverHeart(false)}
           onClick={handleProtectedClick}
@@ -28,7 +28,7 @@ const GuestNav = () => {
         </button>
 
         <button
-          className="text-black text-2xl sm:text-3xl hover:text-orange-500"
+          className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
           onMouseEnter={() => setHoverCart(true)}
           onMouseLeave={() => setHoverCart(false)}
           onClick={handleProtectedClick}
