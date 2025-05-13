@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { FiShoppingCart } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
-import { toast } from "react-toastify";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -13,6 +12,8 @@ const ProductDetail = () => {
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [notifMessage, setNotifMessage] = useState<string | null>(null);
+  const [showNotif, setShowNotif] = useState(false);
 
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
@@ -44,16 +45,8 @@ const ProductDetail = () => {
 
   const handleWishlist = async () => {
     if (!userId || !token || !product) {
-      console.log("belum login")
-      toast.error("Login terlebih dahulu untuk menambahkan ke wishlist", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: false,
-        theme: "light",
-      });
+      setNotifMessage("Login terlebih dahulu untuk menambahkan ke wishlist");
+      setShowNotif(true);
       return;
     }
 
@@ -103,6 +96,21 @@ const ProductDetail = () => {
 
   return (
     <div>
+      {/* Notifikasi */}
+      {showNotif && notifMessage && (
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 bg-white border border-orange-400 text-orange-700 px-6 py-3 rounded shadow z-50">
+          <div className="flex items-center justify-between gap-4">
+            <span>{notifMessage}</span>
+            <button
+              onClick={() => setShowNotif(false)}
+              className="text-orange-600 font-bold text-lg"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="max-w-7xl h-16 mx-auto px-4">
         <div className="h-16 flex items-center text-sm text-gray-600 space-x-2">
@@ -212,22 +220,19 @@ const ProductDetail = () => {
               className={`w-12 h-12 flex items-center justify-center border border-orange-500 ${
                 wishlistIds.includes(product.id)
                   ? "bg-white text-orange-500"
-                  : "text-orange-500"
-              } hover:bg-orange-500 hover:text-white rounded-full transition`}
+                  : "text-white bg-orange-500"
+              } rounded-full transition`}
             >
-              {wishlistIds.includes(product.id) ? (
-                <IoIosHeart size={20} />
+              {wishlistLoading ? (
+                <div className="w-6 h-6 border-4 border-t-4 border-orange-500 rounded-full animate-spin"></div>
+              ) : wishlistIds.includes(product.id) ? (
+                <IoIosHeart size={24} />
               ) : (
-                <IoIosHeartEmpty size={20} />
+                <IoIosHeartEmpty size={24} />
               )}
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Placeholder Additional Info */}
-      <div className="max-w-7xl mx-auto mt-10 px-4 shadow-xl rounded-xl">
-        <p className="py-10 text-center text-gray-500">Informasi Tambahan</p>
       </div>
     </div>
   );
