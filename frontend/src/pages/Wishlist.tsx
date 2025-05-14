@@ -10,6 +10,10 @@ const Wishlist = () => {
   const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [cart, setCart] = useState<any[]>([]); // State untuk menyimpan data cart
+  const [quantities, setQuantities] = useState<{ [productId: number]: number }>(
+    {}
+  );
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -58,7 +62,46 @@ const Wishlist = () => {
         }
       };
 
+      const fetchCart = async () => {
+        const userId = localStorage.getItem("user_id");
+        const userToken = localStorage.getItem("user_token");
+
+        if (!userToken) {
+          console.log("Token tidak ditemukan");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/cart?user_id=${userId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorDetails = await response.text();
+            console.log("Error Details:", errorDetails);
+            throw new Error("Failed to fetch cart");
+          }
+
+          const data = await response.json();
+          setCart(data);
+        } catch (error) {
+          if (error instanceof Error) {
+            setError(error.message);
+          } else {
+            setError("An unknown error occurred");
+          }
+        }
+      };
+
       fetchWishlist();
+      fetchCart();
     }
   }, [userId]);
 
@@ -103,6 +146,57 @@ const Wishlist = () => {
     }
   };
 
+  const handleAddToCart = async (productId: number) => {
+    const userId = localStorage.getItem("user_id");
+    const userToken = localStorage.getItem("user_token");
+
+    if (!userId || !userToken) {
+      toast.error("Anda belum login!");
+      return;
+    }
+
+    const quantity = quantities[productId] || 1; // default quantity = 1
+
+    setRemovingProductIds((prev) => [...prev, productId]);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/cart`,
+        {
+          product_id: productId,
+          quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success("Item berhasil ditambahkan ke keranjang!");
+
+      // update UI (tandai bahwa item sudah di cart)
+      setWishlist((prev) =>
+        prev.map((item) =>
+          item.product_id === productId ? { ...item, addedToCart: true } : item
+        )
+      );
+    } catch (error: any) {
+      console.error(
+        "Gagal menambahkan ke keranjang:",
+        error.response?.data || error
+      );
+      toast.error("Gagal menambahkan ke keranjang");
+    } finally {
+      setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
+    }
+  };
+
+  const isInCart = (productId: number) => {
+    return cart.some((item) => item.product_id === productId);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -139,7 +233,7 @@ const Wishlist = () => {
               {wishlist.map((item) => (
                 <div
                   key={item.id}
-                  className={`rounded-lg hover:shadow-2xl p-4 flex flex-col h-120 group hover:border transition-opacity duration-300 ${
+                  className={`rounded-lg hover:shadow-2xl p-4 flex flex-col group hover:border transition-opacity duration-300 ${
                     removingProductIds.includes(item.product_id)
                       ? "opacity-0 scale-95"
                       : "opacity-100"
@@ -162,13 +256,65 @@ const Wishlist = () => {
                     />
                   </div>
                   <div className="py-3 space-y-4 ">
-                    <p className="">{item.name}</p>
+                    <p>{item.name}</p>
                     <p className="text-orange-500">Rp {item.price}</p>
                     <p className="text-sm"> Stocks: {item.stocks}</p>
                     <p className="text-xs">Posted at {item.created_at}</p>
                   </div>
-                  <button className="mt-auto rounded-xl border-2 px-4 py-2 border-black hover:bg-black hover:text-white opacity-0 group-hover:opacity-100 transition duration-300">
-                    Add To Cart
+
+                  {/* Input quantity */}
+                  <div
+                    className="flex items-center gap-3 my-2 text-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() =>
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [item.product_id]: Math.max(
+                            (prev[item.product_id] || 1) - 1,
+                            1
+                          ),
+                        }))
+                      }
+                      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+                    >
+                      -
+                    </button>
+                    <span className="text-lg">
+                      {quantities[item.product_id] || 1}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [item.product_id]: (prev[item.product_id] || 1) + 1,
+                        }))
+                      }
+                      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    disabled={item.addedToCart}
+                    className={`mt-auto rounded-xl border-2 px-4 py-2 border-black 
+                                hover:bg-black hover:text-white 
+                                opacity-0 group-hover:opacity-100 transition duration-300 
+                                ${
+                                  item.addedToCart
+                                    ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
+                                    : ""
+                                }
+                              `}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (item.addedToCart) return;
+                      handleAddToCart(item.product_id);
+                    }}
+                  >
+                    {item.addedToCart ? "Sudah di Keranjang" : "Add To Cart"}
                   </button>
                 </div>
               ))}

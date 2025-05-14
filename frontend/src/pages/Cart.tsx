@@ -84,12 +84,14 @@ const Cart = () => {
         }
       );
 
+      // Toast after successfully removing item from cart
       toast.success("Item berhasil dihapus dari cart!");
 
-      setTimeout(() => {
-        setCart((prev) => prev.filter((item) => item.product_id !== productId));
-        setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
-      }, 300);
+      // Immediately update cart state after successful deletion
+      setCart((prev) => prev.filter((item) => item.product_id !== productId));
+
+      // Remove product ID from the list of removing products
+      setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     } catch (error: any) {
       console.error("Gagal menghapus cart:", error.response?.data || error);
       toast.error("Gagal menghapus cart");
@@ -161,6 +163,9 @@ const Cart = () => {
           </div>
         )}
       </div>
+
+      {/* ToastContainer must be rendered in the root component */}
+      <ToastContainer position="top-center" />
     </div>
   );
 };

@@ -91,7 +91,7 @@ const UserNav = () => {
         </button>
 
         {open && (
-          <div className="absolute right-0 top-10 w-48 bg-transparent p-4 shadow-md z-50">
+          <div className="absolute right-0 top-10 w-48 bg-white p-4 shadow-md z-50">
             <button
               onClick={() => navigate("/profile")}
               className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2 "

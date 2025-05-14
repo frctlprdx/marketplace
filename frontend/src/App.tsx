@@ -25,8 +25,6 @@ function App() {
             <Route path="/productdetail/:id" element={<ProductDetail />} />
           </Routes>
         </div>
-
-        {/* Tambahkan ini */}
         <ToastContainer />
       </div>
     </Router>

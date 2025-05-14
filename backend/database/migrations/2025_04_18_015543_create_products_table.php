@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
             $table->integer('stocks');
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10, 0);
             $table->string('image')->nullable();
             $table->timestamps();
         });

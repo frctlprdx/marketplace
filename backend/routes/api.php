@@ -13,6 +13,10 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
+Route::get('/product', [ProductController::class, 'search'])->name('product.search');
+Route::get('/categories', function () {
+    return App\Models\Category::all(); // Mengambil semua kategori
+});
 
 Route::get('/unauthorized', function () {
     return view('unauthorized'); // Atau redirect ke halaman tertentu

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -8,14 +8,54 @@ import "react-toastify/dist/ReactToastify.css";
 const Product = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
+  const [categories, setCategories] = useState<any[]>([]); // State for categories
+  const [minPrice, setMinPrice] = useState<number | "">(""); // State for minimum price
+  const [maxPrice, setMaxPrice] = useState<number | "">(""); // State for maximum price
+  const [selectedCategory, setSelectedCategory] = useState<string | "">(""); // State for selected category
   const navigate = useNavigate();
+  const location = useLocation();
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
+  const toggleFilter = () => {
+    setIsFilterVisible(!isFilterVisible);
+  };
+
+  // Mengambil kategori dari API
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/products`)
-      .then((res) => setProducts(res.data))
+      .get(`${import.meta.env.VITE_API_URL}/categories`)
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch(console.error);
+  }, []);
+
+  // Mengambil produk berdasarkan filter
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const searchQuery = queryParams.get("search") || "";
+    const categoryFilter = queryParams.get("category") || "";
+    const minPriceFilter = queryParams.get("minPrice") || "";
+    const maxPriceFilter = queryParams.get("maxPrice") || "";
+
+    setSelectedCategory(categoryFilter);
+    setMinPrice(minPriceFilter ? parseInt(minPriceFilter) : "");
+    setMaxPrice(maxPriceFilter ? parseInt(maxPriceFilter) : "");
+
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/products`, {
+        params: {
+          search: searchQuery,
+          category: categoryFilter,
+          minPrice: minPriceFilter,
+          maxPrice: maxPriceFilter,
+        },
+      })
+      .then((res) => {
+        setProducts(res.data);
+      })
       .catch(console.error);
 
     if (userId && token) {
@@ -31,7 +71,7 @@ const Product = () => {
         })
         .catch(console.error);
     }
-  }, []);
+  }, [location.search, userId, token]);
 
   const handleWishlist = (productId: number) => {
     if (!userId || !token) {
@@ -77,6 +117,19 @@ const Product = () => {
     }
   };
 
+  // Function to update URL with filter parameters
+  const updateUrlWithFilters = () => {
+    console.log("lagi cari");
+    const params = new URLSearchParams();
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (minPrice)
+      params.set("minPrice", Math.floor(Number(minPrice)).toString());
+    if (maxPrice)
+      params.set("maxPrice", Math.floor(Number(maxPrice)).toString());
+
+    navigate(`/product?${params.toString()}`);
+  };
+
   return (
     <div>
       <div className="max-w-7xl h-16 mx-auto px-4">
@@ -92,16 +145,40 @@ const Product = () => {
       </div>
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
-          <aside className="lg:col-span-2 bg-white rounded-xl shadow p-4 h-fit sticky top-24">
+          <aside
+            className={`lg:col-span-2 bg-white rounded-xl shadow p-4 h-fit top-24 transition-all duration-300 ${
+              isFilterVisible ? "block" : "hidden lg:block"
+            } ${isFilterVisible ? " z-10 w-full lg:w-auto" : ""}`}
+          >
             <h2 className="text-lg font-semibold mb-4">Filter Produk</h2>
             <div className="space-y-2">
               <div>
                 <label className="block text-sm text-gray-600">Kategori</label>
-                <select className="w-full mt-1 border rounded p-2">
-                  <option>Semua</option>
-                  <option>Elektronik</option>
-                  <option>Pakaian</option>
+                <select
+                  className="w-full mt-1 border rounded p-2"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">Semua</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">
+                  Harga Minimal
+                </label>
+                <input
+                  type="number"
+                  className="w-full mt-1 border rounded p-2"
+                  value={minPrice}
+                  onChange={(e) =>
+                    setMinPrice(e.target.value ? parseInt(e.target.value) : "")
+                  }
+                />
               </div>
               <div>
                 <label className="block text-sm text-gray-600">
@@ -110,11 +187,32 @@ const Product = () => {
                 <input
                   type="number"
                   className="w-full mt-1 border rounded p-2"
+                  value={maxPrice}
+                  onChange={(e) =>
+                    setMaxPrice(e.target.value ? parseInt(e.target.value) : "")
+                  }
                 />
               </div>
             </div>
+            <button
+              onClick={updateUrlWithFilters}
+              className="w-full mt-4 bg-orange-500 text-white py-2 rounded-xl cursor-pointer"
+            >
+              Terapkan Filter
+            </button>
           </aside>
 
+          {/* Button to toggle filter visibility on mobile */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={toggleFilter}
+              className="px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 hover:shadow-xl transition duration-300"
+            >
+              {isFilterVisible ? "Sembunyikan Filter" : "Tampilkan Filter"}
+            </button>
+          </div>
+
+          {/* Products Section */}
           <section className="lg:col-span-5">
             <h2 className="text-xl font-bold mb-6">Daftar Produk</h2>
             {products.length === 0 ? (
@@ -166,7 +264,6 @@ const Product = () => {
           </section>
         </div>
       </div>
-      {/* Toast container untuk menampilkan notifikasi */}
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
