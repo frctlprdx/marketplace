@@ -252,7 +252,7 @@ const Product = () => {
                     />
                     <h3 className="text-lg font-semibold">{product.name}</h3>
                     <p className="text-orange-600 font-bold mt-2">
-                      Rp {product.price.toLocaleString()}
+                      Rp {Number(product.price).toLocaleString("id-ID")}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Stok: {product.stocks}

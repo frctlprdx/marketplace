@@ -130,7 +130,7 @@ const Cart = () => {
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-lg hover:shadow-2xl p-4 flex flex-col h-120 group hover:border transition-opacity duration-300"
+                  className="rounded-lg hover:shadow-2xl p-4 flex flex-col group hover:border transition-opacity duration-300"
                   onClick={() => navigate(`/productdetail/${item.id}`)}
                 >
                   <div className="w-full h-1/2 relative">
@@ -148,13 +148,25 @@ const Cart = () => {
                       alt={item.name}
                     />
                   </div>
-                  <div className="py-3 space-y-4">
-                    <p>{item.name}</p>
-                    <p className="text-orange-500">Rp {item.price}</p>
-                    <p className="text-sm">Stocks: {item.stocks}</p>
-                    <p className="text-xs">Posted at {item.created_at}</p>
+                  <div className="h-full flex flex-col p-2">
+                    <p className="text-2xl">{item.name}</p>
+                    <p className="text-xs">
+                      Jumlah Barang: {item.quantity}
+                    </p>
+
+                    <p className="text-orange-500 text-center mt-auto mb-2">
+                      Total Harga: Rp{" "}
+                      {(item.price * item.quantity).toLocaleString()}
+                    </p>
                   </div>
-                  <button className="mt-auto rounded-xl border-2 px-4 py-2 border-black hover:bg-black hover:text-white opacity-0 group-hover:opacity-100 transition duration-300">
+
+                  <button
+                    className="mt-auto rounded-xl border-2 px-4 py-2 border-black hover:bg-black hover:text-white opacity-0 group-hover:opacity-100 transition duration-300"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/checkout", { state: { product: item } });
+                    }}
+                  >
                     Checkout
                   </button>
                 </div>

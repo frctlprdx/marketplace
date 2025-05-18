@@ -18,6 +18,8 @@ class CreateProductsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // penjual
             $table->string('name');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->integer('sold')->default(0); // jumlah terjual
+            $table->decimal('rating', 2, 1)->default(0.0); // rating rata-rata review
             $table->text('description')->nullable();
             $table->integer('stocks');
             $table->decimal('price', 10, 0);

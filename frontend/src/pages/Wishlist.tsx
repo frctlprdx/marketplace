@@ -230,94 +230,100 @@ const Wishlist = () => {
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {wishlist.map((item) => (
-                <div
-                  key={item.id}
-                  className={`rounded-lg hover:shadow-2xl p-4 flex flex-col group hover:border transition-opacity duration-300 ${
-                    removingProductIds.includes(item.product_id)
-                      ? "opacity-0 scale-95"
-                      : "opacity-100"
-                  }`}
-                  onClick={() => navigate(`/productdetail/${item.id}`)}
-                >
-                  <div className="w-full h-1/2 relative">
-                    <IoIosHeart
-                      size={40}
+              {wishlist.map((item) => {
+                const quantity = quantities[item.product_id] || 1;
+                const totalPrice = Number(item.price) * quantity;
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`rounded-lg hover:shadow-2xl p-4 flex flex-col group hover:border transition-opacity duration-300 ${
+                      removingProductIds.includes(item.product_id)
+                        ? "opacity-0 scale-95"
+                        : "opacity-100"
+                    }`}
+                    onClick={() => navigate(`/productdetail/${item.id}`)}
+                  >
+                    <div className="w-full h-1/2 relative">
+                      <IoIosHeart
+                        size={40}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveFromWishlist(item.product_id);
+                        }}
+                        className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
+                      />
+                      <img
+                        className="w-full h-full object-cover rounded-md"
+                        src={item.image}
+                        alt={item.name}
+                      />
+                    </div>
+                    <div className="py-3 space-y-4 ">
+                      <p>{item.name}</p>
+                      {/* Harga total sesuai quantity */}
+                      <p className="text-orange-500 font-bold">
+                        Rp {totalPrice.toLocaleString("id-ID")}
+                      </p>
+                      <p className="text-sm"> Stocks: {item.stocks}</p>
+                      <p className="text-xs">Posted at {item.created_at}</p>
+                    </div>
+
+                    {/* Input quantity */}
+                    <div
+                      className="flex items-center gap-3 my-2 text-center"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() =>
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [item.product_id]: Math.max(
+                              (prev[item.product_id] || 1) - 1,
+                              1
+                            ),
+                          }))
+                        }
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+                      >
+                        -
+                      </button>
+                      <span className="text-lg">{quantity}</span>
+                      <button
+                        onClick={() =>
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [item.product_id]: (prev[item.product_id] || 1) + 1,
+                          }))
+                        }
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      disabled={item.addedToCart}
+                      className={`mt-auto rounded-xl border-2 px-4 py-2 border-black 
+                    hover:bg-black hover:text-white 
+                    opacity-0 group-hover:opacity-100 transition duration-300 
+                    ${
+                      item.addedToCart
+                        ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
+                        : ""
+                    }
+                  `}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveFromWishlist(item.product_id);
+                        if (item.addedToCart) return;
+                        handleAddToCart(item.product_id);
                       }}
-                      className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
-                    />
-                    <img
-                      className="w-full h-full object-cover rounded-md"
-                      src={item.image}
-                      alt={item.name}
-                    />
-                  </div>
-                  <div className="py-3 space-y-4 ">
-                    <p>{item.name}</p>
-                    <p className="text-orange-500">Rp {item.price}</p>
-                    <p className="text-sm"> Stocks: {item.stocks}</p>
-                    <p className="text-xs">Posted at {item.created_at}</p>
-                  </div>
-
-                  {/* Input quantity */}
-                  <div
-                    className="flex items-center gap-3 my-2 text-center"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      onClick={() =>
-                        setQuantities((prev) => ({
-                          ...prev,
-                          [item.product_id]: Math.max(
-                            (prev[item.product_id] || 1) - 1,
-                            1
-                          ),
-                        }))
-                      }
-                      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
                     >
-                      -
-                    </button>
-                    <span className="text-lg">
-                      {quantities[item.product_id] || 1}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setQuantities((prev) => ({
-                          ...prev,
-                          [item.product_id]: (prev[item.product_id] || 1) + 1,
-                        }))
-                      }
-                      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
-                    >
-                      +
+                      {item.addedToCart ? "Sudah di Keranjang" : "Add To Cart"}
                     </button>
                   </div>
-
-                  <button
-                    disabled={item.addedToCart}
-                    className={`mt-auto rounded-xl border-2 px-4 py-2 border-black 
-                                hover:bg-black hover:text-white 
-                                opacity-0 group-hover:opacity-100 transition duration-300 
-                                ${
-                                  item.addedToCart
-                                    ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
-                                    : ""
-                                }
-                              `}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (item.addedToCart) return;
-                      handleAddToCart(item.product_id);
-                    }}
-                  >
-                    {item.addedToCart ? "Sudah di Keranjang" : "Add To Cart"}
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { FiShoppingCart, FiCheck } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
@@ -16,6 +16,7 @@ const ProductDetail = () => {
   const [showNotif, setShowNotif] = useState(false);
   const [cartIds, setCartIds] = useState<number[]>([]);
   const [cartLoading, setCartLoading] = useState(false);
+  const navigate = useNavigate();
 
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
@@ -193,7 +194,7 @@ const ProductDetail = () => {
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <div className="text-sm text-gray-600">Stok: {product.stocks}</div>
           <p className="text-2xl text-orange-600 font-semibold">
-            Rp {product.price.toLocaleString()}
+            Rp {Number(product.price).toLocaleString("id-ID")}
           </p>
 
           {/* Expandable Description */}
@@ -255,7 +256,7 @@ const ProductDetail = () => {
             <div className="mt-2 text-gray-700">
               Subtotal:{" "}
               <span className="font-semibold">
-                Rp {subtotal.toLocaleString()}
+                Rp {Number(subtotal).toLocaleString("id-ID")}
               </span>
             </div>
           </div>
@@ -297,9 +298,22 @@ const ProductDetail = () => {
               )}
             </button>
           </div>
-          <div className="w-full bg-orange-500 p-3 rounded-xl text-center text-white hover:shadow-xl hover:bg-orange-600">
-            Checkout Barang
-          </div>
+          <button
+            onClick={() => {
+              if (!product) return;
+              navigate("/checkout", {
+                state: {
+                  product: {
+                    ...product,
+                    quantity,
+                  },
+                },
+              });
+            }}
+            className="w-full py-2 mt-4 rounded-xl bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition"
+          >
+            Beli Sekarang
+          </button>
         </div>
       </div>
     </div>

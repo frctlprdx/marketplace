@@ -17,7 +17,7 @@ class CreateTransactionsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained(); 
             $table->string('status')->default('pending'); 
-            $table->decimal('total', 10, 2);
+            $table->decimal('total', 10, 0);
             $table->timestamps();
         });
     }

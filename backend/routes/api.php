@@ -3,6 +3,7 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RajaOngkirController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
@@ -18,9 +19,7 @@ Route::get('/categories', function () {
     return App\Models\Category::all(); // Mengambil semua kategori
 });
 
-Route::get('/unauthorized', function () {
-    return view('unauthorized'); // Atau redirect ke halaman tertentu
-});
+Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
