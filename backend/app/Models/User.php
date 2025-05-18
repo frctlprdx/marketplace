@@ -63,12 +63,12 @@ class User extends Authenticatable
 
     public function addresses()
     {
-        return $this->hasMany(UserAddress::class);
+        return $this->hasMany(UserShippingAddress::class);
     }
 
     public function defaultAddress()
     {
-        return $this->hasOne(UserAddress::class)->where('is_default', true);
+        return $this->hasOne(UserShippingAddress::class)->where('is_default', true);
     }
 
 
