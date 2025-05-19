@@ -1,6 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { FaTrash, FaPlus } from "react-icons/fa";
+import {
+  FaTrash,
+  FaPlus,
+  FaMapMarkerAlt,
+  FaBox,
+  FaChevronRight,
+} from "react-icons/fa";
 import axios from "axios";
 
 const Checkout = () => {
@@ -14,26 +20,23 @@ const Checkout = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null
   );
-  const [metodePembayaran, setMetodePembayaran] = useState("");
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [newAddress, setNewAddress] = useState({
-    label: "", // tambahan
+    label: "",
     recipient_name: "",
     phone: "",
-    province: "", // tambahan
+    province: "",
     city: "",
-    district: "", // tambahan
-    subdistrict: "", // tambahan
+    district: "",
+    subdistrict: "",
     zip_code: "",
     detail_address: "",
-    is_default: false, // tambahan, boolean
+    is_default: false,
   });
 
-  // Ambil data user dari selected address secara efisien
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
 
-  // Close dropdown ketika klik di luar
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -47,7 +50,6 @@ const Checkout = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch addresses
   useEffect(() => {
     (async () => {
       const userId = localStorage.getItem("user_id");
@@ -73,7 +75,6 @@ const Checkout = () => {
     })();
   }, []);
 
-  // Delete alamat
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem("user_token");
     try {
@@ -93,7 +94,6 @@ const Checkout = () => {
     }
   };
 
-  // Tambah alamat baru
   const handleAddAddress = async () => {
     const userId = localStorage.getItem("user_id");
     const token = localStorage.getItem("user_token");
@@ -115,16 +115,16 @@ const Checkout = () => {
         setAddresses((prev) => [...prev, data]);
         setSelectedAddressId(data.id);
         setNewAddress({
-          label: "", // tambahan
+          label: "",
           recipient_name: "",
           phone: "",
-          province: "", // tambahan
+          province: "",
           city: "",
-          district: "", // tambahan
-          subdistrict: "", // tambahan
+          district: "",
+          subdistrict: "",
           zip_code: "",
           detail_address: "",
-          is_default: false, // tambahan, boolean
+          is_default: false,
         });
         setShowAddAddressModal(false);
         alert("Alamat berhasil ditambahkan.");
@@ -134,259 +134,542 @@ const Checkout = () => {
     }
   };
 
-  // Submit checkout
-  const handleSubmit = async () => {
-    if (!selectedAddress || !metodePembayaran) {
-      alert("Semua kolom harus diisi!");
+  const handleProceedToPayment = () => {
+    if (!selectedAddress) {
+      alert("Silakan pilih alamat pengiriman terlebih dahulu!");
       return;
     }
     if (!product) {
       alert("Produk tidak ditemukan.");
       return;
     }
-    const token = localStorage.getItem("user_token");
-    if (!token) {
-      alert("Anda harus login terlebih dahulu.");
-      return;
-    }
 
-    const checkoutData = {
-      address: selectedAddress,
-      product,
-      payment_method: metodePembayaran,
-    };
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/checkout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(checkoutData),
-      });
-      if (res.ok) {
-        alert("Checkout berhasil!");
-        navigate("/");
-      } else {
-        const errorData = await res.json();
-        alert("Checkout gagal: " + (errorData.message || "Unknown error"));
-      }
-    } catch (error) {
-      alert("Checkout gagal: " + error);
-    }
+    // Navigate to payment page with address and product data
+    navigate("/payment", {
+      state: {
+        address: selectedAddress,
+        product: product,
+      },
+    });
   };
+
+  // Calculate subtotal based on product price and quantity
+  const subtotal = product ? product.price * product.quantity : 0;
 
   if (!product) {
     return (
-      <div className="text-center mt-20 text-red-600 font-semibold">
-        Data checkout tidak ditemukan.
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-md">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Data tidak ditemukan
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Produk yang akan di-checkout tidak ditemukan.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 transition"
+          >
+            Kembali ke Beranda
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded shadow relative">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              ← Kembali
+            </button>
+            <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          {/* Pilih Alamat */}
-          <section className="bg-gray-50 p-6 rounded shadow relative">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Pilih Alamat Pengiriman</h2>
-              <button
-                onClick={() => setShowAddAddressModal(true)}
-                className="text-orange-500 hover:text-orange-600"
-                aria-label="Tambah Alamat Baru"
-              >
-                <FaPlus size={18} />
-              </button>
-            </div>
+          {/* Progress Steps */}
+          <div className="flex items-center gap-2 mt-4 text-sm">
+            <span className="bg-orange-500 text-white px-3 py-1 rounded-full">
+              1
+            </span>
+            <span className="text-orange-500 font-medium">
+              Alamat Pengiriman
+            </span>
+            <FaChevronRight className="text-gray-400" />
+            <span className="bg-gray-300 text-gray-600 px-3 py-1 rounded-full">
+              2
+            </span>
+            <span className="text-gray-500">Pembayaran</span>
+            <FaChevronRight className="text-gray-400" />
+            <span className="bg-gray-300 text-gray-600 px-3 py-1 rounded-full">
+              3
+            </span>
+            <span className="text-gray-500">Konfirmasi</span>
+          </div>
+        </div>
+      </div>
 
-            {addresses.length > 0 ? (
-              <>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="font-semibold">
-                      {selectedAddress?.recipient_name}
-                    </p>
-                    <p>{selectedAddress?.detail_address}</p>
-                    <p>
-                      {selectedAddress?.city}, {selectedAddress?.zip_code}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Telp: {selectedAddress?.phone}
-                    </p>
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Address Selection */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+              {/* Header */}
+              <div className="p-6 border-b bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-orange-100 p-2 rounded-lg">
+                      <FaMapMarkerAlt className="text-orange-500" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Alamat Pengiriman
+                    </h2>
                   </div>
-                  <div>
-                    <button
-                      onClick={() => setShowAddressDropdown((prev) => !prev)}
-                      className="text-sm text-orange-500"
-                    >
-                      {showAddressDropdown ? "Tutup Pilihan" : "Pilih Alamat"}
-                    </button>
-                  </div>
-                </div>
-
-                {showAddressDropdown && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute z-50 bg-white border rounded shadow-lg p-4 w-full max-h-96 overflow-y-auto"
+                  <button
+                    onClick={() => setShowAddAddressModal(true)}
+                    className="flex items-center gap-2 text-orange-500 hover:text-orange-600 font-medium transition"
                   >
-                    {addresses.map((addr) => (
-                      <div
-                        key={addr.id}
-                        onClick={() => setSelectedAddressId(addr.id)}
-                        className={`cursor-pointer border rounded p-3 mb-3 flex justify-between items-start gap-2 transition-all ${
-                          selectedAddressId === addr.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        <div>
-                          <p className="font-semibold">{addr.recipient_name}</p>
-                          <p>{addr.detail_address}</p>
-                          <p>
-                            {addr.city}, {addr.zip_code}
+                    <FaPlus size={14} />
+                    Tambah Alamat
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {addresses.length > 0 ? (
+                  <>
+                    {/* Selected Address Display */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                              {selectedAddress?.label || "Alamat Utama"}
+                            </span>
+                            {selectedAddress?.is_default && (
+                              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-semibold text-gray-800 mb-1">
+                            {selectedAddress?.recipient_name}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            Telp: {addr.phone}
+                          <p className="text-gray-600 text-sm mb-1">
+                            {selectedAddress?.phone}
+                          </p>
+                          <p className="text-gray-700">
+                            {selectedAddress?.detail_address}
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            {selectedAddress?.district}, {selectedAddress?.city}
+                            , {selectedAddress?.province}{" "}
+                            {selectedAddress?.zip_code}
                           </p>
                         </div>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(addr.id);
-                          }}
+                          onClick={() => setShowAddressDropdown(true)}
+                          className="text-orange-500 hover:text-orange-600 font-medium text-sm ml-4"
                         >
-                          <FaTrash className="text-red-500 hover:text-red-700" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {showAddAddressModal && (
-                  <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-                    <div className="bg-white rounded p-6 w-96 relative shadow-lg">
-                      <button
-                        onClick={() => setShowAddAddressModal(false)}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 font-bold"
-                        aria-label="Tutup Modal"
-                      >
-                        ×
-                      </button>
-                      <h3 className="text-xl font-semibold mb-4">
-                        Tambah Alamat Baru
-                      </h3>
-                      <div className="flex flex-col gap-3">
-                        {[
-                          {
-                            key: "recipient_name",
-                            placeholder: "Nama Penerima",
-                          },
-                          {
-                            key: "phone",
-                            placeholder: "Nomor Telepon",
-                            type: "tel",
-                          },
-                          {
-                            key: "label",
-                            placeholder: "Label Alamat (Rumah, Kantor, dll)",
-                          },
-                          { key: "province", placeholder: "Provinsi" },
-                          { key: "city", placeholder: "Kota/Kabupaten" },
-                          { key: "subdistrict", placeholder: "Kecamatan" },
-                          { key: "zip_code", placeholder: "Kode Pos" },
-                        ].map(({ key, placeholder, type }) => (
-                          <input
-                            key={key}
-                            type={type || "text"}
-                            placeholder={placeholder}
-                            className="border rounded px-3 py-2"
-                            value={(newAddress as any)[key] || ""}
-                            onChange={(e) =>
-                              setNewAddress((prev) => ({
-                                ...prev,
-                                [key]: e.target.value,
-                              }))
-                            }
-                          />
-                        ))}
-
-                        {/* Textarea untuk Alamat Lengkap */}
-                        <textarea
-                          placeholder="Alamat Lengkap (Jalan, RT/RW, Patokan, dll)"
-                          className="border rounded px-3 py-2 resize-none"
-                          rows={3}
-                          value={(newAddress as any).detail_address || ""}
-                          onChange={(e) =>
-                            setNewAddress((prev) => ({
-                              ...prev,
-                              detail_address: e.target.value,
-                            }))
-                          }
-                        />
-
-                        <button
-                          onClick={handleAddAddress}
-                          className="bg-orange-500 text-white rounded py-2 mt-2 hover:bg-orange-600"
-                        >
-                          Simpan Alamat
+                          Ubah Alamat
                         </button>
                       </div>
                     </div>
+
+                    {/* Address Dropdown */}
+                    {showAddressDropdown && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute z-50 bg-white border rounded-lg shadow-lg p-4 w-full max-w-2xl max-h-96 overflow-y-auto"
+                      >
+                        <h3 className="font-semibold mb-3 text-gray-800">
+                          Pilih Alamat Lain
+                        </h3>
+                        <div className="space-y-3">
+                          {addresses.map((addr) => (
+                            <div
+                              key={addr.id}
+                              onClick={() => {
+                                setSelectedAddressId(addr.id);
+                                setShowAddressDropdown(false);
+                              }}
+                              className={`cursor-pointer border rounded-lg p-4 transition-all ${
+                                selectedAddressId === addr.id
+                                  ? "border-blue-500 bg-blue-50"
+                                  : "border-gray-200 hover:border-gray-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
+                                      {addr.label || "Alamat"}
+                                    </span>
+                                    {addr.is_default && (
+                                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                        Default
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="font-semibold text-gray-800">
+                                    {addr.recipient_name}
+                                  </p>
+                                  <p className="text-gray-600 text-sm">
+                                    {addr.phone}
+                                  </p>
+                                  <p className="text-gray-700 text-sm">
+                                    {addr.detail_address}
+                                  </p>
+                                  <p className="text-gray-600 text-sm">
+                                    {addr.city}, {addr.zip_code}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(addr.id);
+                                  }}
+                                  className="text-red-500 hover:text-red-700 p-2"
+                                  title="Hapus alamat"
+                                >
+                                  <FaTrash size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaMapMarkerAlt className="text-gray-400 text-2xl" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      Belum ada alamat pengiriman
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Tambahkan alamat pengiriman untuk melanjutkan checkout
+                    </p>
+                    <button
+                      onClick={() => setShowAddAddressModal(true)}
+                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                    >
+                      <FaPlus className="inline mr-2" />
+                      Tambah Alamat Pertama
+                    </button>
                   </div>
                 )}
-              </>
-            ) : (
-              <p>
-                Anda belum memiliki alamat pengiriman. Silakan tambah alamat
-                baru.
-              </p>
-            )}
-          </section>
-          {/* Pilih Metode Pembayaran */}
-          <section className="bg-gray-50 p-6 rounded shadow">
-            <h2 className="text-xl font-semibold mb-4">Metode Pembayaran</h2>
-            <select
-              value={metodePembayaran}
-              onChange={(e) => setMetodePembayaran(e.target.value)}
-              className="w-full border rounded p-2"
-            >
-              <option value="">Pilih metode pembayaran</option>
-              <option value="transfer_bank">Transfer Bank</option>
-              <option value="gopay">Gopay</option>
-            </select>
-          </section>
-        </div>
-
-        {/* Ringkasan Pesanan */}
-        <div className="bg-gray-50 p-6 rounded shadow flex flex-col gap-4">
-          <h2 className="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
-          <div className="flex items-center gap-4">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-24 h-24 rounded object-cover"
-            />
-            <div>
-              <p className="font-semibold">{product.name}</p>
-              <p className="text-sm text-gray-600">
-                Harga: Rp{product.price.toLocaleString()}
-              </p>
+              </div>
             </div>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="mt-auto bg-orange-500 text-white py-3 rounded hover:bg-orange-600 transition"
-          >
-            Checkout
-          </button>
+          {/* Right Column - Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border overflow-hidden sticky top-6">
+              {/* Header */}
+              <div className="p-6 border-b bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <FaBox className="text-blue-500" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Ringkasan Pesanan
+                  </h2>
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="p-6">
+                <div className="flex gap-4 mb-6">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-20 h-20 rounded-lg object-cover border"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-orange-500 font-bold text-lg">
+                      Rp {Number(product.price).toLocaleString("id-ID")}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Qty: {product.quantity}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span>Rp {subtotal.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Ongkir</span>
+                    <span>Akan dihitung di halaman pembayaran</span>
+                  </div>
+                  <div className="border-t pt-3 flex justify-between font-semibold text-lg">
+                    <span>Total</span>
+                    <span className="text-orange-500">
+                      Rp {subtotal.toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={handleProceedToPayment}
+                  disabled={!selectedAddress}
+                  className={`w-full mt-6 py-4 rounded-lg font-semibold transition-all ${
+                    selectedAddress
+                      ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  {selectedAddress
+                    ? "Lanjut ke Pembayaran"
+                    : "Pilih Alamat Terlebih Dahulu"}
+                  {selectedAddress && (
+                    <FaChevronRight className="inline ml-2" />
+                  )}
+                </button>
+
+                <p className="text-center text-gray-500 text-xs mt-3">
+                  Dengan melanjutkan, Anda menyetujui syarat dan ketentuan kami
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Add Address Modal */}
+      {showAddAddressModal && (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Tambah Alamat Baru
+                </h3>
+                <button
+                  onClick={() => setShowAddAddressModal(false)}
+                  className="text-gray-500 hover:text-gray-800 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Label Alamat
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Rumah, Kantor, Kost, dll."
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    value={newAddress.label}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, label: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nama Penerima *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nama lengkap penerima"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    value={newAddress.recipient_name}
+                    onChange={(e) =>
+                      setNewAddress({
+                        ...newAddress,
+                        recipient_name: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nomor Telepon *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="08XXXXXXXXXX"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    value={newAddress.phone}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, phone: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Provinsi *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Provinsi"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      value={newAddress.province}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          province: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Kota/Kabupaten *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Kota/Kabupaten"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      value={newAddress.city}
+                      onChange={(e) =>
+                        setNewAddress({ ...newAddress, city: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Kecamatan *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Kecamatan"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      value={newAddress.district}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          district: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Kelurahan/Desa
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Kelurahan/Desa"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      value={newAddress.subdistrict}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          subdistrict: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Kode Pos *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="12345"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    value={newAddress.zip_code}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, zip_code: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Alamat Lengkap *
+                  </label>
+                  <textarea
+                    placeholder="Jalan, RT/RW, Patokan, No. Rumah, dll."
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                    rows={3}
+                    value={newAddress.detail_address}
+                    onChange={(e) =>
+                      setNewAddress({
+                        ...newAddress,
+                        detail_address: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="default-address"
+                    checked={newAddress.is_default}
+                    onChange={(e) =>
+                      setNewAddress({
+                        ...newAddress,
+                        is_default: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                  />
+                  <label
+                    htmlFor="default-address"
+                    className="text-sm text-gray-700"
+                  >
+                    Jadikan sebagai alamat utama
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t bg-gray-50 sticky bottom-0 z-10">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowAddAddressModal(false)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleAddAddress}
+                  className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition"
+                >
+                  Simpan Alamat
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

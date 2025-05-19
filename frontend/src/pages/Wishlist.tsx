@@ -212,7 +212,7 @@ const Wishlist = () => {
           <a href="/" className="hover:underline cursor-pointer">
             Home
           </a>
-          <span>{">"}</span>
+          <span>{"/"}</span>
           <a href="/wishlist" className="hover:underline cursor-pointer">
             Wishlist
           </a>

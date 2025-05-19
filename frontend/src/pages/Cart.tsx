@@ -109,7 +109,7 @@ const Cart = () => {
           <a href="/" className="hover:underline cursor-pointer">
             Home
           </a>
-          <span>{">"}</span>
+          <span>{"/"}</span>
           <a href="/cart" className="hover:underline cursor-pointer">
             Cart
           </a>

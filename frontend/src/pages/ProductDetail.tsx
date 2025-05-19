@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { FiShoppingCart, FiCheck } from "react-icons/fi";
+import {
+  FiShoppingCart,
+  FiCheck,
+  FiArrowLeft,
+  FiMinus,
+  FiPlus,
+  FiShare2,
+} from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
 
@@ -8,7 +15,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
-  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -62,6 +69,15 @@ const ProductDetail = () => {
       });
   }, [token]);
 
+  useEffect(() => {
+    if (showNotif) {
+      const timer = setTimeout(() => {
+        setShowNotif(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNotif]);
+
   const handleCart = async () => {
     if (!userId || !token || !product) {
       setNotifMessage("Login terlebih dahulu untuk menambahkan ke keranjang");
@@ -80,6 +96,8 @@ const ProductDetail = () => {
           data: { user_id: userId, product_id: pid },
         });
         setCartIds((prev) => prev.filter((id) => id !== pid));
+        setNotifMessage("Produk dihapus dari keranjang");
+        setShowNotif(true);
       } else {
         await axios.post(
           `${import.meta.env.VITE_API_URL}/cart`,
@@ -87,9 +105,13 @@ const ProductDetail = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCartIds((prev) => [...prev, pid]);
+        setNotifMessage("Produk ditambahkan ke keranjang");
+        setShowNotif(true);
       }
     } catch (err) {
       console.error("Cart toggle error:", err);
+      setNotifMessage("Gagal memperbarui keranjang");
+      setShowNotif(true);
     } finally {
       setCartLoading(false);
     }
@@ -113,6 +135,8 @@ const ProductDetail = () => {
           data: { user_id: userId, product_id: pid },
         });
         setWishlistIds((prev) => prev.filter((id) => id !== pid));
+        setNotifMessage("Produk dihapus dari wishlist");
+        setShowNotif(true);
       } else {
         await axios.post(
           `${import.meta.env.VITE_API_URL}/wishlist`,
@@ -120,9 +144,13 @@ const ProductDetail = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setWishlistIds((prev) => [...prev, pid]);
+        setNotifMessage("Produk ditambahkan ke wishlist");
+        setShowNotif(true);
       }
     } catch (err) {
       console.error("Wishlist toggle error:", err);
+      setNotifMessage("Gagal memperbarui wishlist");
+      setShowNotif(true);
     } finally {
       setWishlistLoading(false);
     }
@@ -132,30 +160,47 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center text-2xl text-orange-500">
-        Loading product...
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-t-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading product details...</p>
+        </div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center text-2xl text-red-500">
-        Produk tidak ditemukan.
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 text-5xl mb-4">¯\_(ツ)_/¯</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Produk tidak ditemukan
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Maaf, produk yang Anda cari tidak tersedia atau telah dihapus.
+          </p>
+          <Link
+            to="/product"
+            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition duration-300"
+          >
+            <FiArrowLeft /> Kembali ke Daftar Produk
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Notifikasi */}
+    <div className="bg-gray-50 min-h-screen pb-12">
+      {/* Notification */}
       {showNotif && notifMessage && (
-        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 bg-white border border-orange-400 text-orange-700 px-6 py-3 rounded shadow z-50">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-lg shadow-lg z-50 border-l-4 border-orange-500 animate-fade-in">
           <div className="flex items-center justify-between gap-4">
-            <span>{notifMessage}</span>
+            <span className="text-gray-700">{notifMessage}</span>
             <button
               onClick={() => setShowNotif(false)}
-              className="text-orange-600 font-bold text-lg"
+              className="text-gray-400 hover:text-gray-600"
             >
               &times;
             </button>
@@ -164,49 +209,186 @@ const ProductDetail = () => {
       )}
 
       {/* Breadcrumb */}
-      <div className="max-w-7xl h-16 mx-auto px-4">
-        <div className="h-16 flex items-center text-sm text-gray-600 space-x-2">
-          <Link to="/" className="hover:underline">
-            Home
-          </Link>
-          <span>{">"}</span>
-          <Link to="/product" className="hover:underline">
-            Product
-          </Link>
-          <span>{">"}</span>
-          <span className="text-orange-600 font-semibold">{product.name}</span>
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center text-sm text-gray-600 space-x-2">
+            <Link
+              to="/"
+              className="hover:text-orange-500 transition duration-200"
+            >
+              Home
+            </Link>
+            <span>/</span>
+            <Link
+              to="/product"
+              className="hover:text-orange-500 transition duration-200"
+            >
+              Product
+            </Link>
+            <span>/</span>
+            <span className="text-orange-500 font-medium truncate max-w-xs">
+              {product.name}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Main Detail */}
-      <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-[2fr_3fr_1.5fr] gap-10">
-        {/* Image */}
-        <div className="flex flex-col items-center shadow-xl rounded-lg overflow-hidden mx-8 sm:mx-0">
-          <img
-            src={product.image || "/placeholder.jpg"}
-            alt={product.name}
-            className="w-full h-auto object-cover"
-          />
-        </div>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="md:grid md:grid-cols-5 gap-0">
+            {/* Product Image */}
+            <div className="md:col-span-3 p-6 relative">
+              <div className="relative rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center h-96">
+                <img
+                  src={product.image || "/placeholder.jpg"}
+                  alt={product.name}
+                  className="h-full w-full object-contain"
+                />
 
-        {/* Description */}
-        <div className="flex flex-col gap-4 px-8">
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <div className="text-sm text-gray-600">Stok: {product.stocks}</div>
-          <p className="text-2xl text-orange-600 font-semibold">
-            Rp {Number(product.price).toLocaleString("id-ID")}
-          </p>
+                <button
+                  onClick={handleWishlist}
+                  disabled={wishlistLoading}
+                  className="absolute top-4 right-4 bg-white shadow-md rounded-full p-2 hover:shadow-lg transition-shadow duration-300"
+                >
+                  {wishlistLoading ? (
+                    <div className="w-5 h-5 border-2 border-t-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  ) : wishlistIds.includes(product.id) ? (
+                    <IoIosHeart size={22} className="text-orange-500" />
+                  ) : (
+                    <IoIosHeartEmpty
+                      size={22}
+                      className="text-gray-400 hover:text-orange-500"
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
 
-          {/* Expandable Description */}
-          <div className="border-t pt-4">
-            <h2 className="text-lg font-semibold flex items-center">
-              Deskripsi Produk
+            {/* Product Info */}
+            <div className="md:col-span-2 p-6 md:border-l border-gray-100">
+              {/* Product Basic Info */}
+              <div>
+                {product.category_name && (
+                  <div className="mb-2">
+                    <span className="bg-orange-50 text-orange-700 text-xs font-medium px-2.5 py-1 rounded">
+                      {product.category_name}
+                    </span>
+                  </div>
+                )}
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                  {product.name}
+                </h1>
+                <p className="text-3xl font-bold text-orange-600 mb-4">
+                  Rp {Number(product.price).toLocaleString("id-ID")}
+                </p>
+
+                <div className="flex items-center space-x-2 mb-6">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                      product.stocks > 10
+                        ? "bg-green-50 text-green-700"
+                        : product.stocks > 0
+                        ? "bg-yellow-50 text-yellow-700"
+                        : "bg-red-50 text-red-700"
+                    }`}
+                  >
+                    Stok: {product.stocks}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 my-6"></div>
+
+              {/* Quantity Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jumlah
+                </label>
+                <div className="flex items-center">
+                  <button
+                    onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                    className="w-10 h-10 rounded-l-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                    disabled={quantity <= 1}
+                  >
+                    <FiMinus size={16} />
+                  </button>
+                  <div className="w-16 h-10 flex items-center justify-center border-t border-b border-gray-200 text-center text-gray-800">
+                    {quantity}
+                  </div>
+                  <button
+                    onClick={() =>
+                      quantity < product.stocks && setQuantity(quantity + 1)
+                    }
+                    className="w-10 h-10 rounded-r-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                    disabled={quantity >= product.stocks}
+                  >
+                    <FiPlus size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Subtotal */}
+              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-lg font-bold text-gray-800">
+                    Rp {Number(subtotal).toLocaleString("id-ID")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-4 gap-3">
+                <button
+                  onClick={handleCart}
+                  disabled={cartLoading}
+                  className={`col-span-1 h-12 flex items-center justify-center rounded-lg transition-all duration-300 ${
+                    cartIds.includes(Number(product.id))
+                      ? "bg-green-500 text-white"
+                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {cartLoading ? (
+                    <div className="w-5 h-5 border-2 border-t-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : cartIds.includes(Number(product.id)) ? (
+                    <FiCheck size={20} />
+                  ) : (
+                    <FiShoppingCart size={20} />
+                  )}
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate("/checkout", {
+                      state: {
+                        product: {
+                          ...product,
+                          quantity,
+                        },
+                      },
+                    });
+                  }}
+                  className="col-span-3 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
+                >
+                  Beli Sekarang
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="px-6 pb-6">
+            <div className="border-t border-gray-100 pt-6">
               <button
                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                className="ml-2 transition-transform duration-300"
+                className="w-full flex items-center justify-between text-lg font-medium text-gray-800 mb-4"
               >
+                <span>Deskripsi Produk</span>
                 <svg
-                  className={`w-6 h-6 ${isDescriptionOpen ? "rotate-180" : ""}`}
+                  className={`w-5 h-5 transition-transform duration-300 ${
+                    isDescriptionOpen ? "rotate-180" : ""
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -219,101 +401,23 @@ const ProductDetail = () => {
                   />
                 </svg>
               </button>
-            </h2>
-            <div
-              className={`transition-all duration-500 mt-2 ${
-                isDescriptionOpen
-                  ? "opacity-100 max-h-screen"
-                  : "opacity-0 max-h-0 overflow-hidden"
-              }`}
-            >
-              <p className="text-gray-700 leading-relaxed text-justify shadow-xl p-4 rounded-xl bg-white">
-                {product.description}
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* Checkout */}
-        <div className="bg-white shadow-md rounded-lg px-8 pb-4 flex flex-col gap-6 h-fit">
-          <div className="flex flex-col gap-2">
-            <span className="text-gray-700">Jumlah</span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+              <div
+                className={`transition-all duration-300 overflow-hidden ${
+                  isDescriptionOpen
+                    ? "max-h-screen opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
               >
-                -
-              </button>
-              <span className="text-lg">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
-              >
-                +
-              </button>
-            </div>
-            <div className="mt-2 text-gray-700">
-              Subtotal:{" "}
-              <span className="font-semibold">
-                Rp {Number(subtotal).toLocaleString("id-ID")}
-              </span>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-gray-700 leading-relaxed">
+                    {product.description ||
+                      "Tidak ada deskripsi untuk produk ini."}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-4 justify-center">
-            <button
-              onClick={handleCart}
-              disabled={cartLoading}
-              className={`w-12 h-12 flex items-center justify-center border transition rounded-full ${
-                cartIds.includes(product.id)
-                  ? "bg-orange-500 text-white border-orange-500 hover:shadow-xl"
-                  : "bg-white text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
-              }`}
-            >
-              {cartLoading ? (
-                <div className="w-6 h-6 border-4 border-t-4 border-white rounded-full animate-spin"></div>
-              ) : cartIds.includes(product.id) ? (
-                <FiCheck size={20} />
-              ) : (
-                <FiShoppingCart size={20} />
-              )}
-            </button>
-
-            <button
-              onClick={handleWishlist}
-              disabled={wishlistLoading}
-              className={`w-12 h-12 flex items-center justify-center border border-orange-500 ${
-                wishlistIds.includes(product.id)
-                  ? "bg-white text-orange-500 hover:shadow-xl"
-                  : "bg-white text-orange-500 hover:shadow-xl"
-              } rounded-full transition`}
-            >
-              {wishlistLoading ? (
-                <div className="w-6 h-6 border-4 border-t-4 border-orange-500 rounded-full animate-spin"></div>
-              ) : wishlistIds.includes(product.id) ? (
-                <IoIosHeart size={24} />
-              ) : (
-                <IoIosHeartEmpty size={24} />
-              )}
-            </button>
-          </div>
-          <button
-            onClick={() => {
-              if (!product) return;
-              navigate("/checkout", {
-                state: {
-                  product: {
-                    ...product,
-                    quantity,
-                  },
-                },
-              });
-            }}
-            className="w-full py-2 mt-4 rounded-xl bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition"
-          >
-            Beli Sekarang
-          </button>
         </div>
       </div>
     </div>

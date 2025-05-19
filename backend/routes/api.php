@@ -20,7 +20,7 @@ Route::get('/categories', function () {
     return App\Models\Category::all(); // Mengambil semua kategori
 });
 
-Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
+Route::post('countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete');
     Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update');
 
+    Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->middleware('role:customer')->name('destination.search');
 
     Route::get('/transactionhistory', [TransactionController::class, 'historyindex'])->middleware('role:customer')->name('transaction.index');
     Route::post('/transactionhistory', [TransactionController::class, 'store'])->middleware('role:customer')->name('transaction.store');
