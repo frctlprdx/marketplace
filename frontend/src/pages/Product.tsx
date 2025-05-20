@@ -188,7 +188,7 @@ const Product = () => {
           <div
             className={`lg:block ${
               isFilterVisible
-                ? "block fixed inset-0 z-50 bg-gray-900 bg-opacity-50"
+                ? "block fixed inset-0 z-50 bg-black/60 bg-opacity-50"
                 : "hidden"
             }`}
           >

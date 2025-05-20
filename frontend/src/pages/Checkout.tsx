@@ -7,6 +7,7 @@ import {
   FaBox,
   FaChevronRight,
   FaWeight,
+  FaTruck,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -24,6 +25,7 @@ const Checkout = () => {
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [newAddress, setNewAddress] = useState({
     label: "",
     recipient_name: "",
@@ -148,12 +150,11 @@ const Checkout = () => {
   };
 
   // Search destination for shipping
-  // Original searchDestination function with added console.log
   const searchDestination = async (district: string) => {
     try {
       setIsLoadingDestination(true);
       const response = await fetch(
-        `http://localhost:8000/api/destination?search=${district}`
+        `${import.meta.env.VITE_API_URL}/destination?search=${district}`
       );
       const result = await response.json();
 
@@ -161,7 +162,6 @@ const Checkout = () => {
         const firstDestination = result.data.data[0];
         const destinationId = firstDestination.id;
 
-        // Added console.log to show the destination ID
         console.log("Found destination ID:", destinationId);
         console.log("Full destination data:", firstDestination);
 
@@ -176,6 +176,45 @@ const Checkout = () => {
       return null;
     } finally {
       setIsLoadingDestination(false);
+    }
+  };
+
+  // Calculate shipping price
+  const calculateShippingPrice = async (
+    destinationId: string | number,
+    weight: number
+  ) => {
+    try {
+      setIsCalculatingShipping(true);
+
+      // Fixed origin code
+      const origin = "68246";
+
+      // API call to count shipping price
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/countprice`,
+        {
+          origin: origin,
+          destination: destinationId,
+          weight: weight,
+          courier: "jne:jnt", // Only getting JNE and JNT options
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Shipping price response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error calculating shipping price:", error);
+      alert("Gagal menghitung ongkos kirim. Silakan coba lagi.");
+      return null;
+    } finally {
+      setIsCalculatingShipping(false);
     }
   };
 
@@ -196,17 +235,35 @@ const Checkout = () => {
       return;
     }
 
+    // First get destination ID
     const destinationId = await searchDestination(selectedAddress.district);
 
-    if (destinationId) {
-      navigate("/payment", {
-        state: {
-          address: selectedAddress,
-          product: product,
-          destinationId: destinationId,
-        },
-      });
+    if (!destinationId) {
+      alert(
+        "Tidak dapat menemukan kode area untuk kecamatan yang dipilih. Silakan pilih alamat lain."
+      );
+      return;
     }
+
+    // Then calculate shipping price
+    const shippingData = await calculateShippingPrice(
+      destinationId,
+      totalWeight
+    );
+
+    if (!shippingData) {
+      return; // Error message already shown in calculateShippingPrice
+    }
+
+    // Navigate to payment page with all necessary data
+    navigate("/payment", {
+      state: {
+        address: selectedAddress,
+        product: product,
+        destinationId: destinationId,
+        shippingData: shippingData,
+      },
+    });
   };
 
   // Calculate subtotal and total weight
@@ -368,69 +425,92 @@ const Checkout = () => {
                         </button>
                       </div>
                     </div>
-
                     {/* Address Dropdown */}
                     {showAddressDropdown && (
-                      <div
-                        ref={dropdownRef}
-                        className="absolute z-50 bg-white border rounded-lg shadow-lg p-4 w-full max-w-2xl max-h-96 overflow-y-auto"
-                      >
-                        <h3 className="font-semibold mb-3 text-gray-800">
-                          Pilih Alamat Lain
-                        </h3>
-                        <div className="space-y-3">
-                          {addresses.map((address) => (
-                            <div
-                              key={address.id}
-                              onClick={() => {
-                                setSelectedAddressId(address.id);
-                                setShowAddressDropdown(false);
-                              }}
-                              className={`cursor-pointer border rounded-lg p-4 transition-all ${
-                                selectedAddressId === address.id
-                                  ? "border-blue-500 bg-blue-50"
-                                  : "border-gray-200 hover:border-gray-300"
-                              }`}
+                      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 md:p-0">
+                        <div
+                          ref={dropdownRef}
+                          className="bg-white border rounded-lg shadow-lg w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col"
+                        >
+                          {/* Header */}
+                          <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+                            <h3 className="font-semibold text-gray-800">
+                              Pilih Alamat Lain
+                            </h3>
+                            <button
+                              onClick={() => setShowAddressDropdown(false)}
+                              className="text-gray-500 hover:text-gray-800 text-xl"
                             >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
-                                      {address.label || "Alamat"}
-                                    </span>
-                                    {address.is_default === 1 && (
-                                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
-                                        Default
-                                      </span>
-                                    )}
-                                  </div>
+                              ×
+                            </button>
+                          </div>
 
-                                  <p className="font-semibold text-gray-800">
-                                    {address.recipient_name}
-                                  </p>
-                                  <p className="text-gray-600 text-sm">
-                                    {address.phone}
-                                  </p>
-                                  <p className="text-gray-700 text-sm">
-                                    {address.detail_address}
-                                  </p>
-                                  <p className="text-gray-600 text-sm">
-                                    {address.city}, {address.zip_code}
-                                  </p>
+                          {/* Address List */}
+                          <div className="overflow-y-auto p-4 space-y-3 flex-1">
+                            {addresses.map((address) => (
+                              <div
+                                key={address.id}
+                                onClick={() => {
+                                  setSelectedAddressId(address.id);
+                                  setShowAddressDropdown(false);
+                                }}
+                                className={`cursor-pointer border rounded-lg p-4 transition-all ${
+                                  selectedAddressId === address.id
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "border-gray-200 hover:border-gray-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                      <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
+                                        {address.label || "Alamat"}
+                                      </span>
+                                      {address.is_default === 1 && (
+                                        <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                          Default
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <p className="font-semibold text-gray-800">
+                                      {address.recipient_name}
+                                    </p>
+                                    <p className="text-gray-600 text-sm">
+                                      {address.phone}
+                                    </p>
+                                    <p className="text-gray-700 text-sm">
+                                      {address.detail_address}
+                                    </p>
+                                    <p className="text-gray-600 text-sm">
+                                      {address.district}, {address.city},{" "}
+                                      {address.province} {address.zip_code}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDelete(address.id);
+                                    }}
+                                    className="text-red-500 hover:text-red-700 p-2"
+                                    title="Hapus alamat"
+                                  >
+                                    <FaTrash size={14} />
+                                  </button>
                                 </div>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(address.id);
-                                  }}
-                                  className="text-red-500 hover:text-red-700 p-2"
-                                  title="Hapus alamat"
-                                >
-                                  <FaTrash size={14} />
-                                </button>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
+
+                          {/* Footer with close button */}
+                          <div className="p-4 border-t bg-gray-50 sticky bottom-0">
+                            <button
+                              onClick={() => setShowAddressDropdown(false)}
+                              className="w-full bg-blue-500 text-white py-2 rounded-lg font-medium hover:bg-blue-600 transition"
+                            >
+                              Tutup
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -513,8 +593,9 @@ const Checkout = () => {
                       {Number(totalWeight).toLocaleString("id-ID")} gram
                     </span>
                   </div>
-                  <div className="flex justify-between text-gray-600 text-center">
-                    Ongkir Akan dihitung di halaman pembayaran
+                  <div className="flex items-center justify-center text-gray-600 py-2 px-5 text-sm border border-dashed border-gray-300 rounded bg-gray-50">
+                    <FaTruck className="mr-2 text-orange-500" />
+                    Ongkir akan dihitung di halaman pembayaran
                   </div>
                   <div className="border-t pt-3 flex justify-between font-semibold text-lg">
                     <span>Total</span>
@@ -528,24 +609,35 @@ const Checkout = () => {
                 <button
                   onClick={handleProceedToPayment}
                   disabled={
-                    !selectedAddress || !isLoggedIn || isLoadingDestination
+                    !selectedAddress ||
+                    !isLoggedIn ||
+                    isLoadingDestination ||
+                    isCalculatingShipping
                   }
                   className={`w-full mt-6 py-4 rounded-lg font-semibold transition-all ${
-                    selectedAddress && isLoggedIn && !isLoadingDestination
+                    selectedAddress &&
+                    isLoggedIn &&
+                    !isLoadingDestination &&
+                    !isCalculatingShipping
                       ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
                   {isLoadingDestination
                     ? "Mencari destinasi..."
+                    : isCalculatingShipping
+                    ? "Menghitung ongkir..."
                     : !isLoggedIn
                     ? "Login Terlebih Dahulu"
                     : selectedAddress
                     ? "Lanjut ke Pembayaran"
                     : "Pilih Alamat Terlebih Dahulu"}
-                  {selectedAddress && isLoggedIn && !isLoadingDestination && (
-                    <FaChevronRight className="inline ml-2" />
-                  )}
+                  {selectedAddress &&
+                    isLoggedIn &&
+                    !isLoadingDestination &&
+                    !isCalculatingShipping && (
+                      <FaChevronRight className="inline ml-2" />
+                    )}
                 </button>
 
                 <p className="text-center text-gray-500 text-xs mt-3">
@@ -669,7 +761,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       placeholder="Kecamatan"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       value={newAddress.district}
                       onChange={(e) =>
                         setNewAddress({
