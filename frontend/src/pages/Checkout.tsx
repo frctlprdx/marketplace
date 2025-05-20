@@ -23,7 +23,7 @@ const Checkout = () => {
   );
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoadingDestination, setIsLoadingDestination] = useState(false);
   const [newAddress, setNewAddress] = useState({
     label: "",
     recipient_name: "",
@@ -37,15 +37,14 @@ const Checkout = () => {
     is_default: false,
   });
 
+  // Get user authentication from localStorage
+  const userId = localStorage.getItem("user_id");
+  const token = localStorage.getItem("user_token");
+  const isLoggedIn = !!(userId && token);
+
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
 
-  // Check if user is logged in
-  useEffect(() => {
-    const userId = localStorage.getItem("user_id");
-    const token = localStorage.getItem("user_token");
-    setIsLoggedIn(!!(userId && token));
-  }, []);
-
+  // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -59,14 +58,15 @@ const Checkout = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fetch addresses only if user is logged in
   useEffect(() => {
-    (async () => {
-      const userId = localStorage.getItem("user_id");
-      const token = localStorage.getItem("user_token");
-      if (!userId || !token) {
-        setAddresses([]);
-        return;
-      }
+    if (!isLoggedIn) {
+      setAddresses([]);
+      setSelectedAddressId(null);
+      return;
+    }
+
+    const fetchAddresses = async () => {
       try {
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/addresses?user_id=${userId}`,
@@ -74,18 +74,21 @@ const Checkout = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        if (!res.ok) throw new Error("Gagal fetch alamat");
+        if (!res.ok) throw new Error("Failed to fetch addresses");
         const data = await res.json();
         setAddresses(data);
         if (data.length) setSelectedAddressId(data[0].id);
-      } catch {
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
         setAddresses([]);
       }
-    })();
-  }, []);
+    };
 
+    fetchAddresses();
+  }, [isLoggedIn, userId, token]);
+
+  // Delete address
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("user_token");
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/addresses/${id}`,
@@ -98,25 +101,15 @@ const Checkout = () => {
         setAddresses((prev) => prev.filter((a) => a.id !== id));
         if (selectedAddressId === id) setSelectedAddressId(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("Error deleting address:", error);
       alert("Gagal menghapus alamat.");
     }
   };
 
-  const handleAddAddressClick = () => {
-    if (!isLoggedIn) {
-      alert("Login terlebih dahulu untuk menambah alamat!");
-      // Optionally navigate to login page
-      // navigate("/login");
-      return;
-    }
-    setShowAddAddressModal(true);
-  };
-
+  // Add new address
   const handleAddAddress = async () => {
-    const userId = localStorage.getItem("user_id");
-    const token = localStorage.getItem("user_token");
-    if (!userId || !token) return alert("Anda harus login terlebih dahulu.");
+    if (!isLoggedIn) return;
 
     try {
       const res = await axios.post(
@@ -147,17 +140,49 @@ const Checkout = () => {
         });
         setShowAddAddressModal(false);
         alert("Alamat berhasil ditambahkan.");
-      } else alert("Gagal menambahkan alamat.");
-    } catch {
+      }
+    } catch (error) {
+      console.error("Error adding address:", error);
       alert("Gagal menambahkan alamat.");
     }
   };
 
-  const handleProceedToPayment = () => {
+  // Search destination for shipping
+  // Original searchDestination function with added console.log
+  const searchDestination = async (district: string) => {
+    try {
+      setIsLoadingDestination(true);
+      const response = await fetch(
+        `http://localhost:8000/api/destination?search=${district}`
+      );
+      const result = await response.json();
+
+      if (result.data && result.data.data && result.data.data.length > 0) {
+        const firstDestination = result.data.data[0];
+        const destinationId = firstDestination.id;
+
+        // Added console.log to show the destination ID
+        console.log("Found destination ID:", destinationId);
+        console.log("Full destination data:", firstDestination);
+
+        return destinationId;
+      } else {
+        console.log("No destination found for district:", district);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error searching destination:", error);
+      alert("Gagal mencari destinasi pengiriman.");
+      return null;
+    } finally {
+      setIsLoadingDestination(false);
+    }
+  };
+
+  // Proceed to payment
+  const handleProceedToPayment = async () => {
     if (!isLoggedIn) {
       alert("Login terlebih dahulu untuk melanjutkan pembayaran!");
-      // Optionally navigate to login page
-      // navigate("/login");
       return;
     }
 
@@ -165,18 +190,23 @@ const Checkout = () => {
       alert("Silakan pilih alamat pengiriman terlebih dahulu!");
       return;
     }
+
     if (!product) {
       alert("Produk tidak ditemukan.");
       return;
     }
 
-    // Navigate to payment page with address and product data
-    navigate("/payment", {
-      state: {
-        address: selectedAddress,
-        product: product,
-      },
-    });
+    const destinationId = await searchDestination(selectedAddress.district);
+
+    if (destinationId) {
+      navigate("/payment", {
+        state: {
+          address: selectedAddress,
+          product: product,
+          destinationId: destinationId,
+        },
+      });
+    }
   };
 
   // Calculate subtotal and total weight
@@ -185,6 +215,7 @@ const Checkout = () => {
     ? product.totalweight || product.weight * product.quantity
     : 0;
 
+  // Redirect if no product
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -261,7 +292,8 @@ const Checkout = () => {
                     </h2>
                   </div>
                   <button
-                    onClick={handleAddAddressClick}
+                    onClick={() => setShowAddAddressModal(true)}
+                    disabled={!isLoggedIn}
                     className={`flex items-center gap-2 font-medium transition ${
                       isLoggedIn
                         ? "text-orange-500 hover:text-orange-600"
@@ -270,7 +302,7 @@ const Checkout = () => {
                     title={!isLoggedIn ? "Login terlebih dahulu" : ""}
                   >
                     <FaPlus size={14} />
-                    {isLoggedIn ? "Tambah Alamat" : "Login Terlebih Dahulu"}
+                    {isLoggedIn ? "Tambah Alamat" : "Login untuk Tambah Alamat"}
                   </button>
                 </div>
               </div>
@@ -306,12 +338,13 @@ const Checkout = () => {
                             <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
                               {selectedAddress?.label || "Alamat Utama"}
                             </span>
-                            {selectedAddress?.is_default && (
+                            {selectedAddress?.is_default === 1 && (
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
                                 Default
                               </span>
                             )}
                           </div>
+
                           <p className="font-semibold text-gray-800 mb-1">
                             {selectedAddress?.recipient_name}
                           </p>
@@ -346,15 +379,15 @@ const Checkout = () => {
                           Pilih Alamat Lain
                         </h3>
                         <div className="space-y-3">
-                          {addresses.map((addr) => (
+                          {addresses.map((address) => (
                             <div
-                              key={addr.id}
+                              key={address.id}
                               onClick={() => {
-                                setSelectedAddressId(addr.id);
+                                setSelectedAddressId(address.id);
                                 setShowAddressDropdown(false);
                               }}
                               className={`cursor-pointer border rounded-lg p-4 transition-all ${
-                                selectedAddressId === addr.id
+                                selectedAddressId === address.id
                                   ? "border-blue-500 bg-blue-50"
                                   : "border-gray-200 hover:border-gray-300"
                               }`}
@@ -363,31 +396,32 @@ const Checkout = () => {
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
-                                      {addr.label || "Alamat"}
+                                      {address.label || "Alamat"}
                                     </span>
-                                    {addr.is_default && (
+                                    {address.is_default === 1 && (
                                       <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
                                         Default
                                       </span>
                                     )}
                                   </div>
+
                                   <p className="font-semibold text-gray-800">
-                                    {addr.recipient_name}
+                                    {address.recipient_name}
                                   </p>
                                   <p className="text-gray-600 text-sm">
-                                    {addr.phone}
+                                    {address.phone}
                                   </p>
                                   <p className="text-gray-700 text-sm">
-                                    {addr.detail_address}
+                                    {address.detail_address}
                                   </p>
                                   <p className="text-gray-600 text-sm">
-                                    {addr.city}, {addr.zip_code}
+                                    {address.city}, {address.zip_code}
                                   </p>
                                 </div>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete(addr.id);
+                                    handleDelete(address.id);
                                   }}
                                   className="text-red-500 hover:text-red-700 p-2"
                                   title="Hapus alamat"
@@ -413,7 +447,7 @@ const Checkout = () => {
                       Tambahkan alamat pengiriman untuk melanjutkan checkout
                     </p>
                     <button
-                      onClick={handleAddAddressClick}
+                      onClick={() => setShowAddAddressModal(true)}
                       className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
                     >
                       <FaPlus className="inline mr-2" />
@@ -493,19 +527,23 @@ const Checkout = () => {
                 {/* Action Button */}
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={!selectedAddress || !isLoggedIn}
+                  disabled={
+                    !selectedAddress || !isLoggedIn || isLoadingDestination
+                  }
                   className={`w-full mt-6 py-4 rounded-lg font-semibold transition-all ${
-                    selectedAddress && isLoggedIn
+                    selectedAddress && isLoggedIn && !isLoadingDestination
                       ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  {!isLoggedIn
+                  {isLoadingDestination
+                    ? "Mencari destinasi..."
+                    : !isLoggedIn
                     ? "Login Terlebih Dahulu"
                     : selectedAddress
                     ? "Lanjut ke Pembayaran"
                     : "Pilih Alamat Terlebih Dahulu"}
-                  {selectedAddress && isLoggedIn && (
+                  {selectedAddress && isLoggedIn && !isLoadingDestination && (
                     <FaChevronRight className="inline ml-2" />
                   )}
                 </button>
@@ -520,7 +558,7 @@ const Checkout = () => {
       </div>
 
       {/* Add Address Modal */}
-      {showAddAddressModal && (
+      {showAddAddressModal && isLoggedIn && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
