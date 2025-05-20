@@ -6,7 +6,6 @@ import {
   FiArrowLeft,
   FiMinus,
   FiPlus,
-  FiShare2,
 } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
@@ -15,6 +14,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
+  const [weight, setWeight] = useState(1);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +157,7 @@ const ProductDetail = () => {
   };
 
   const subtotal = product ? product.price * quantity : 0;
+  const totalweight = product ? product.weight * quantity : 0;
 
   if (loading) {
     return (
@@ -295,6 +296,9 @@ const ProductDetail = () => {
                   >
                     Stok: {product.stocks}
                   </span>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700">
+                    Berat: {product.weight} gram
+                  </span>
                 </div>
               </div>
 
@@ -337,6 +341,14 @@ const ProductDetail = () => {
                   </span>
                 </div>
               </div>
+              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Berat Total</span>
+                  <span className="text-lg font-bold text-gray-800">
+                    {Number(totalweight).toLocaleString("id-ID")} gram
+                  </span>
+                </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="grid grid-cols-4 gap-3">
@@ -365,6 +377,7 @@ const ProductDetail = () => {
                         product: {
                           ...product,
                           quantity,
+                          totalweight,
                         },
                       },
                     });

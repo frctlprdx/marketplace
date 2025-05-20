@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateProductsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
@@ -19,6 +14,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->integer('sold')->default(0); // jumlah terjual
+            $table->decimal('weight', 8, 0)->default(0); // hapus ->after('price')
             $table->decimal('rating', 2, 1)->default(0.0); // rating rata-rata review
             $table->text('description')->nullable();
             $table->integer('stocks');
@@ -28,11 +24,6 @@ class CreateProductsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('products');

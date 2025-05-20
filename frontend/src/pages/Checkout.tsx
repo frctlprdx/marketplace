@@ -6,6 +6,7 @@ import {
   FaMapMarkerAlt,
   FaBox,
   FaChevronRight,
+  FaWeight,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -22,6 +23,7 @@ const Checkout = () => {
   );
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [newAddress, setNewAddress] = useState({
     label: "",
     recipient_name: "",
@@ -36,6 +38,13 @@ const Checkout = () => {
   });
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    const token = localStorage.getItem("user_token");
+    setIsLoggedIn(!!(userId && token));
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -94,6 +103,16 @@ const Checkout = () => {
     }
   };
 
+  const handleAddAddressClick = () => {
+    if (!isLoggedIn) {
+      alert("Login terlebih dahulu untuk menambah alamat!");
+      // Optionally navigate to login page
+      // navigate("/login");
+      return;
+    }
+    setShowAddAddressModal(true);
+  };
+
   const handleAddAddress = async () => {
     const userId = localStorage.getItem("user_id");
     const token = localStorage.getItem("user_token");
@@ -135,6 +154,13 @@ const Checkout = () => {
   };
 
   const handleProceedToPayment = () => {
+    if (!isLoggedIn) {
+      alert("Login terlebih dahulu untuk melanjutkan pembayaran!");
+      // Optionally navigate to login page
+      // navigate("/login");
+      return;
+    }
+
     if (!selectedAddress) {
       alert("Silakan pilih alamat pengiriman terlebih dahulu!");
       return;
@@ -153,8 +179,11 @@ const Checkout = () => {
     });
   };
 
-  // Calculate subtotal based on product price and quantity
+  // Calculate subtotal and total weight
   const subtotal = product ? product.price * product.quantity : 0;
+  const totalWeight = product
+    ? product.totalweight || product.weight * product.quantity
+    : 0;
 
   if (!product) {
     return (
@@ -232,18 +261,42 @@ const Checkout = () => {
                     </h2>
                   </div>
                   <button
-                    onClick={() => setShowAddAddressModal(true)}
-                    className="flex items-center gap-2 text-orange-500 hover:text-orange-600 font-medium transition"
+                    onClick={handleAddAddressClick}
+                    className={`flex items-center gap-2 font-medium transition ${
+                      isLoggedIn
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 cursor-not-allowed"
+                    }`}
+                    title={!isLoggedIn ? "Login terlebih dahulu" : ""}
                   >
                     <FaPlus size={14} />
-                    Tambah Alamat
+                    {isLoggedIn ? "Tambah Alamat" : "Login Terlebih Dahulu"}
                   </button>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6">
-                {addresses.length > 0 ? (
+                {!isLoggedIn ? (
+                  <div className="text-center py-12">
+                    <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaMapMarkerAlt className="text-gray-400 text-2xl" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      Login untuk melihat alamat
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Anda perlu login terlebih dahulu untuk mengakses alamat
+                      pengiriman
+                    </p>
+                    <button
+                      onClick={() => navigate("/login")}
+                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                    >
+                      Login Sekarang
+                    </button>
+                  </div>
+                ) : addresses.length > 0 ? (
                   <>
                     {/* Selected Address Display */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
@@ -360,7 +413,7 @@ const Checkout = () => {
                       Tambahkan alamat pengiriman untuk melanjutkan checkout
                     </p>
                     <button
-                      onClick={() => setShowAddAddressModal(true)}
+                      onClick={handleAddAddressClick}
                       className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
                     >
                       <FaPlus className="inline mr-2" />
@@ -405,6 +458,12 @@ const Checkout = () => {
                     <p className="text-gray-600 text-sm">
                       Qty: {product.quantity}
                     </p>
+                    <div className="flex items-center gap-1 text-gray-600 text-sm mt-1">
+                      <FaWeight size={12} />
+                      <span>
+                        {Number(totalWeight).toLocaleString("id-ID")} gram
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -415,8 +474,13 @@ const Checkout = () => {
                     <span>Rp {subtotal.toLocaleString("id-ID")}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>Ongkir</span>
-                    <span>Akan dihitung di halaman pembayaran</span>
+                    <span>Berat Total</span>
+                    <span>
+                      {Number(totalWeight).toLocaleString("id-ID")} gram
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-600 text-center">
+                    Ongkir Akan dihitung di halaman pembayaran
                   </div>
                   <div className="border-t pt-3 flex justify-between font-semibold text-lg">
                     <span>Total</span>
@@ -429,17 +493,19 @@ const Checkout = () => {
                 {/* Action Button */}
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={!selectedAddress}
+                  disabled={!selectedAddress || !isLoggedIn}
                   className={`w-full mt-6 py-4 rounded-lg font-semibold transition-all ${
-                    selectedAddress
+                    selectedAddress && isLoggedIn
                       ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  {selectedAddress
+                  {!isLoggedIn
+                    ? "Login Terlebih Dahulu"
+                    : selectedAddress
                     ? "Lanjut ke Pembayaran"
                     : "Pilih Alamat Terlebih Dahulu"}
-                  {selectedAddress && (
+                  {selectedAddress && isLoggedIn && (
                     <FaChevronRight className="inline ml-2" />
                   )}
                 </button>
