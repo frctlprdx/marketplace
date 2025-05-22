@@ -114,7 +114,7 @@ const UserNav = () => {
             {/* Hanya muncul jika role adalah seller */}
             {role === "seller" && (
               <button
-                onClick={() => navigate("/addproduct")}
+                onClick={() => navigate("/allproducts")}
                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
               >
                 <MdStorefront className="text-lg" />

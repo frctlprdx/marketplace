@@ -25,22 +25,22 @@ Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('c
 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
-    Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index');
-    Route::post('/cart', [CartController::class, 'store'])->middleware('role:customer')->name('cart.store');
-    Route::delete('/cart', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy');
+    Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index'); //Check
+    Route::post('/cart', [CartController::class, 'store'])->middleware('role:customer')->name('cart.store'); //Check
+    Route::delete('/cart', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy'); //Check
 
-    Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index');
-    Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store');
-    Route::delete('/wishlist', [WishlistController::class, 'destroy'])->middleware('role:customer')->name('wishlist.destroy');
+    Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index'); //Check
+    Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store'); //Check
+    Route::delete('/wishlist', [WishlistController::class, 'destroy'])->middleware('role:customer')->name('wishlist.destroy'); //Check
 
     Route::get('/profile', [UserController::class, 'indexuser'])->middleware('role:customer')->name('profile.index');
     Route::put('/profile/{id}', [UserController::class, 'update'])->middleware('role:customer')->name('profile.update');
 
     // Route alamat user (customer)
-    Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index');
-    Route::post('/addresses', [UserAddressController::class, 'store'])->middleware('role:customer')->name('addresses.store');
-    Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete');
-    Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update');
+    Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index'); //Check
+    Route::post('/addresses', [UserAddressController::class, 'store'])->middleware('role:customer')->name('addresses.store'); //Check
+    Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete'); //Check
+    Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update'); //Check
 
     Route::get('/transactionhistory', [TransactionController::class, 'historyindex'])->middleware('role:customer')->name('transaction.index');
     Route::post('/transactionhistory', [TransactionController::class, 'store'])->middleware('role:customer')->name('transaction.store');
@@ -55,8 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/{id}', [UserController::class, 'update'])->middleware('role:seller')->name('user.update');
     Route::delete('/user/{id}', [UserController::class, 'destroy'])->middleware('role:seller')->name('user.destroy');
 
-    Route::get('/sellerpage', [ProductController::class, 'index'])->middleware('role:seller')->name('seller.page');
-    Route::post('/product', [ProductController::class, 'store'])->middleware('role:seller')->name('product.store');
+    Route::get('/sellerpage', [ProductController::class, 'sellerProduct'])->middleware('role:seller')->name('seller.page'); //Check
+    Route::post('/product', [ProductController::class, 'store'])->middleware('role:seller')->name('product.store');//Check
+    Route::get('/product/{id}', [ProductController::class, 'showSeller'])->middleware('role:seller')->name('product.store');//Check
     Route::put('/product/{id}', [ProductController::class, 'update'])->middleware('role:seller')->name('product.update');
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->middleware('role:seller')->name('product.destroy');
 

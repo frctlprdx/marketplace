@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->decimal('rating', 2, 1)->default(0.0); // rating rata-rata review
             $table->text('description')->nullable();
             $table->integer('stocks');
-            $table->decimal('price', 10, 0);
+            $table->decimal('price', 11, 0);
             $table->string('image')->nullable();
             $table->timestamps();
         });

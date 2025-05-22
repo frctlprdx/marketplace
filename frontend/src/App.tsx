@@ -10,6 +10,8 @@ import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
 import AddProduct from "./pages/AddProduct";
 import SellerLayout from "./components/Layouts/SellerLayout";
+import SellerProducts from "./pages/SellerProducts";
+import EditProduct from "./pages/EditProduct";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -40,6 +42,16 @@ function App() {
               </SellerLayout>
             }
           />
+          <Route
+            path="/allproducts"
+            element={
+              <SellerLayout>
+                <SellerProducts />
+              </SellerLayout>
+            }
+          />
+          <Route path="/editproduct/:id" element={<EditProduct />} />
+
         </Routes>
 
         <ToastContainer />

@@ -63,9 +63,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-
-
     public function show($id)
     {
         $product = Product::find($id);
@@ -90,6 +87,51 @@ class ProductController extends Controller
         // Kembalikan view atau data produk (bisa diubah sesuai kebutuhan)
         return view('product.index', ['products' => $products]);
     }  
+
+
+
+    public function sellerProduct(Request $request)
+    {
+        $user = $request->user(); // user dari token yang dikirim
+
+        $products = Product::where('user_id', $user->id)
+            ->with('category') // jika ingin menampilkan relasi kategori
+            ->get();
+
+        return response()->json($products);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = $request->user();
+
+        // Cari produk milik user berdasarkan ID
+        $product = Product::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        // Update data produk termasuk gambar baru (kalau ada)
+        $product->update($request->only(['name', 'description', 'stocks', 'price', 'image']));
+
+        return response()->json(['message' => 'Produk berhasil diperbarui']);
+    }
+
+
+    public function showSeller($id)
+    {
+        $user = auth()->user();
+
+        $product = Product::where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        return response()->json($product);
+    }
+
 
     
 }
