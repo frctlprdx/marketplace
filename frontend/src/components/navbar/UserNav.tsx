@@ -8,20 +8,35 @@ import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { MdStorefront } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const UserNav = () => {
   const [hoverHeart, setHoverHeart] = useState(false);
   const [hoverCart, setHoverCart] = useState(false);
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
-  // Ambil role saat komponen dimount
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     setRole(storedRole);
+  }, []);
+
+  // Tutup dropdown jika klik di luar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -38,9 +53,6 @@ const UserNav = () => {
     const userToken = localStorage.getItem("user_token");
 
     if (userId && role === "customer") {
-      console.log("User ID:", userId);
-      console.log("Role:", role);
-      console.log("User Token:", userToken);
       navigate(`/wishlist?user_id=${userId}`);
     } else {
       console.log("User ID atau role tidak ditemukan di localStorage");
@@ -53,9 +65,6 @@ const UserNav = () => {
     const userToken = localStorage.getItem("user_token");
 
     if (userId && role === "customer") {
-      console.log("User ID:", userId);
-      console.log("Role:", role);
-      console.log("User Token:", userToken);
       navigate(`/cart?user_id=${userId}`);
     } else {
       console.log("User ID atau role tidak ditemukan di localStorage");
@@ -64,7 +73,6 @@ const UserNav = () => {
 
   return (
     <div className="flex items-center space-x-2 sm:space-x-4">
-      {/* Wishlist Icon */}
       <button
         className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
         onMouseEnter={() => setHoverHeart(true)}
@@ -74,7 +82,6 @@ const UserNav = () => {
         {hoverHeart ? <FaHeart /> : <FiHeart />}
       </button>
 
-      {/* Cart Icon */}
       <button
         className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
         onMouseEnter={() => setHoverCart(true)}
@@ -84,8 +91,7 @@ const UserNav = () => {
         {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
       </button>
 
-      {/* User Icon + Dropdown */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}
           className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
@@ -111,7 +117,6 @@ const UserNav = () => {
               Settings
             </button>
 
-            {/* Hanya muncul jika role adalah seller */}
             {role === "seller" && (
               <button
                 onClick={() => navigate("/allproducts")}

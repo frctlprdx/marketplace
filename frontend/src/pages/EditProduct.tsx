@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { supabase } from "../supabase";
+import { useNavigate } from "react-router-dom";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -12,12 +13,21 @@ const EditProduct = () => {
     stocks: "",
     image: "",
   });
+  const navigate = useNavigate();
+
   const [message, setMessage] = useState("");
   const [newImage, setNewImage] = useState<File | null>(null);
   const [oldImageUrl, setOldImageUrl] = useState("");
 
   useEffect(() => {
+    const role = localStorage.getItem("role");
     const token = localStorage.getItem("user_token");
+
+    // Redirect jika belum login atau bukan seller
+    if (!token || role !== "seller") {
+      navigate("/");
+      return;
+    }
     axios
       .get(`${import.meta.env.VITE_API_URL}/product/${id}`, {
         headers: { Authorization: `Bearer ${token}` },

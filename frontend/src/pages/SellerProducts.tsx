@@ -1,7 +1,6 @@
-// SellerProducts.tsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface Product {
   id: number;
@@ -14,20 +13,32 @@ const SellerProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("user_token");
+
+    // Redirect jika belum login atau bukan seller
+    if (!token || role !== "seller") {
+      navigate("/");
+      return;
+    }
+
     const fetchProducts = async () => {
-      const token = localStorage.getItem("user_token");
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/sellerpage`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setProducts(res.data);
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/sellerpage`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setProducts(res.data);
+      } catch (error) {
+        console.error("Gagal memuat produk:", error);
+      }
     };
+
     fetchProducts();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="p-4 max-w-screen-lg mx-auto">

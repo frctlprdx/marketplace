@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function AddProduct() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,8 @@ function AddProduct() {
     stocks: "",
     price: "",
   });
+  const navigate = useNavigate();
+
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
   );
@@ -19,6 +22,14 @@ function AddProduct() {
 
   // Fetch kategori dari API saat halaman dibuka
   useEffect(() => {
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("user_token");
+
+    // Redirect jika belum login atau bukan seller
+    if (!token || role !== "seller") {
+      navigate("/");
+      return;
+    }
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
