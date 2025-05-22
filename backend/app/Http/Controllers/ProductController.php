@@ -40,8 +40,12 @@ class ProductController extends Controller
             $query->where('products.price', '<=', intval($request->maxPrice));
         }
 
+        // Tambahkan random order
+        $query->inRandomOrder();
+
         return response()->json($query->get());
     }
+
 
     public function store(Request $request)
     {
