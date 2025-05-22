@@ -43,6 +43,27 @@ class ProductController extends Controller
         return response()->json($query->get());
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'name' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
+            'stocks' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+            'image' => 'required|string', // URL dari Supabase
+        ]);
+
+        $product = Product::create($request->all());
+
+        return response()->json([
+            'message' => 'Produk berhasil ditambahkan.',
+            'data' => $product
+        ]);
+    }
+
+
 
 
     public function show($id)

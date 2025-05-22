@@ -8,6 +8,8 @@ import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
+import AddProduct from "./pages/AddProduct";
+import SellerLayout from "./components/Layouts/SellerLayout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,17 +20,28 @@ function App() {
         <div className="sticky top-0 z-50">
           <Navbar />
         </div>
-        <div className="w-screen">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/product" element={<Product />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/productdetail/:id" element={<ProductDetail />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/payment" element={<Payment />} />
-          </Routes>
-        </div>
+
+        <Routes>
+          {/* Halaman umum */}
+          <Route path="/" element={<Home />} />
+          <Route path="/product" element={<Product />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/productdetail/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment" element={<Payment />} />
+
+          {/* Halaman seller */}
+          <Route
+            path="/addproduct"
+            element={
+              <SellerLayout>
+                <AddProduct />
+              </SellerLayout>
+            }
+          />
+        </Routes>
+
         <ToastContainer />
       </div>
     </Router>

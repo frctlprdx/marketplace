@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserController::class, 'indexuser'])->middleware('role:customer')->name('profile.index');
     Route::put('/profile/{id}', [UserController::class, 'update'])->middleware('role:customer')->name('profile.update');
 
-        // Route alamat user (customer)
+    // Route alamat user (customer)
     Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index');
     Route::post('/addresses', [UserAddressController::class, 'store'])->middleware('role:customer')->name('addresses.store');
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete');
