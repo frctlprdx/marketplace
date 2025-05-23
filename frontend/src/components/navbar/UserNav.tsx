@@ -9,6 +9,8 @@ import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { MdStorefront } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const UserNav = () => {
   const [hoverHeart, setHoverHeart] = useState(false);
@@ -24,7 +26,6 @@ const UserNav = () => {
     setRole(storedRole);
   }, []);
 
-  // Tutup dropdown jika klik di luar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -34,7 +35,6 @@ const UserNav = () => {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -50,24 +50,22 @@ const UserNav = () => {
   const handleClickWishlist = () => {
     const userId = localStorage.getItem("user_id");
     const role = localStorage.getItem("role");
-    const userToken = localStorage.getItem("user_token");
 
     if (userId && role === "customer") {
       navigate(`/wishlist?user_id=${userId}`);
     } else {
-      console.log("User ID atau role tidak ditemukan di localStorage");
+      toast.error("Login Akun customer terlebih dahulu");
     }
   };
 
   const handleClickCart = () => {
     const userId = localStorage.getItem("user_id");
     const role = localStorage.getItem("role");
-    const userToken = localStorage.getItem("user_token");
 
     if (userId && role === "customer") {
       navigate(`/cart?user_id=${userId}`);
     } else {
-      console.log("User ID atau role tidak ditemukan di localStorage");
+      toast.error("Login Akun customer terlebih dahulu");
     }
   };
 

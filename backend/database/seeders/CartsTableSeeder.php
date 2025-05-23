@@ -17,7 +17,7 @@ class CartsTableSeeder extends Seeder
         Cart::create([
             'user_id' => 1, // Ivan Customer
             'product_id' => 1,
-            'quantity' => 2
+            'quantity' => 1
         ]);
 
         Cart::create([
