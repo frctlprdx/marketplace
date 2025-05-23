@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sellerpage', [ProductController::class, 'sellerProduct'])->middleware('role:seller')->name('seller.page'); //Check
     Route::post('/product', [ProductController::class, 'store'])->middleware('role:seller')->name('product.store');//Check
     Route::get('/product/{id}', [ProductController::class, 'showSeller'])->middleware('role:seller')->name('product.store');//Check
-    Route::put('/product/{id}', [ProductController::class, 'update'])->middleware('role:seller')->name('product.update');
+    Route::put('/product/{id}', [ProductController::class, 'update'])->middleware('role:seller')->name('product.update'); // Check
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->middleware('role:seller')->name('product.destroy');
 
     Route::get('/payments', [PaymentController::class, 'index'])->middleware('role:seller')->name('payments.index');
