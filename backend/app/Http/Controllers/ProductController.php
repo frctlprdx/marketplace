@@ -117,7 +117,7 @@ class ProductController extends Controller
             ->firstOrFail();
 
         // Update data produk termasuk gambar baru (kalau ada)
-        $product->update($request->only(['name', 'description', 'stocks', 'price', 'image']));
+        $product->update($request->only(['name', 'description', 'stocks', 'price', 'image', 'show']));
 
         return response()->json(['message' => 'Produk berhasil diperbarui']);
     }

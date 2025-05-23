@@ -10,17 +10,19 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'name',
-        'category_id',
-        'sold',
-        'weight',
-        'rating',
-        'description',
-        'stocks',
-        'price',
-        'image',
+    'user_id',
+    'name',
+    'category_id',
+    'sold',
+    'weight',
+    'rating',
+    'description',
+    'stocks',
+    'price',
+    'image',
+    'show'
     ];
+
 
     /**
      * Produk ini ada di banyak cart

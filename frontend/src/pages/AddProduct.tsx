@@ -10,8 +10,6 @@ function AddProduct() {
     stocks: "",
     price: "",
   });
-  const navigate = useNavigate();
-
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
   );
@@ -19,17 +17,17 @@ function AddProduct() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  // Fetch kategori dari API saat halaman dibuka
   useEffect(() => {
     const role = localStorage.getItem("role");
     const token = localStorage.getItem("user_token");
 
-    // Redirect jika belum login atau bukan seller
     if (!token || role !== "seller") {
       navigate("/");
       return;
     }
+
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
@@ -50,17 +48,18 @@ function AddProduct() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (show: boolean) => {
     if (!file) return alert("Pilih gambar terlebih dahulu");
     if (!selectedCategory) return alert("Pilih kategori terlebih dahulu");
     setLoading(true);
 
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `produk/${fileName}`; // ✅ simpan di folder 'produk'
 
     const { error } = await supabase.storage
       .from("nogosarenmarketplace")
-      .upload(fileName, file);
+      .upload(filePath, file);
 
     if (error) {
       setLoading(false);
@@ -69,7 +68,7 @@ function AddProduct() {
 
     const { data: publicUrl } = supabase.storage
       .from("nogosarenmarketplace")
-      .getPublicUrl(fileName);
+      .getPublicUrl(filePath); // ✅ ambil dari folder 'produk'
 
     const userId = localStorage.getItem("user_id");
     const token = localStorage.getItem("user_token");
@@ -89,7 +88,8 @@ function AddProduct() {
           description: formData.description,
           stocks: formData.stocks,
           price: formData.price,
-          image: publicUrl.publicUrl,
+          image: publicUrl.publicUrl, // ✅ image URL yang benar
+          show: show,
         },
         {
           headers: {
@@ -98,6 +98,14 @@ function AddProduct() {
         }
       );
       setMessage("Produk berhasil ditambahkan!");
+      setFormData({
+        name: "",
+        description: "",
+        stocks: "",
+        price: "",
+      });
+      setFile(null);
+      setSelectedCategory("");
     } catch (error) {
       console.error(error);
       setMessage("Gagal menyimpan produk.");
@@ -115,6 +123,7 @@ function AddProduct() {
         name="name"
         placeholder="Nama Produk"
         onChange={handleChange}
+        value={formData.name}
         className="border p-2 mb-2 w-full"
       />
 
@@ -140,6 +149,7 @@ function AddProduct() {
         name="description"
         placeholder="Deskripsi"
         onChange={handleChange}
+        value={formData.description}
         className="border p-2 mb-2 w-full"
       />
       <input
@@ -147,6 +157,7 @@ function AddProduct() {
         name="stocks"
         placeholder="Stok"
         onChange={handleChange}
+        value={formData.stocks}
         className="border p-2 mb-2 w-full"
       />
       <input
@@ -154,6 +165,7 @@ function AddProduct() {
         name="price"
         placeholder="Harga"
         onChange={handleChange}
+        value={formData.price}
         className="border p-2 mb-2 w-full"
       />
       <input
@@ -162,14 +174,27 @@ function AddProduct() {
         onChange={(e) => setFile(e.target.files?.[0] || null)}
         className="mb-4"
       />
-      <button
-        onClick={handleUpload}
-        disabled={loading}
-        className="bg-orange-500 text-white px-4 py-2 rounded"
-      >
-        {loading ? "Mengupload..." : "Simpan Produk"}
-      </button>
-      {message && <p className="mt-2 text-sm text-center">{message}</p>}
+
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={() => handleUpload(true)}
+          disabled={loading}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+        >
+          {loading ? "Menyimpan..." : "Tampilkan ke Pembeli"}
+        </button>
+        <button
+          onClick={() => handleUpload(false)}
+          disabled={loading}
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+        >
+          {loading ? "Menyimpan..." : "Sembunyikan dari Pembeli"}
+        </button>
+      </div>
+
+      {message && (
+        <p className="mt-4 text-center text-sm text-blue-600">{message}</p>
+      )}
     </div>
   );
 }

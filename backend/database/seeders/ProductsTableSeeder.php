@@ -21,6 +21,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 650000000, // Rp650.000.000
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/aprosegold.jpg',
+                'show' => true,
             ],
             [
                 'user_id' => 2,
@@ -33,6 +34,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 600000000,
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/aproyaloak.jpg',
+                'show' => true,
             ],
             [
                 'user_id' => 2,
@@ -45,6 +47,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 400000000,
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/cosmographdaytona.jpg',
+                'show' => true,
             ],
             [
                 'user_id' => 2,
@@ -57,6 +60,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 50000000000,
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/gmchime.jpg',
+                'show' => true,
             ],
             [
                 'user_id' => 2,
@@ -69,6 +73,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 700000000,
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/gmtpepsi.jpg',
+                'show' => true,
             ],
             [
                 'user_id' => 2,
@@ -81,6 +86,7 @@ class ProductsTableSeeder extends Seeder
                 'rating' => 5.0,
                 'price' => 3000000000,
                 'image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/produk/nautilusblue.jpg',
+                'show' => true,
             ],
         ];
 
