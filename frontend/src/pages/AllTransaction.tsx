@@ -1,15 +1,31 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  FiShoppingBag,
+  FiUser,
+  FiPackage,
+  FiHash,
+  FiClock,
+  FiEye,
+  FiCheckCircle,
+  FiXCircle,
+  FiAlertCircle,
+  FiTrendingUp,
+  FiCalendar,
+  FiTag,
+} from "react-icons/fi";
 
 interface Transaction {
   id: number;
   transaction_item: number;
   user_id: string; // nama user
   product_name: string;
+  category_name: string; // nama kategori
   amount: number;
   status: string;
   created_at: string;
+  category?: string; // category name
 }
 
 const AllTransactionTable = () => {
@@ -42,53 +58,310 @@ const AllTransactionTable = () => {
     fetchTransactions();
   }, [navigate]);
 
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "paid":
+      case "dibayar":
+        return <FiCheckCircle className="text-green-500" />;
+      case "completed":
+      case "selesai":
+        return <FiCheckCircle className="text-green-500" />;
+      case "pending":
+      case "menunggu":
+        return <FiAlertCircle className="text-orange-500" />;
+      case "cancelled":
+      case "dibatalkan":
+        return <FiXCircle className="text-red-500" />;
+      case "not paid":
+      case "belum dibayar":
+      case "unpaid":
+        return <FiClock className="text-gray-500" />;
+      default:
+        return <FiClock className="text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "paid":
+      case "dibayar":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "completed":
+      case "selesai":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "pending":
+      case "menunggu":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "cancelled":
+      case "dibatalkan":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "not paid":
+      case "belum dibayar":
+      case "unpaid":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   return (
-    <div className="p-4 max-w-screen-xl mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Daftar Transaksi Pembeli</h2>
-      {transactions.length === 0 ? (
-        <p>Tidak ada transaksi ditemukan.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border border-gray-300 text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 border">ID</th>
-                <th className="px-4 py-2 border">Pembeli</th>
-                <th className="px-4 py-2 border">Produk</th>
-                <th className="px-4 py-2 border">Jumlah</th>
-                <th className="px-4 py-2 border">Status</th>
-                <th className="px-4 py-2 border">Tanggal</th>
-              </tr>
-            </thead>
-            <tbody>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
+                <FiShoppingBag className="text-xl text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">
+                  Daftar Transaksi
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Kelola semua transaksi pembeli Anda
+                </p>
+              </div>
+            </div>
+            <div className="hidden sm:flex items-center space-x-4">
+              <div className="flex items-center space-x-2 bg-orange-100 px-4 py-2 rounded-lg">
+                <FiTrendingUp className="text-orange-600" />
+                <span className="text-orange-800 font-medium">
+                  {transactions.length} Transaksi
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        {transactions.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-6">
+              <FiShoppingBag className="text-2xl text-orange-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Belum Ada Transaksi
+            </h3>
+            <p className="text-gray-600">
+              Transaksi pembeli akan muncul di sini setelah ada pesanan masuk.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {/* Table Header */}
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
+              <h2 className="text-lg font-semibold text-white">
+                Riwayat Transaksi Pembeli
+              </h2>
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-orange-50 border-b border-orange-100">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                      <div className="flex items-center space-x-2">
+                        <FiHash className="text-orange-600" />
+                        <span>ID</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                      <div className="flex items-center space-x-2">
+                        <FiUser className="text-orange-600" />
+                        <span>Pembeli</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                      <div className="flex items-center space-x-2">
+                        <FiPackage className="text-orange-600" />
+                        <span>Produk</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                      <div className="flex items-center justify-center space-x-2">
+                        <FiHash className="text-orange-600" />
+                        <span>Jumlah</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                      <div className="flex items-center justify-center space-x-2">
+                        <FiCheckCircle className="text-orange-600" />
+                        <span>Status</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                      <div className="flex items-center justify-center space-x-2">
+                        <FiCalendar className="text-orange-600" />
+                        <span>Tanggal</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {transactions.map((trx, index) => (
+                    <tr
+                      key={trx.id}
+                      onClick={() =>
+                        navigate(`/transactiondetail/${trx.transaction_item}`)
+                      }
+                      className="hover:bg-orange-25 transition-colors duration-200 group cursor-pointer"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <span className="text-orange-600 font-semibold text-sm">
+                              #{trx.id}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center">
+                            <FiUser className="text-white text-sm" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-800">
+                              {trx.user_id}
+                            </p>
+                            <p className="text-xs text-gray-500">Pembeli</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <p className="font-medium text-gray-800 truncate">
+                            {trx.product_name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {trx.category_name || "Kategori tidak tersedia"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center px-3 py-1 bg-orange-50 border border-orange-200 rounded-full">
+                          <span className="text-orange-800 font-semibold">
+                            {trx.amount}
+                          </span>
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                            trx.status
+                          )}`}
+                        >
+                          {getStatusIcon(trx.status)}
+                          <span>{trx.status}</span>
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="text-sm text-gray-600">
+                          <div className="font-medium">
+                            {new Date(trx.created_at).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(trx.created_at).toLocaleTimeString(
+                              "id-ID",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="lg:hidden p-4 space-y-4">
               {transactions.map((trx) => (
-                <tr
+                <div
                   key={trx.id}
-                  className="hover:bg-gray-100 cursor-pointer"
                   onClick={() =>
                     navigate(`/transactiondetail/${trx.transaction_item}`)
                   }
+                  className="bg-gradient-to-r from-white to-orange-25 border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                 >
-                  <td className="px-4 py-2 border text-center">{trx.id}</td>
-                  <td className="px-4 py-2 border">{trx.user_id}</td>
-                  <td className="px-4 py-2 border">{trx.product_name}</td>
-                  <td className="px-4 py-2 border text-center">{trx.amount}</td>
-                  <td className="px-4 py-2 border text-center">{trx.status}</td>
-                  <td className="px-4 py-2 border text-center">
-                    {new Date(trx.created_at).toLocaleString("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                </tr>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <span className="text-orange-600 font-semibold text-sm">
+                          #{trx.id}
+                        </span>
+                      </div>
+                      <span
+                        className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          trx.status
+                        )}`}
+                      >
+                        {getStatusIcon(trx.status)}
+                        <span>{trx.status}</span>
+                      </span>
+                    </div>
+                    <FiEye className="text-orange-500" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <FiUser className="text-orange-500 text-sm" />
+                      <span className="text-sm font-medium text-gray-800">
+                        {trx.user_id}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FiTag className="text-orange-500 text-sm" />
+                      <span className="text-xs text-gray-500">
+                        {trx.category_name || "Kategori tidak tersedia"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FiPackage className="text-orange-500 text-sm" />
+                      <span className="text-sm text-gray-600 truncate">
+                        {trx.product_name}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <FiHash className="text-orange-500 text-sm" />
+                        <span className="text-sm text-gray-600">
+                          Jumlah: {trx.amount}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-xs text-gray-500">
+                        <FiCalendar />
+                        <span>
+                          {new Date(trx.created_at).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

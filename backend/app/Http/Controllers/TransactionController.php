@@ -21,6 +21,7 @@ class TransactionController extends Controller
             $transactions = DB::table('transactions')
                 ->join('transaction_items', 'transactions.transaction_item', '=', 'transaction_items.id')
                 ->join('products', 'transaction_items.product_id', '=', 'products.id')
+                ->join('categories', 'products.category_id', '=', 'categories.id')
                 ->join('users', 'transactions.user_id', '=', 'users.id')
                 ->where('transactions.seller_id', $user->id)
                 ->select(
@@ -28,6 +29,7 @@ class TransactionController extends Controller
                     'transaction_item',
                     'users.name as user_id', // frontend expects this key
                     'products.name as product_name',
+                    'categories.name as category_name',
                     'transaction_items.amount as amount',
                     'transactions.status as status',
                     'transactions.created_at as created_at'
