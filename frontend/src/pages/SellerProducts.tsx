@@ -83,7 +83,7 @@ const SellerProducts = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {products.map((product, index) => (
+                    {products.map((product) => (
                       <tr
                         key={product.id}
                         className="hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 cursor-pointer transition-all duration-200 group"
@@ -124,7 +124,7 @@ const SellerProducts = () => {
 
           {/* Mobile/Tablet Card View */}
           <div className="lg:hidden space-y-4">
-            {products.map((product, index) => (
+            {products.map((product) => (
               <div
                 key={product.id}
                 className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 overflow-hidden group"

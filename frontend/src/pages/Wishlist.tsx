@@ -157,6 +157,13 @@ const Wishlist = () => {
 
     const quantity = quantities[productId] || 1; // default quantity = 1
 
+    // Check if quantity exceeds available stock
+    const item = wishlist.find((item) => item.product_id === productId);
+    if (item && quantity > item.stocks) {
+      toast.error(`Stok tidak mencukupi! Hanya tersedia ${item.stocks} item.`);
+      return;
+    }
+
     setRemovingProductIds((prev) => [...prev, productId]);
 
     try {
@@ -290,36 +297,53 @@ const Wishlist = () => {
                       </button>
                       <span className="text-lg">{quantity}</span>
                       <button
-                        onClick={() =>
-                          setQuantities((prev) => ({
-                            ...prev,
-                            [item.product_id]: (prev[item.product_id] || 1) + 1,
-                          }))
-                        }
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
+                        onClick={() => {
+                          const currentQty = quantities[item.product_id] || 1;
+                          if (currentQty < item.stocks) {
+                            setQuantities((prev) => ({
+                              ...prev,
+                              [item.product_id]: currentQty + 1,
+                            }));
+                          } else {
+                            toast.warning(
+                              `Maksimal ${item.stocks} item tersedia!`
+                            );
+                          }
+                        }}
+                        disabled={quantity >= item.stocks}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xl
+                          ${
+                            quantity >= item.stocks
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : "bg-gray-200 hover:bg-gray-300"
+                          }`}
                       >
                         +
                       </button>
                     </div>
 
                     <button
-                      disabled={item.addedToCart}
+                      disabled={item.addedToCart || item.stocks === 0}
                       className={`mt-auto rounded-xl border-2 px-4 py-2 border-black 
                     hover:bg-black hover:text-white 
                     opacity-0 group-hover:opacity-100 transition duration-300 
                     ${
-                      item.addedToCart
+                      item.addedToCart || item.stocks === 0
                         ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
                         : ""
                     }
                   `}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (item.addedToCart) return;
+                        if (item.addedToCart || item.stocks === 0) return;
                         handleAddToCart(item.product_id);
                       }}
                     >
-                      {item.addedToCart ? "Sudah di Keranjang" : "Add To Cart"}
+                      {item.stocks === 0
+                        ? "Stok Habis"
+                        : item.addedToCart
+                        ? "Sudah di Keranjang"
+                        : "Add To Cart"}
                     </button>
                   </div>
                 );

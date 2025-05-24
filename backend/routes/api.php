@@ -23,6 +23,7 @@ Route::get('/categories', function () {
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
+
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk customer
     Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index'); //Check
@@ -42,13 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete'); //Check
     Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update'); //Check
 
-    Route::get('/transactionhistory', [TransactionController::class, 'historyindex'])->middleware('role:customer')->name('transaction.index');
-    Route::post('/transactionhistory', [TransactionController::class, 'store'])->middleware('role:customer')->name('transaction.store');
-    Route::put('/transactionhistory/{id}', [TransactionController::class, 'update'])->middleware('role:customer')->name('transaction.update');
-    Route::delete('/transactionhistory/{id}', [TransactionController::class, 'destroy'])->middleware('role:customer')->name('transaction.destroy');
-
+    Route::post('/snaptoken', [TransactionController::class, 'getSnapToken'])->middleware('role:customer')->name('transaction.store'); //Check
+    Route::get('/transactionhistory', [TransactionController::class, 'index'])->middleware('role:customer')->name('transaction.index');
+    
     Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->middleware('role:customer')->name('transaction.item');
-
     // Route untuk seller)
     Route::get('/allusers', [UserController::class, 'indexall'])->middleware('role:seller')->name('users.index');
     Route::post('/user', [UserController::class, 'store'])->middleware('role:seller')->name('user.store');

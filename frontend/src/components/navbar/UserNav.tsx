@@ -6,7 +6,7 @@ import {
 import { IoPersonOutline } from "react-icons/io5";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
-import { MdStorefront } from "react-icons/md";
+import { MdStorefront, MdHistory } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
@@ -114,6 +114,16 @@ const UserNav = () => {
               <AiOutlineSetting className="text-lg" />
               Settings
             </button>
+
+            {role === "customer" && (
+              <button
+                onClick={() => navigate("/transactionhistory")}
+                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
+              >
+                <MdHistory className="text-lg" />
+                Transaksi
+              </button>
+            )}
 
             {role === "seller" && (
               <button

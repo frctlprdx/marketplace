@@ -8,6 +8,7 @@ import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
+import TransactionHistory from "./pages/TransactionHistory";
 import AddProduct from "./pages/AddProduct";
 import SellerLayout from "./components/Layouts/SellerLayout";
 import SellerProducts from "./pages/SellerProducts";
@@ -34,6 +35,7 @@ function App() {
           <Route path="/productdetail/:id" element={<ProductDetail />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/transactionhistory" element={<TransactionHistory />} />
 
           {/* Halaman seller */}
           <Route
