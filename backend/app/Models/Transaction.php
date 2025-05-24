@@ -10,9 +10,10 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'transaction_item',
         'user_id',
+        'seller_id',
         'status',
-        'total',
     ];
 
     /**
@@ -24,7 +25,15 @@ class Transaction extends Model
     }
 
     /**
-     * Relasi ke item transaksi
+     * Relasi ke item utama transaksi (1 item)
+     */
+    public function mainItem()
+    {
+        return $this->belongsTo(TransactionItem::class, 'transaction_item');
+    }
+
+    /**
+     * Relasi ke semua item transaksi (banyak)
      */
     public function items()
     {

@@ -11,14 +11,14 @@ use App\Http\Controllers\UserAddressController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/products', [ProductController::class, 'index'])->name('products.index'); //Main Page
-Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+Route::get('/products', [ProductController::class, 'index'])->name('products.index'); //Main Page //Check
+Route::get('/products/{id}', [ProductController::class, 'show']); //Check
+Route::post('/register', [UserController::class, 'register']); //Check
+Route::post('/login', [UserController::class, 'login']); //Check
 Route::get('/product', [ProductController::class, 'search'])->name('product.search');
 Route::get('/categories', function () {
     return App\Models\Category::all(); // Mengambil semua kategori
-});
+}); //Check
 
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
@@ -59,7 +59,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/product', [ProductController::class, 'store'])->middleware('role:seller')->name('product.store');//Check
     Route::get('/product/{id}', [ProductController::class, 'showSeller'])->middleware('role:seller')->name('product.store');//Check
     Route::put('/product/{id}', [ProductController::class, 'update'])->middleware('role:seller')->name('product.update'); // Check
-    Route::delete('/product/{id}', [ProductController::class, 'destroy'])->middleware('role:seller')->name('product.destroy');
 
     Route::get('/payments', [PaymentController::class, 'index'])->middleware('role:seller')->name('payments.index');
 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTransactionsItemsTable extends Migration
+class CreateItemOnTransactionTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,11 +15,12 @@ class CreateTransactionsItemsTable extends Migration
     {
         Schema::create('transaction_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('amount');
-            $table->decimal('price', 10, 2);
-            $table->timestamps();  // Menambahkan created_at dan updated_at
+            $table->decimal('total_price', 10, 0);
+            $table->string('courier');
+            $table->foreignId('destination');
+            $table->timestamps(); // created_at & updated_at
         });
     }
 
@@ -30,6 +31,6 @@ class CreateTransactionsItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transactions_items');
+        Schema::dropIfExists('transaction_items');
     }
 }

@@ -20,7 +20,8 @@ class ProductController extends Controller
                 'products.*',
                 'categories.name as category_name',
                 'users.name as seller_name'
-            );
+            )
+            ->where('products.show', 1); // hanya tampilkan yang show = 1
 
         // Filter by search keyword
         if ($request->filled('search')) {
@@ -47,6 +48,7 @@ class ProductController extends Controller
 
         return response()->json($query->get());
     }
+
 
 
     public function store(Request $request)
@@ -137,25 +139,4 @@ class ProductController extends Controller
 
         return response()->json($product);
     }
-
-    public function destroy(Request $request, $id)
-    {
-        $user = $request->user();
-
-        $product = Product::where('id', $id)
-            ->where('user_id', $user->id)
-            ->first();
-
-        if (!$product) {
-            return response()->json(['message' => 'Produk tidak ditemukan atau tidak milik Anda'], 404);
-        }
-
-        // Tidak perlu hapus gambar, karena sudah dilakukan di frontend
-        $product->delete();
-
-        return response()->json(['message' => 'Produk berhasil dihapus']);
-    }
-
-
-    
 }

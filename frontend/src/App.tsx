@@ -12,6 +12,7 @@ import AddProduct from "./pages/AddProduct";
 import SellerLayout from "./components/Layouts/SellerLayout";
 import SellerProducts from "./pages/SellerProducts";
 import EditProduct from "./pages/EditProduct";
+import AllTransaction from "./pages/AllTransaction";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -50,8 +51,22 @@ function App() {
               </SellerLayout>
             }
           />
-          <Route path="/editproduct/:id" element={<EditProduct />} />
-
+          <Route
+            path="/editproduct/:id"
+            element={
+              <SellerLayout>
+                <EditProduct />
+              </SellerLayout>
+            }
+          />
+          <Route
+            path="/alltransaction"
+            element={
+              <SellerLayout>
+                <AllTransaction />
+              </SellerLayout>
+            }
+          />
         </Routes>
 
         <ToastContainer />

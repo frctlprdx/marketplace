@@ -7,17 +7,13 @@ use App\Models\Transaction;
 
 class TransactionsTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         Transaction::create([
-            'user_id' => 1,
-            'status' => 'paid',
-            'total' => 200000,
+            'transaction_item' => 1, // kode transaksi
+            'user_id'          => 1, // ID customer
+            'seller_id'        => 2, // ID seller
+            'status'           => 'paid',
         ]);
     }
 }

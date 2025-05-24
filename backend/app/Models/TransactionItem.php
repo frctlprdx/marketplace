@@ -10,30 +10,28 @@ class TransactionItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'transaction_id',
         'product_id',
         'amount',
-        'price',
+        'total_price',
+        'courier',
+        'destination',
     ];
 
-    /**
-     * Relasi ke transaksi
-     */
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
     }
 
-    /**
-     * Relasi ke produk
-     */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function getTotalPriceAttribute()
+    /**
+     * Relasi ke alamat pengiriman.
+     */
+    public function shippingAddress()
     {
-        return $this->amount * $this->price;
+        return $this->belongsTo(UserShippingAddress::class, 'destination');
     }
 }

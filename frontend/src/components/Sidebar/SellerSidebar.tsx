@@ -39,6 +39,13 @@ const SellerSidebar = () => {
           >
             Tambah Produk
           </Link>
+          <Link
+            to="/alltransaction"
+            className="block text-gray-700 hover:text-orange-500"
+            onClick={() => setOpen(false)}
+          >
+            Lihat Transaksi
+          </Link>
         </nav>
       </div>
     </>
