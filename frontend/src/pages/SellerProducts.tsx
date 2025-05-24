@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Trash2 } from "lucide-react"; // Icon trash
-import { supabase } from "../supabase"; // pastikan sudah import
 
 interface Product {
   id: number;
@@ -41,71 +39,47 @@ const SellerProducts = () => {
     fetchProducts();
   }, [navigate]);
 
-  const handleDelete = async (id: number, imageUrl: string) => {
-    const token = localStorage.getItem("user_token");
-    if (!confirm("Yakin ingin menghapus produk ini?")) return;
-
-    try {
-      // 1. Hapus gambar dari Supabase
-      const imagePath = imageUrl.split("/nogosarenmarketplace/")[1];
-      if (imagePath) {
-        const { error: deleteError } = await supabase.storage
-          .from("nogosarenmarketplace")
-          .remove([imagePath]);
-
-        if (deleteError) throw deleteError;
-      }
-
-      // 2. Hapus produk dari Laravel
-      await axios.delete(`${import.meta.env.VITE_API_URL}/product/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setProducts(products.filter((product) => product.id !== id));
-    } catch (err) {
-      console.error("Gagal menghapus produk:", err);
-    }
-  };
-
   return (
     <div className="p-4 max-w-screen-lg mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Semua Produk Anda</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="relative group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition duration-200"
-          >
-            {/* Tombol Trash */}
-            <button
-              onClick={() => handleDelete(product.id, product.image)}
-              className="absolute top-2 right-2 z-10 p-1 bg-red-500 rounded-full text-white sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition"
-            >
-              <Trash2 size={16} />
-            </button>
-
-            {/* Konten Card */}
-            <div
-              onClick={() => navigate(`/editproduct/${product.id}`)}
-              className="cursor-pointer"
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded-t-lg"
-              />
-              <div className="p-3">
-                <h3 className="text-base font-medium truncate">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-orange-600 font-semibold mt-1">
-                  Rp{Number(product.price).toLocaleString("id-ID")}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <h2 className="text-xl font-semibold mb-4">Daftar Produk Anda</h2>
+      {products.length === 0 ? (
+        <p>Belum ada produk.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border border-gray-300 text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 border">ID</th>
+                <th className="px-4 py-2 border">Gambar</th>
+                <th className="px-4 py-2 border">Nama Produk</th>
+                <th className="px-4 py-2 border">Harga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr
+                  key={product.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/editproduct/${product.id}`)}
+                >
+                  <td className="px-4 py-2 border text-center">{product.id}</td>
+                  <td className="px-4 py-2 border text-center">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover mx-auto rounded"
+                    />
+                  </td>
+                  <td className="px-4 py-2 border">{product.name}</td>
+                  <td className="px-4 py-2 border text-orange-600 font-semibold">
+                    Rp{Number(product.price).toLocaleString("id-ID")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

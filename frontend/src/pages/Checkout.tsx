@@ -42,7 +42,9 @@ const Checkout = () => {
   // Get user authentication from localStorage
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
-  const isLoggedIn = !!(userId && token);
+  const role = localStorage.getItem("role");
+  console.log(role)
+  const isLoggedIn = !!(userId && token && role === "customer");
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
 
@@ -379,10 +381,10 @@ const Checkout = () => {
                       pengiriman
                     </p>
                     <button
-                      onClick={() => navigate("/login")}
+                      onClick={() => navigate("/")}
                       className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
                     >
-                      Login Sekarang
+                      Login Menggunakan Akun Customer
                     </button>
                   </div>
                 ) : addresses.length > 0 ? (

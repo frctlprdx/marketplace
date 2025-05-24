@@ -62,8 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/payments', [PaymentController::class, 'index'])->middleware('role:seller')->name('payments.index');
 
-    Route::get('/sellertransactionpage', [TransactionController::class, 'sellerindex'])->middleware('role:seller')->name('seller.transaction.index');
-
-    Route::get('/sellertransactionitempage/{id}', [TransactionController::class, 'sellertransactionitem'])->middleware('role:seller')->name('seller.transaction.item');
+    Route::get('/sellertransactionpage', [TransactionController::class, 'sellerindex'])->middleware('role:seller')->name('seller.transaction.index'); //Check
+    Route::get('/transactiondetail/{id}', [TransactionController::class, 'getDetail'])->middleware('role:seller')->name('seller.transaction.detail'); //Check
 });
 

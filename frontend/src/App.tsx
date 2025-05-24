@@ -13,6 +13,7 @@ import SellerLayout from "./components/Layouts/SellerLayout";
 import SellerProducts from "./pages/SellerProducts";
 import EditProduct from "./pages/EditProduct";
 import AllTransaction from "./pages/AllTransaction";
+import TransactionDetail from "./pages/TransactionDetail";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -67,8 +68,15 @@ function App() {
               </SellerLayout>
             }
           />
+          <Route
+            path="/transactiondetail/:id"
+            element={
+              <SellerLayout>
+                <TransactionDetail />
+              </SellerLayout>
+            }
+          />
         </Routes>
-
         <ToastContainer />
       </div>
     </Router>
