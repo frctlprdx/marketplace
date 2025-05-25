@@ -97,27 +97,35 @@ class TransactionController extends Controller
             'recipient_name' => 'required|string',
             'phone' => 'required|string',
             'userID' => 'required|integer',
+            'seller_id' => 'required|integer',
+            'product_id' => 'required|integer',
+            'quantity' => 'required|integer',
+            'subtotal' => 'required|numeric',
+            'courier' => 'required|string',
+            'destination_id' => 'required|integer',
         ]);
 
         $totalPrice = $request->input('totalPrice');
         $recipientName = $request->input('recipient_name');
         $phone = $request->input('phone');
         $userID = $request->input('userID');
+        $sellerId = $request->input('seller_id');
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity');
+        $subtotal = $request->input('subtotal');
+        $courier = $request->input('courier');
+        $destinationId = $request->input('destination_id');
 
         $email = DB::table('users')
             ->where('id', $userID)
             ->value('email');
 
-        // ✅ BETTER: Generate unique, traceable order ID
+        // Generate unique order ID
         $orderId = 'ORDER-' . date('YmdHis') . '-' . uniqid() . '-' . $userID;
-        
-        // Alternative options:
-        // $orderId = 'INV-' . time() . '-' . $userID;
-        // $orderId = 'TXN-' . microtime(true) . '-' . $userID;
         
         $params = [
             'transaction_details' => [
-                'order_id' => $orderId,  // Use our generated unique ID
+                'order_id' => $orderId,
                 'gross_amount' => (int) $totalPrice,
             ],
             'customer_details' => [
@@ -131,21 +139,44 @@ class TransactionController extends Controller
         try {
             $snapToken = Snap::getSnapToken($params);
             
-            // Log for debugging
-            Log::info('Midtrans Transaction', [
+            // Create transaction record
+            DB::table('transactions')->insert([
                 'order_id' => $orderId,
                 'user_id' => $userID,
+                'seller_id' => $sellerId,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Create transaction item record
+            DB::table('transaction_items')->insert([
+                'order_id' => $orderId,
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'total_price' => $subtotal,
+                'courier' => $courier,
+                'destination_id' => $destinationId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            // Log for debugging
+            Log::info('Transaction Created', [
+                'order_id' => $orderId,
+                'user_id' => $userID,
+                'seller_id' => $sellerId,
+                'product_id' => $productId,
                 'amount' => $totalPrice
             ]);
 
             return response()->json([
                 'token' => $snapToken,
-
                 'order_id' => $orderId,
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Transaction Creation Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

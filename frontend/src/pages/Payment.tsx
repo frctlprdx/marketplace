@@ -61,8 +61,8 @@ const Payment = () => {
 
   // Get Snap Token from Midtrans
   const getSnapToken = async () => {
-    if (!userId || !address) {
-      console.error("Data user atau alamat tidak lengkap");
+    if (!userId || !address || !selectedCourier || !product) {
+      console.error("Data tidak lengkap untuk membuat transaksi");
       return null;
     }
 
@@ -70,12 +70,22 @@ const Payment = () => {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/snaptoken`,
         {
+          // Midtrans required data
           userID: parseInt(userId),
           totalPrice: totalPrice,
           recipient_name: address.recipient_name,
           phone: address.phone,
-          // Add frontend URL for redirects
           frontend_url: window.location.origin,
+
+          // Transaction data
+          seller_id: product.user_id, // Make sure this exists in your product data
+
+          // Transaction items data
+          product_id: product.id,
+          quantity: product.quantity,
+          subtotal: subtotal, // This will be total_price in transaction_items
+          courier: selectedCourier.name,
+          destination_id: address.id,
         },
         {
           headers: {
@@ -393,4 +403,3 @@ const Payment = () => {
 };
 
 export default Payment;
-  

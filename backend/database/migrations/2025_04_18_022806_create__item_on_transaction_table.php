@@ -15,12 +15,17 @@ class CreateItemOnTransactionTable extends Migration
     {
         Schema::create('transaction_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('amount');
-            $table->decimal('total_price', 10, 0);
-            $table->string('courier');
-            $table->foreignId('destination');
-            $table->timestamps(); // created_at & updated_at
+            $table->string('order_id'); // Match with transactions.order_id
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->integer('quantity');
+            $table->decimal('total_price', 11, 0);
+            $table->string('courier')->nullable();
+            $table->foreignId('destination_id')->nullable()->constrained('user_shipping_addresses')->onDelete('set null');
+            $table->timestamps();
+            
+            // Add index for better performance on order_id lookups
+            $table->index('order_id');
+            
         });
     }
 

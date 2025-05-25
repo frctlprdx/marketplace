@@ -10,10 +10,10 @@ class TransactionsTableSeeder extends Seeder
     public function run()
     {
         Transaction::create([
-            'transaction_item' => 1, // kode transaksi
-            'user_id'          => 1, // ID customer
-            'seller_id'        => 2, // ID seller
-            'status'           => 'paid',
+            'order_id' => 'avs',
+            'user_id' => 1, // ID pengguna yang melakukan transaksi
+            'seller_id' => 2, // ID penjual yang menerima transaksi
+            'status' => 'paid', // Status awal transaksi
         ]);
     }
 }

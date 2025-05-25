@@ -10,7 +10,7 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_item')->nullable()->constrained('transaction_items')->onDelete('set null');
+            $table->string('order_id');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
             $table->string('status')->default('pending');

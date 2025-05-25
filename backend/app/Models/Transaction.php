@@ -1,5 +1,5 @@
 <?php
-
+// Transaction Model
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +10,7 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'transaction_item',
+        'order_id',      // Fixed: matches migration
         'user_id',
         'seller_id',
         'status',
@@ -25,26 +25,38 @@ class Transaction extends Model
     }
 
     /**
-     * Relasi ke item utama transaksi (1 item)
+     * Relasi ke seller/penjual
      */
-    public function mainItem()
+    public function seller()
     {
-        return $this->belongsTo(TransactionItem::class, 'transaction_item');
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     /**
-     * Relasi ke semua item transaksi (banyak)
+     * Relasi ke semua item transaksi (relationship via order_id)
      */
     public function items()
     {
-        return $this->hasMany(TransactionItem::class);
+        return $this->hasMany(TransactionItem::class, 'order_id', 'order_id');
     }
 
     /**
      * Relasi ke pembayaran
      */
-    public function payment()
+
+    /**
+     * Get total amount from all items
+     */
+    public function getTotalAmountAttribute()
     {
-        return $this->hasOne(Payment::class);
+        return $this->items->sum('total_price');
+    }
+
+    /**
+     * Get total quantity from all items
+     */
+    public function getTotalQuantityAttribute()
+    {
+        return $this->items->sum('quantity');
     }
 }

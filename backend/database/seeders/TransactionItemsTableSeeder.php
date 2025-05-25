@@ -10,11 +10,12 @@ class TransactionItemsTableSeeder extends Seeder
     public function run()
     {
         TransactionItem::create([
+            'order_id' => 'avs',
             'product_id' => 1,
-            'amount' => 2,
-            'total_price' => 75000,
-            'courier' => 'JNE',
-            'destination' => 1, // ID dari UserShippingAddress
+            'quantity' => 1,
+            'total_price' => 650000000,
+            'courier' => 'J&T Express',
+            'destination_id' => 1,
         ]);
     }
 }

@@ -18,11 +18,10 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductsTableSeeder::class,
             CartsTableSeeder::class,
+            UserAddressSeeder::class,
+            WishlistSeeder::class,
             TransactionItemsTableSeeder::class,
             TransactionsTableSeeder::class,
-            PaymentsTableSeeder::class,
-            WishlistSeeder::class,
-            UserAddressSeeder::class,
         ]);
     }
 }
