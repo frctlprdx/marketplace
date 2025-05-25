@@ -44,7 +44,7 @@ const AllTransactionTable = () => {
     const fetchTransactions = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/sellertransactionpage`,
+          `${import.meta.env.VITE_API_URL}/sellertransactionpage/`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

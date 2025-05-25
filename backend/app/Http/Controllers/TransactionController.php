@@ -16,33 +16,36 @@ class TransactionController extends Controller
     {
         try {
             $user = $request->user();
-
+            
             // Cek role seller
             if ($user->role !== 'seller') {
                 return response()->json(['error' => 'Forbidden'], 403);
             }
-
+            
             $transactions = DB::table('transactions')
-                ->join('transaction_items', 'transactions.transaction_item', '=', 'transaction_items.id')
+                ->join('transaction_items', 'transactions.order_id', '=', 'transaction_items.order_id')
                 ->join('products', 'transaction_items.product_id', '=', 'products.id')
                 ->join('categories', 'products.category_id', '=', 'categories.id')
                 ->join('users', 'transactions.user_id', '=', 'users.id')
                 ->where('transactions.seller_id', $user->id)
                 ->select(
                     'transactions.id as id',
-                    'transaction_item',
+                    'transaction_items.id as transaction_item', // Add this field that frontend expects
+                    'transactions.order_id',
                     'users.name as user_id', // frontend expects this key
                     'products.name as product_name',
                     'categories.name as category_name',
-                    'transaction_items.amount as amount',
+                    'transaction_items.quantity as quantity',
                     'transactions.status as status',
                     'transactions.created_at as created_at'
                 )
-                ->orderBy('transactions.created_at', 'desc')
+                ->orderBy('transactions.created_at', 'asc')
                 ->get();
-
+            
             return response()->json($transactions);
         } catch (\Exception $e) {
+            // Log the actual error for debugging
+            
             return response()->json([
                 'error' => 'Internal Server Error',
                 'message' => $e->getMessage()
@@ -55,12 +58,12 @@ class TransactionController extends Controller
         try {
             $detail = DB::table('transaction_items')
                 ->join('products', 'transaction_items.product_id', '=', 'products.id')
-                ->join('user_shipping_addresses', 'transaction_items.destination', '=', 'user_shipping_addresses.id')
+                ->join('user_shipping_addresses', 'transaction_items.destination_id', '=', 'user_shipping_addresses.id')
                 ->where('transaction_items.id', $id)
                 ->select(
                     'products.name',
                     'products.image',
-                    'transaction_items.amount',
+                    'transaction_items.quantity',
                     'transaction_items.total_price',
                     'transaction_items.courier',
                     'user_shipping_addresses.label',
