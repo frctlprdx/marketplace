@@ -29,9 +29,6 @@ const Payment = () => {
   // States
   const [selectedCourier, setSelectedCourier] = useState<Courier | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
-  const [orderError, setOrderError] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
   const [snapToken, setSnapToken] = useState("");
   const [midtransResponse, setMidtransResponse] = useState<any>(null);
 
@@ -40,62 +37,16 @@ const Payment = () => {
   const token = localStorage.getItem("user_token");
   const isLoggedIn = !!(userId && token);
 
-  // Check for URL parameters (redirect from Midtrans)
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const status =
-      urlParams.get("status_code") || urlParams.get("transaction_status");
-    const orderId = urlParams.get("order_id");
-
-    // Handle Midtrans redirect
-    if (status && orderId) {
-      console.log("Midtrans redirect detected:", { status, orderId });
-
-      if (status === "200" || status === "settlement" || status === "pending") {
-        setOrderSuccess(true);
-        setOrderNumber(orderId);
-      } else {
-        setOrderError(`Payment failed with status: ${status}`);
-      }
-
-      // Clean URL parameters after processing
-      navigate("/payment", {
-        replace: true,
-        state: location.state,
-      });
-    }
-  }, [location.search, navigate, location.state]);
-
   // Verify that we have all required data
   useEffect(() => {
     if (!address || !product || !destinationId || !shippingData) {
-      // Only navigate away if not coming from Midtrans redirect
-      const urlParams = new URLSearchParams(location.search);
-      const hasPaymentParams =
-        urlParams.get("order_id") || urlParams.get("transaction_status");
-
-      if (!hasPaymentParams) {
-        navigate("/checkout");
-      }
+      navigate("/checkout");
     }
-  }, [
-    address,
-    product,
-    destinationId,
-    shippingData,
-    navigate,
-    location.search,
-  ]);
+  }, [address, product, destinationId, shippingData, navigate]);
 
-  // Return null if no data and no payment redirect
-  const urlParams = new URLSearchParams(location.search);
-  const hasPaymentParams =
-    urlParams.get("order_id") || urlParams.get("transaction_status");
-
+  // Return null if no data
   if (!address || !product || !destinationId || !shippingData) {
-    if (!hasPaymentParams) {
-      return null;
-    }
+    return null;
   }
 
   // Calculate total price
@@ -111,7 +62,7 @@ const Payment = () => {
   // Get Snap Token from Midtrans
   const getSnapToken = async () => {
     if (!userId || !address) {
-      setOrderError("Data user atau alamat tidak lengkap");
+      console.error("Data user atau alamat tidak lengkap");
       return null;
     }
 
@@ -137,10 +88,6 @@ const Payment = () => {
       console.log("Midtrans Response:", response.data);
       setMidtransResponse(response.data);
 
-      if (response.data.order_id) {
-        setOrderNumber(response.data.order_id);
-      }
-
       return response.data.token;
     } catch (error: any) {
       console.error("Error getting snap token:", error);
@@ -150,9 +97,6 @@ const Payment = () => {
         console.error("Response status:", error.response.status);
       }
 
-      setOrderError(
-        error.response?.data?.message || "Gagal mendapatkan token pembayaran"
-      );
       return null;
     }
   };
@@ -164,7 +108,6 @@ const Payment = () => {
     }
 
     setIsLoading(true);
-    setOrderError("");
 
     try {
       const snapToken = await getSnapToken();
@@ -183,34 +126,25 @@ const Payment = () => {
         window.snap.pay(snapToken, {
           onSuccess: function (result: any) {
             console.log("Payment Success:", result);
-            setOrderSuccess(true);
-            setOrderNumber(
-              result.order_id || orderNumber || "INV-" + Date.now()
-            );
+            // Redirect will be handled by Midtrans callback URL
           },
           onPending: function (result: any) {
             console.log("Payment Pending:", result);
-            setOrderSuccess(true);
-            setOrderNumber(
-              result.order_id || orderNumber || "INV-" + Date.now()
-            );
+            // Redirect will be handled by Midtrans callback URL
           },
           onError: function (result: any) {
             console.log("Payment Error:", result);
-            setOrderError(
-              "Pembayaran gagal: " + (result.status_message || "Unknown error")
-            );
+            // Redirect will be handled by Midtrans callback URL
           },
           onClose: function () {
             console.log("Payment popup closed");
           },
         });
       } else {
-        setOrderError("Midtrans tidak tersedia. Silakan refresh halaman.");
+        console.error("Midtrans tidak tersedia. Silakan refresh halaman.");
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      setOrderError("Gagal membuat pesanan. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
@@ -231,103 +165,6 @@ const Payment = () => {
     };
   }, []);
 
-  // Check if the data is loaded correctly (handle redirect case)
-  if (
-    (!address || !product || !destinationId || !shippingData) &&
-    !hasPaymentParams
-  ) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-lg shadow-md">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Data tidak ditemukan
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Informasi pembayaran tidak ditemukan. Silakan kembali ke halaman
-            checkout.
-          </p>
-          <button
-            onClick={() => navigate("/checkout")}
-            className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 transition"
-          >
-            Kembali ke Checkout
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Success order screen
-  if (orderSuccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-md max-w-md w-full p-8 text-center">
-          <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-green-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Pesanan Berhasil!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Pesanan Anda dengan nomor <strong>{orderNumber}</strong> telah
-            berhasil dibuat dan sedang diproses.
-          </p>
-
-          <div className="bg-gray-50 p-4 rounded-lg mb-6 text-left">
-            <p className="text-sm text-gray-600 mb-2">
-              <strong>Total Pembayaran:</strong> Rp{" "}
-              {totalPrice.toLocaleString("id-ID")}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Status:</strong>{" "}
-              <span className="text-yellow-500 font-medium">
-                Menunggu Pembayaran
-              </span>
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={() =>
-                navigate("/payment-instruction", { state: { orderNumber } })
-              }
-              className="bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition font-medium"
-            >
-              Lihat Instruksi Pembayaran
-            </button>
-            <button
-              onClick={() => navigate("/orders")}
-              className="bg-orange-500 text-white px-4 py-3 rounded-lg hover:bg-orange-600 transition font-medium"
-            >
-              Lihat Pesanan Saya
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="bg-gray-200 text-gray-800 px-4 py-3 rounded-lg hover:bg-gray-300 transition font-medium"
-            >
-              Kembali ke Beranda
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Rest of your component remains the same...
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -356,11 +193,6 @@ const Payment = () => {
               2
             </span>
             <span className="text-orange-500">Pembayaran</span>
-            <FaChevronRight className="text-gray-400" />
-            <span className="bg-gray-300 text-gray-600 px-3 py-1 rounded-full">
-              3
-            </span>
-            <span className="text-gray-500">Konfirmasi</span>
           </div>
         </div>
       </div>
@@ -546,12 +378,6 @@ const Payment = () => {
                 >
                   {isLoading ? "Memproses..." : "Bayar Sekarang"}
                 </button>
-
-                {orderError && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                    {orderError}
-                  </div>
-                )}
 
                 <p className="text-center text-gray-500 text-xs mt-3">
                   Dengan membuat pesanan, Anda menyetujui syarat dan ketentuan

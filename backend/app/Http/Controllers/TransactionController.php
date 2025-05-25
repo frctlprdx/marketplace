@@ -85,69 +85,70 @@ class TransactionController extends Controller
     }
 
     public function getSnapToken(Request $request)
-{
-    // Set Midtrans configuration from env
-    Config::$serverKey = config('Midtrans.server_key');
-    Config::$isProduction = config('Midtrans.is_production');
-    Config::$isSanitized = config('Midtrans.is_sanitized');
-    Config::$is3ds = config('Midtrans.is_3ds');
+    {
+        // Set Midtrans configuration from env
+        Config::$serverKey = config('Midtrans.server_key');
+        Config::$isProduction = config('Midtrans.is_production');
+        Config::$isSanitized = config('Midtrans.is_sanitized');
+        Config::$is3ds = config('Midtrans.is_3ds');
 
-    $request->validate([
-        'totalPrice' => 'required|numeric',
-        'recipient_name' => 'required|string',
-        'phone' => 'required|string',
-        'userID' => 'required|integer',
-    ]);
-
-    $totalPrice = $request->input('totalPrice');
-    $recipientName = $request->input('recipient_name');
-    $phone = $request->input('phone');
-    $userID = $request->input('userID');
-
-    $email = DB::table('users')
-        ->where('id', $userID)
-        ->value('email');
-
-    // ✅ BETTER: Generate unique, traceable order ID
-    $orderId = 'ORDER-' . date('YmdHis') . '-' . uniqid() . '-' . $userID;
-    
-    // Alternative options:
-    // $orderId = 'INV-' . time() . '-' . $userID;
-    // $orderId = 'TXN-' . microtime(true) . '-' . $userID;
-    
-    $params = [
-        'transaction_details' => [
-            'order_id' => $orderId,  // Use our generated unique ID
-            'gross_amount' => (int) $totalPrice,
-        ],
-        'customer_details' => [
-            'first_name' => $recipientName,
-            'last_name' => '',
-            'email' => $email ?: 'customer@example.com',
-            'phone' => $phone,
-        ],
-    ];
-
-    try {
-        $snapToken = Snap::getSnapToken($params);
-        
-        // Log for debugging
-        Log::info('Midtrans Transaction', [
-            'order_id' => $orderId,
-            'user_id' => $userID,
-            'amount' => $totalPrice
+        $request->validate([
+            'totalPrice' => 'required|numeric',
+            'recipient_name' => 'required|string',
+            'phone' => 'required|string',
+            'userID' => 'required|integer',
         ]);
 
-        return response()->json([
-            'token' => $snapToken,
-            'order_id' => $orderId,
-        ]);
+        $totalPrice = $request->input('totalPrice');
+        $recipientName = $request->input('recipient_name');
+        $phone = $request->input('phone');
+        $userID = $request->input('userID');
+
+        $email = DB::table('users')
+            ->where('id', $userID)
+            ->value('email');
+
+        // ✅ BETTER: Generate unique, traceable order ID
+        $orderId = 'ORDER-' . date('YmdHis') . '-' . uniqid() . '-' . $userID;
         
-    } catch (\Exception $e) {
-        Log::error('Midtrans Error: ' . $e->getMessage());
-        return response()->json(['error' => $e->getMessage()], 500);
+        // Alternative options:
+        // $orderId = 'INV-' . time() . '-' . $userID;
+        // $orderId = 'TXN-' . microtime(true) . '-' . $userID;
+        
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,  // Use our generated unique ID
+                'gross_amount' => (int) $totalPrice,
+            ],
+            'customer_details' => [
+                'first_name' => $recipientName,
+                'last_name' => '',
+                'email' => $email ?: 'customer@example.com',
+                'phone' => $phone,
+            ],
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+            
+            // Log for debugging
+            Log::info('Midtrans Transaction', [
+                'order_id' => $orderId,
+                'user_id' => $userID,
+                'amount' => $totalPrice
+            ]);
+
+            return response()->json([
+                'token' => $snapToken,
+
+                'order_id' => $orderId,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Midtrans Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
-}
 
 
 
