@@ -54,7 +54,7 @@ const EditProduct = () => {
 
       if (newImage) {
         const fileExt = newImage.name.split(".").pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+        const fileName = `produk/${Date.now()}.${fileExt}`;
         const { error } = await supabase.storage
           .from("nogosarenmarketplace")
           .upload(fileName, newImage);
@@ -65,7 +65,7 @@ const EditProduct = () => {
           import.meta.env.VITE_SUPABASE_URL
         }/storage/v1/object/public/nogosarenmarketplace/${fileName}`;
 
-        const oldPath = oldImageUrl.split("/nogosarenmarketplace/")[1];
+        const oldPath = oldImageUrl.split("/nogosarenmarketplace/")[1]; // Ambil path relatif dari dalam bucket
         if (oldPath) {
           await supabase.storage.from("nogosarenmarketplace").remove([oldPath]);
         }
