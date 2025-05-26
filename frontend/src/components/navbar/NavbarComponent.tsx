@@ -36,7 +36,7 @@ const Navbar = () => {
     <div className="w-screen h-16 bg-white shadow px-2 sm:px-6 flex items-center justify-between">
       <Link to="/">
         <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1 cursor-pointer">
-          Etsy
+          Insert Name
         </div>
       </Link>
 

@@ -40,17 +40,17 @@ const HeroSection = () => {
         className="max-w-xl sm:mx-0 mx-20 px-4"
       >
         <h1 className="text-center text-3xl sm:text-4xl font-bold mb-4">
-          Selamat Datang
+          Welcome !
         </h1>
         <p className="text-justify leading-relaxed">
-          Marketplace Untuk Anda Menjual Barang dan Jasa Secara Online
+          Marketplace To sell all your products online
         </p>
         <div className="mt-6 flex justify-center">
           <button
             className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 cursor-pointer"
             onClick={handleClick}
           >
-            Lihat Produk
+            See Products
           </button>
         </div>
       </motion.div>
