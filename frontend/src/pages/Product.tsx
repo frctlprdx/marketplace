@@ -156,12 +156,12 @@ const Product = () => {
           <div className="flex items-center text-sm text-gray-600 space-x-2">
             <a
               href="/"
-              className="hover:text-orange-500 transition duration-200"
+              className="hover:text-[#507969] transition duration-200"
             >
               Home
             </a>
             <span>{"/"}</span>
-            <a href="/product" className="text-orange-500 font-medium">
+            <a href="/product" className="text-primary font-medium">
               Products
             </a>
           </div>
@@ -218,7 +218,7 @@ const Product = () => {
                     Kategori
                   </label>
                   <select
-                    className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                   >
@@ -241,7 +241,7 @@ const Product = () => {
                       <label className="text-xs text-gray-500">Min (Rp)</label>
                       <input
                         type="number"
-                        className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                         placeholder="Min"
                         value={minPrice}
                         onChange={(e) =>
@@ -255,7 +255,7 @@ const Product = () => {
                       <label className="text-xs text-gray-500">Max (Rp)</label>
                       <input
                         type="number"
-                        className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                         placeholder="Max"
                         value={maxPrice}
                         onChange={(e) =>
@@ -272,7 +272,7 @@ const Product = () => {
                 <div className="flex flex-col space-y-2 pt-3">
                   <button
                     onClick={updateUrlWithFilters}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
+                    className="w-full bg-button text-white py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
                   >
                     <FiFilter size={16} />
                     <span>Terapkan Filter</span>
@@ -320,7 +320,7 @@ const Product = () => {
                 </p>
                 <button
                   onClick={resetFilters}
-                  className="mt-4 text-orange-500 hover:text-orange-600"
+                  className="mt-4 text-primary"
                 >
                   Reset Filter
                 </button>
@@ -347,7 +347,7 @@ const Product = () => {
                         }}
                       >
                         {wishlistIds.includes(product.id) ? (
-                          <IoIosHeart size={22} className="text-orange-500" />
+                          <IoIosHeart size={22} className="text-primary" />
                         ) : (
                           <IoIosHeartEmpty
                             size={22}
@@ -372,14 +372,14 @@ const Product = () => {
                         {product.name}
                       </h3>
                       <div className="flex justify-between items-center">
-                        <p className="text-orange-600 font-bold">
+                        <p className="text-primary font-bold">
                           Rp {Number(product.price).toLocaleString("id-ID")}
                         </p>
                         <p
                           className={`text-sm ${
                             product.stocks > 10
                               ? "text-green-600"
-                              : "text-orange-600"
+                              : "text-primary"
                           }`}
                         >
                           Stok: {product.stocks}

@@ -1,0 +1,18 @@
+.bg-button {
+  background-color: #507969;
+}
+
+.text-primary{
+    color:#507969;
+}
+
+.bg-soft {
+  background-color:#9fb5ad;
+}
+.bg-soft:hover {
+  background-color:#9fb5ad;
+}
+
+.bg-button:hover {
+  background-color: #2d5847;
+}

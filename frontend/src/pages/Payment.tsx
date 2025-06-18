@@ -199,10 +199,10 @@ const Payment = () => {
               Alamat Pengiriman
             </span>
             <FaChevronRight className="text-gray-400" />
-            <span className="bg-orange-500 text-white px-3 py-1 rounded-full">
+            <span className="bg-[#507969] text-white px-3 py-1 rounded-full">
               2
             </span>
-            <span className="text-orange-500">Pembayaran</span>
+            <span className="text-primary">Pembayaran</span>
           </div>
         </div>
       </div>
@@ -230,7 +230,7 @@ const Payment = () => {
                       {address?.label || "Alamat Utama"}
                     </span>
                     {address?.is_default === 1 && (
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                      <span className="bg-[#507969] text-white text-xs px-2 py-1 rounded">
                         Default
                       </span>
                     )}
@@ -252,8 +252,8 @@ const Payment = () => {
             <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
               <div className="p-6 border-b bg-gray-50">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <FaTruck className="text-blue-500" />
+                  <div className="bg-soft p-2 rounded-lg">
+                    <FaTruck className="text-[#507969]" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800">
                     Pilih Kurir
@@ -270,7 +270,7 @@ const Payment = () => {
                         selectedCourier &&
                         selectedCourier.code === courier.code &&
                         selectedCourier.service === courier.service
-                          ? "border-blue-500 bg-blue-50"
+                          ? "border-[#507969] bg-blue-50"
                           : "border-gray-200"
                       }`}
                     >
@@ -295,7 +295,7 @@ const Payment = () => {
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-orange-500">
+                          <p className="font-semibold text-primary">
                             Rp {Number(courier.cost).toLocaleString("id-ID")}
                           </p>
                         </div>
@@ -313,8 +313,8 @@ const Payment = () => {
               {/* Header */}
               <div className="p-6 border-b bg-gray-50">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <FaBox className="text-blue-500" />
+                  <div className="bg-soft p-2 rounded-lg">
+                    <FaBox className="text-[#507969]" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800">
                     Ringkasan Pesanan
@@ -334,7 +334,7 @@ const Payment = () => {
                     <h3 className="font-semibold text-gray-800 mb-1">
                       {product?.name}
                     </h3>
-                    <p className="text-orange-500 font-bold text-lg">
+                    <p className="text-primary font-bold text-lg">
                       Rp {Number(product?.price || 0).toLocaleString("id-ID")}
                     </p>
                     <p className="text-gray-600 text-sm">
@@ -370,7 +370,7 @@ const Payment = () => {
 
                   <div className="border-t pt-3 flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span className="text-orange-500">
+                    <span className="text-primary">
                       Rp {totalPrice.toLocaleString("id-ID")}
                     </span>
                   </div>
@@ -383,7 +383,7 @@ const Payment = () => {
                   className={`w-full py-3 rounded-lg text-white font-semibold mt-4 ${
                     !selectedCourier || !isLoggedIn
                       ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-orange-500 hover:bg-orange-600"
+                      : "bg-[#507969] hover:bg-[#2d5847]"
                   }`}
                 >
                   {isLoading ? "Memproses..." : "Bayar Sekarang"}

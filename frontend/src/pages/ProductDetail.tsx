@@ -163,7 +163,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-t-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-t-4 border-[#507969] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">Loading product details...</p>
         </div>
       </div>
@@ -183,7 +183,7 @@ const ProductDetail = () => {
           </p>
           <Link
             to="/product"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition duration-300"
+            className="inline-flex items-center gap-2 bg-[#507969] hover:bg-[#2d5847] text-white px-6 py-3 rounded-lg transition duration-300"
           >
             <FiArrowLeft /> Kembali ke Daftar Produk
           </Link>
@@ -196,7 +196,7 @@ const ProductDetail = () => {
     <div className="bg-gray-50 min-h-screen pb-12">
       {/* Notification */}
       {showNotif && notifMessage && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-lg shadow-lg z-50 border-l-4 border-orange-500 animate-fade-in">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-lg shadow-lg z-50 border-l-4 border-[#507969] animate-fade-in">
           <div className="flex items-center justify-between gap-4">
             <span className="text-gray-700">{notifMessage}</span>
             <button
@@ -215,19 +215,19 @@ const ProductDetail = () => {
           <div className="flex items-center text-sm text-gray-600 space-x-2">
             <Link
               to="/"
-              className="hover:text-orange-500 transition duration-200"
+              className="hover:text-[#507969] transition duration-200"
             >
               Home
             </Link>
             <span>/</span>
             <Link
               to="/product"
-              className="hover:text-orange-500 transition duration-200"
+              className="hover:text-[#507969] transition duration-200"
             >
               Product
             </Link>
             <span>/</span>
-            <span className="text-orange-500 font-medium truncate max-w-xs">
+            <span className="text-[#507969] font-medium truncate max-w-xs">
               {product.name}
             </span>
           </div>
@@ -253,13 +253,13 @@ const ProductDetail = () => {
                   className="absolute top-4 right-4 bg-white shadow-md rounded-full p-2 hover:shadow-lg transition-shadow duration-300"
                 >
                   {wishlistLoading ? (
-                    <div className="w-5 h-5 border-2 border-t-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-t-2 border-[#507969] border-t-transparent rounded-full animate-spin"></div>
                   ) : wishlistIds.includes(product.id) ? (
-                    <IoIosHeart size={22} className="text-orange-500" />
+                    <IoIosHeart size={22} className="text-[#507969]" />
                   ) : (
                     <IoIosHeartEmpty
                       size={22}
-                      className="text-gray-400 hover:text-orange-500"
+                      className="text-gray-400 hover:text-[#507969]"
                     />
                   )}
                 </button>
@@ -272,7 +272,7 @@ const ProductDetail = () => {
               <div>
                 {product.category_name && (
                   <div className="mb-2">
-                    <span className="bg-orange-50 text-orange-700 text-xs font-medium px-2.5 py-1 rounded">
+                    <span className="bg-soft text-primary text-xs font-medium px-2.5 py-1 rounded">
                       {product.category_name}
                     </span>
                   </div>
@@ -280,7 +280,7 @@ const ProductDetail = () => {
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
                   {product.name}
                 </h1>
-                <p className="text-3xl font-bold text-orange-600 mb-4">
+                <p className="text-3xl font-bold text-primary mb-4">
                   Rp {Number(product.price).toLocaleString("id-ID")}
                 </p>
 
@@ -296,7 +296,7 @@ const ProductDetail = () => {
                   >
                     Stok: {product.stocks}
                   </span>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-soft text-primary">
                     Berat: {product.weight} gram
                   </span>
                 </div>
@@ -382,7 +382,7 @@ const ProductDetail = () => {
                       },
                     });
                   }}
-                  className="col-span-3 bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
+                  className="col-span-3 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
                 >
                   Beli Sekarang
                 </button>

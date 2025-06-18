@@ -10,7 +10,7 @@ const SellerSidebar = () => {
       {/* Tombol toggle */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed top-20 left-4 z-50 bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 backdrop-blur-sm cursor-pointer"
+        className="fixed top-25 left-4 z-50 bg-gradient-to-r from-green-700 to-green-300 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 backdrop-blur-sm cursor-pointer"
       >
         {open ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -30,7 +30,7 @@ const SellerSidebar = () => {
         }`}
       >
         {/* Header */}
-        {/* <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-orange-500 to-amber-500">
+        {/* <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-green-300 to-green-300">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
               <div className="w-4 h-4 bg-white rounded"></div>
@@ -43,18 +43,18 @@ const SellerSidebar = () => {
         <nav className="px-6 pt-35">
           <Link
             to="/allproducts"
-            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 hover:translate-x-1 "
+            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:translate-x-1 "
             onClick={() => setOpen(false)}
           >
-            {/* <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center group-hover:from-orange-200 group-hover:to-orange-300 transition-all duration-200">
-              <div className="w-5 h-5 bg-orange-500 rounded"></div>
+            {/* <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center group-hover:from-green-200 group-hover:to-green-300 transition-all duration-200">
+              <div className="w-5 h-5 bg-green-500 rounded"></div>
             </div> */}
             <span className="font-medium">Semua Produk</span>
           </Link>
 
           <Link
             to="/addproduct"
-            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 hover:translate-x-1"
+            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:translate-x-1"
             onClick={() => setOpen(false)}
           >
             {/* <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center group-hover:from-green-200 group-hover:to-green-300 transition-all duration-200">
@@ -65,7 +65,7 @@ const SellerSidebar = () => {
 
           <Link
             to="/alltransaction"
-            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-200 hover:translate-x-1"
+            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:translate-x-1"
             onClick={() => setOpen(false)}
           >
             {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-200">

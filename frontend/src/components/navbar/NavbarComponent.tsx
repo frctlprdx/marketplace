@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import GuestNav from "./GuestNav";
 import UserNav from "./UserNav";
 import { useNavigate } from "react-router-dom";
+import logo from "../../../public/assets/logo cerah.png";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,10 +34,10 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="w-screen h-16 bg-white shadow px-2 sm:px-6 flex items-center justify-between">
+    <div className="w-screen h-22 bg-white shadow px-2 sm:px-6 flex items-center justify-between">
       <Link to="/">
-        <div className="text-2xl sm:text-3xl font-bold text-orange-600 pb-1 cursor-pointer">
-          Insert Name
+        <div className="cursor-pointer sm:h-20 h-10">
+          <img src={logo} alt="logo" className="h-full w-full object-contain" />
         </div>
       </Link>
 
@@ -47,7 +48,7 @@ const Navbar = () => {
             placeholder="Search for anything"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-2 sm:px-6 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-2 sm:px-6 py-1.5 sm:py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-[#507969] text-sm sm:text-base"
           />
         </form>
       </div>

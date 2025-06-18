@@ -132,7 +132,7 @@ function AddProduct() {
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-300 to-orange-500 rounded-full mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-300 to-green-500 rounded-full mb-4 shadow-lg">
             <FiPackage className="text-2xl text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Tambah Produk Baru</h1>
@@ -146,7 +146,7 @@ function AddProduct() {
               {/* Product Name */}
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                  <FiPackage className="mr-2 text-orange-500" />
+                  <FiPackage className="mr-2 text-green-500" />
                   Nama Produk
                 </label>
                 <div className="relative">
@@ -156,7 +156,7 @@ function AddProduct() {
                     placeholder="Masukkan nama produk yang menarik"
                     onChange={handleChange}
                     value={formData.name}
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -164,12 +164,12 @@ function AddProduct() {
               {/* Category */}
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                  <FiTag className="mr-2 text-orange-500" />
+                  <FiTag className="mr-2 text-green-500" />
                   Kategori Produk
                 </label>
                 <div className="relative">
                   <select
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all duration-200 outline-none text-gray-700 bg-white appearance-none cursor-pointer"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 bg-white appearance-none cursor-pointer"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                   >
@@ -191,7 +191,7 @@ function AddProduct() {
               {/* Description */}
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                  <FiFileText className="mr-2 text-orange-500" />
+                  <FiFileText className="mr-2 text-green-500" />
                   Deskripsi Produk
                 </label>
                 <textarea
@@ -200,7 +200,7 @@ function AddProduct() {
                   onChange={handleChange}
                   value={formData.description}
                   rows={4}
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400 resize-none"
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400 resize-none"
                 />
               </div>
 
@@ -209,7 +209,7 @@ function AddProduct() {
                 {/* Stock */}
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                    <FiHash className="mr-2 text-orange-500" />
+                    <FiHash className="mr-2 text-green-500" />
                     Jumlah Stok
                   </label>
                   <input
@@ -219,14 +219,14 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.stocks}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
 
                 {/* Price */}
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                    <FiDollarSign className="mr-2 text-orange-500" />
+                    <FiDollarSign className="mr-2 text-green-500" />
                     Harga (Rp)
                   </label>
                   <input
@@ -236,7 +236,7 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.price}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -244,15 +244,15 @@ function AddProduct() {
               {/* Image Upload */}
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                  <FiImage className="mr-2 text-orange-500" />
+                  <FiImage className="mr-2 text-green-500" />
                   Gambar Produk
                 </label>
                 <div className="relative">
                   <div className="flex items-center justify-center w-full">
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200 group">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <FiUpload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-orange-500 transition-colors" />
-                        <p className="mb-2 text-sm text-gray-500 group-hover:text-orange-500 transition-colors">
+                        <FiUpload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-green-500 transition-colors" />
+                        <p className="mb-2 text-sm text-gray-500 group-hover:text-green-500 transition-colors">
                           <span className="font-semibold">Klik untuk upload</span> atau drag & drop
                         </p>
                         <p className="text-xs text-gray-400">PNG, JPG, atau JPEG (MAX. 10MB)</p>
@@ -284,7 +284,7 @@ function AddProduct() {
               <button
                 onClick={() => handleUpload(true)}
                 disabled={loading}
-                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-700 focus:ring-4 focus:ring-orange-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {loading ? (
                   <FiLoader className="animate-spin mr-2" />
@@ -312,10 +312,10 @@ function AddProduct() {
 
         {/* Success/Error Message */}
         {message && (
-          <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
             <div className="flex items-center">
-              <FiCheck className="text-orange-500 mr-3" />
-              <p className="text-orange-700 font-medium">{message}</p>
+              <FiCheck className="text-green-500 mr-3" />
+              <p className="text-green-700 font-medium">{message}</p>
             </div>
           </div>
         )}

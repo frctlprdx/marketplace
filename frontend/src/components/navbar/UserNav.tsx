@@ -72,7 +72,7 @@ const UserNav = () => {
   return (
     <div className="flex items-center space-x-2 sm:space-x-4">
       <button
-        className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
+        className="flex items-center justify-center text-primary text-2xl hover:text-primary"
         onMouseEnter={() => setHoverHeart(true)}
         onMouseLeave={() => setHoverHeart(false)}
         onClick={handleClickWishlist}
@@ -81,7 +81,7 @@ const UserNav = () => {
       </button>
 
       <button
-        className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
+        className="flex items-center justify-center text-primary text-2xl hover:text-primary"
         onMouseEnter={() => setHoverCart(true)}
         onMouseLeave={() => setHoverCart(false)}
         onClick={handleClickCart}
@@ -92,7 +92,7 @@ const UserNav = () => {
       <div className="relative flex items-center" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
+          className="flex items-center justify-center text-primary text-2xl hover:text-primary"
         >
           <AiOutlineUser />
         </button>
@@ -101,7 +101,7 @@ const UserNav = () => {
           <div className="absolute right-0 top-10 w-48 bg-white p-4 shadow-md z-50">
             <button
               onClick={() => navigate("/profile")}
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
+              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm border rounded-md my-2"
             >
               <IoPersonOutline className="text-lg" />
               Profile
@@ -109,7 +109,7 @@ const UserNav = () => {
 
             <button
               onClick={() => navigate("/setting")}
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
+              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm border rounded-md my-2"
             >
               <AiOutlineSetting className="text-lg" />
               Settings
@@ -118,7 +118,7 @@ const UserNav = () => {
             {role === "customer" && (
               <button
                 onClick={() => navigate("/transactionhistory")}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
+                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm border rounded-md my-2"
               >
                 <MdHistory className="text-lg" />
                 Transaksi
@@ -128,7 +128,7 @@ const UserNav = () => {
             {role === "seller" && (
               <button
                 onClick={() => navigate("/allproducts")}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm border rounded-md my-2"
+                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm border rounded-md my-2"
               >
                 <MdStorefront className="text-lg" />
                 Kelola Toko
@@ -137,7 +137,7 @@ const UserNav = () => {
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-orange-50 transition text-sm text-red-500 border rounded-md my-2"
+              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm text-red-500 border rounded-md my-2"
             >
               <AiOutlineLogout className="text-lg" />
               Logout

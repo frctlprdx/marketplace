@@ -19,7 +19,7 @@ const GuestNav = () => {
     <>
       <div className="flex items-center space-x-2 sm:space-x-4">
         <button
-          className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
+          className="flex items-center justify-center text-primary text-2xl hover:text[#507969]"
           onMouseEnter={() => setHoverHeart(true)}
           onMouseLeave={() => setHoverHeart(false)}
           onClick={handleProtectedClick}
@@ -28,7 +28,7 @@ const GuestNav = () => {
         </button>
 
         <button
-          className="flex items-center justify-center text-black text-2xl hover:text-orange-500"
+          className="flex items-center justify-center text-primary text-2xl hover:text[#507969]"
           onMouseEnter={() => setHoverCart(true)}
           onMouseLeave={() => setHoverCart(false)}
           onClick={handleProtectedClick}
@@ -36,7 +36,7 @@ const GuestNav = () => {
           {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
         </button>
         <button
-          className="text-[15px] font-medium text-white bg-orange-500 hover:bg-orange-600 px-4 py-1 rounded-full"
+          className="text-[15px] font-medium text-white bg-button sm:px-6 px-4 py-1 rounded-full"
           onClick={() => setShowLogin(true)}
         >
           Login
@@ -73,7 +73,7 @@ const GuestNav = () => {
               Anda harus login terlebih dahulu
             </p>
             <button
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full mr-2"
+              className="bg-button text-white px-4 py-2 rounded-full mr-2"
               onClick={() => {
                 setShowAlert(false);
                 setShowLogin(true);

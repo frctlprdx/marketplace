@@ -78,7 +78,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
             required
           />
           {errors.name && (
@@ -89,7 +89,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
             required
           />
           {errors.email && (
@@ -103,13 +103,13 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2  text-orange-500"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2  text-primary"
             >
               {showPassword ? (
                 <AiOutlineEyeInvisible size={20} />
@@ -130,7 +130,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
               required
             />
             <button
@@ -138,7 +138,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
               onClick={() =>
                 setShowConfirmationPassword(!showConfirmationPassword)
               }
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary"
             >
               {showConfirmationPassword ? (
                 <AiOutlineEyeInvisible size={20} />
@@ -159,7 +159,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             placeholder="Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
           />
           {errors.address && (
             <p className="text-sm text-red-500">{errors.address[0]}</p>
@@ -169,7 +169,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             placeholder="Phone Number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
           />
           {errors.phone_number && (
             <p className="text-sm text-red-500">{errors.phone_number[0]}</p>
@@ -182,7 +182,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
           )}
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600"
+            className="w-full text-white py-2 rounded-md bg-button"
           >
             Register
           </button>
@@ -191,7 +191,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
           Sudah punya akun?{" "}
           <button
             onClick={onSwitchToLogin}
-            className="text-orange-600 hover:underline"
+            className="text-primary hover:underline"
           >
             Login
           </button>

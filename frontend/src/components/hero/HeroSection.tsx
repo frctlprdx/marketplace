@@ -2,6 +2,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { useInView } from "framer-motion";
+import herobg from "../../../public/assets/herobg.png";
 
 const HeroSection = () => {
   const ref = useRef(null);
@@ -31,23 +32,28 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center">
+    <div
+      className="w-screen h-screen flex items-center justify-center bg-cover bg-center"
+      style={{
+        // backgroundImage: `url(${herobg})`,
+      }}
+    >
       <motion.div
         ref={ref}
         initial="hidden"
         animate={controls}
         variants={variants}
-        className="max-w-xl sm:mx-0 mx-20 px-4"
+        className="sm:mx-0 mx-20 px-4 bg-[#507969]/0 w-screen py-4 text-center"
       >
-        <h1 className="text-center text-3xl sm:text-4xl font-bold mb-4">
+        <h1 className=" text-black text-center text-3xl sm:text-4xl font-bold mb-4">
           Welcome !
         </h1>
-        <p className="text-justify leading-relaxed">
-          Marketplace To sell all your products online
+        <p className=" text-black">
+          Marketplace to sell all your products online
         </p>
         <div className="mt-6 flex justify-center">
           <button
-            className="bg-black text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold hover:bg-gray-800 transition duration-300 cursor-pointer"
+            className="bg-button text-white px-15 sm:px-30 py-3 rounded-full text-lg font-semibold transition duration-300 cursor-pointer"
             onClick={handleClick}
           >
             See Products

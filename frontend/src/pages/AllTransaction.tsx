@@ -22,7 +22,7 @@ interface Transaction {
   user_id: string; // nama user
   product_name: string;
   category_name: string; // nama kategori
-  amount: number;
+  stocks: number;
   status: string;
   created_at: string;
   category?: string; // category name
@@ -68,7 +68,7 @@ const AllTransactionTable = () => {
         return <FiCheckCircle className="text-green-500" />;
       case "pending":
       case "menunggu":
-        return <FiAlertCircle className="text-orange-500" />;
+        return <FiAlertCircle className="text-orange -500" />;
       case "cancelled":
       case "dibatalkan":
         return <FiXCircle className="text-red-500" />;
@@ -105,13 +105,13 @@ const AllTransactionTable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-green-500 to-green-500 rounded-xl shadow-lg">
                 <FiShoppingBag className="text-xl text-white" />
               </div>
               <div>
@@ -124,9 +124,9 @@ const AllTransactionTable = () => {
               </div>
             </div>
             <div className="hidden sm:flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-orange-100 px-4 py-2 rounded-lg">
-                <FiTrendingUp className="text-orange-600" />
-                <span className="text-orange-800 font-medium">
+              <div className="flex items-center space-x-2 bg-green-100 px-4 py-2 rounded-lg">
+                <FiTrendingUp className="text-green-600" />
+                <span className="text-green-800 font-medium">
                   {transactions.length} Transaksi
                 </span>
               </div>
@@ -137,8 +137,8 @@ const AllTransactionTable = () => {
         {/* Main Content */}
         {transactions.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-6">
-              <FiShoppingBag className="text-2xl text-orange-500" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
+              <FiShoppingBag className="text-2xl text-green-500" />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               Belum Ada Transaksi
@@ -150,7 +150,7 @@ const AllTransactionTable = () => {
         ) : (
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             {/* Table Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
+            <div className="bg-gradient-to-r from-[#2d5847] to-[#9fb5ad] px-6 py-4">
               <h2 className="text-lg font-semibold text-white">
                 Riwayat Transaksi Pembeli
               </h2>
@@ -159,41 +159,41 @@ const AllTransactionTable = () => {
             {/* Desktop Table */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-orange-50 border-b border-orange-100">
+                <thead className="bg-green-50 border-b border-green-100">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">
                       <div className="flex items-center space-x-2">
-                        <FiHash className="text-orange-600" />
+                        <FiHash className="text-green-600" />
                         <span>ID</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">
                       <div className="flex items-center space-x-2">
-                        <FiUser className="text-orange-600" />
+                        <FiUser className="text-green-600" />
                         <span>Pembeli</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">
                       <div className="flex items-center space-x-2">
-                        <FiPackage className="text-orange-600" />
+                        <FiPackage className="text-green-600" />
                         <span>Produk</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-green-800">
                       <div className="flex items-center justify-center space-x-2">
-                        <FiHash className="text-orange-600" />
+                        <FiHash className="text-green-600" />
                         <span>Jumlah</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-green-800">
                       <div className="flex items-center justify-center space-x-2">
-                        <FiCheckCircle className="text-orange-600" />
+                        <FiCheckCircle className="text-green-600" />
                         <span>Status</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-orange-800">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-green-800">
                       <div className="flex items-center justify-center space-x-2">
-                        <FiCalendar className="text-orange-600" />
+                        <FiCalendar className="text-green-600" />
                         <span>Tanggal</span>
                       </div>
                     </th>
@@ -206,12 +206,12 @@ const AllTransactionTable = () => {
                       onClick={() =>
                         navigate(`/transactiondetail/${trx.transaction_item}`)
                       }
-                      className="hover:bg-orange-25 transition-colors duration-200 group cursor-pointer"
+                      className="hover:bg-green-25 transition-colors duration-200 group cursor-pointer"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <span className="text-orange-600 font-semibold text-sm">
+                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span className="text-green-600 font-semibold text-sm">
                               #{trx.id}
                             </span>
                           </div>
@@ -219,7 +219,7 @@ const AllTransactionTable = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-400 rounded-full flex items-center justify-center">
                             <FiUser className="text-white text-sm" />
                           </div>
                           <div>
@@ -241,9 +241,9 @@ const AllTransactionTable = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center px-3 py-1 bg-orange-50 border border-orange-200 rounded-full">
-                          <span className="text-orange-800 font-semibold">
-                            {trx.amount}
+                        <span className="inline-flex items-center px-3 py-1 bg-green-50 border border-green-200 rounded-full">
+                          <span className="text-green-800 font-semibold">
+                            {trx.stocks}
                           </span>
                         </span>
                       </td>
@@ -294,12 +294,12 @@ const AllTransactionTable = () => {
                   onClick={() =>
                     navigate(`/transactiondetail/${trx.transaction_item}`)
                   }
-                  className="bg-gradient-to-r from-white to-orange-25 border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  className="bg-gradient-to-r from-white to-green-25 border border-green-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <span className="text-orange-600 font-semibold text-sm">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span className="text-green-600 font-semibold text-sm">
                           #{trx.id}
                         </span>
                       </div>
@@ -312,33 +312,33 @@ const AllTransactionTable = () => {
                         <span>{trx.status}</span>
                       </span>
                     </div>
-                    <FiEye className="text-orange-500" />
+                    <FiEye className="text-green-500" />
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
-                      <FiUser className="text-orange-500 text-sm" />
+                      <FiUser className="text-green-500 text-sm" />
                       <span className="text-sm font-medium text-gray-800">
                         {trx.user_id}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <FiTag className="text-orange-500 text-sm" />
+                      <FiTag className="text-green-500 text-sm" />
                       <span className="text-xs text-gray-500">
                         {trx.category_name || "Kategori tidak tersedia"}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <FiPackage className="text-orange-500 text-sm" />
+                      <FiPackage className="text-green-500 text-sm" />
                       <span className="text-sm text-gray-600 truncate">
                         {trx.product_name}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <FiHash className="text-orange-500 text-sm" />
+                        <FiHash className="text-green-500 text-sm" />
                         <span className="text-sm text-gray-600">
-                          Jumlah: {trx.amount}
+                          Jumlah: {trx.stocks}
                         </span>
                       </div>
                       <div className="flex items-center space-x-1 text-xs text-gray-500">

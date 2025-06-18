@@ -46,13 +46,13 @@ const SellerProducts = () => {
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
           Daftar Produk Anda
         </h2>
-        <div className="w-20 h-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>
+        <div className="w-20 h-1 bg-gradient-to-r from-[#507969] to-[#9fb5ad] rounded-full"></div>
       </div>
 
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 sm:py-24">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center mb-6">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-300 to-amber-300 rounded-full"></div>
+          <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mb-6">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-300 to-green-300 rounded-full"></div>
           </div>
           <h3 className="text-lg sm:text-xl font-semibold text-gray-600 mb-2">
             Belum ada produk
@@ -69,7 +69,7 @@ const SellerProducts = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+                    <tr className="bg-gradient-to-r from-[#507969] to-[#00a867] text-white">
                       <th className="px-6 py-4 text-left font-semibold">ID</th>
                       <th className="px-6 py-4 text-left font-semibold">
                         Gambar
@@ -86,11 +86,11 @@ const SellerProducts = () => {
                     {products.map((product) => (
                       <tr
                         key={product.id}
-                        className="hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 cursor-pointer transition-all duration-200 group"
+                        className="hover:bg-gradient-to-r hover:from-green-50 hover:to-green-50 cursor-pointer transition-all duration-200 group"
                         onClick={() => navigate(`/editproduct/${product.id}`)}
                       >
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full text-sm font-medium group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors">
+                          <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full text-sm font-medium group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
                             {product.id}
                           </span>
                         </td>
@@ -110,7 +110,7 @@ const SellerProducts = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 font-semibold rounded-full text-sm">
+                          <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-100 to-green-100 text-green-700 font-semibold rounded-full text-sm">
                             Rp{Number(product.price).toLocaleString("id-ID")}
                           </span>
                         </td>
@@ -148,13 +148,13 @@ const SellerProducts = () => {
                         <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 text-sm sm:text-base truncate pr-2">
                           {product.name}
                         </h3>
-                        <span className="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 text-gray-600 rounded-full text-xs sm:text-sm font-medium group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors flex-shrink-0">
+                        <span className="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 text-gray-600 rounded-full text-xs sm:text-sm font-medium group-hover:bg-green-100 group-hover:text-green-600 transition-colors flex-shrink-0">
                           {product.id}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 font-semibold rounded-full text-sm">
+                        <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-100 to-green-100 text-green-700 font-semibold rounded-full text-sm">
                           Rp{Number(product.price).toLocaleString("id-ID")}
                         </span>
                         <div className="text-xs text-gray-400 group-hover:text-gray-500 transition-colors">
@@ -166,7 +166,7 @@ const SellerProducts = () => {
                 </div>
 
                 {/* Hover indicator */}
-                <div className="h-1 bg-gradient-to-r from-orange-500 to-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                <div className="h-1 bg-gradient-to-r from-green-500 to-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </div>
             ))}
           </div>

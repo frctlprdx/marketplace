@@ -56,7 +56,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
             required
           />
           <div className="relative">
@@ -65,7 +65,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pr-10"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969] pr-10"
               required
             />
             <button
@@ -87,14 +87,14 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
               type="checkbox"
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
-              className="h-4 w-4 text-orange-500 border-gray-300 rounded"
+              className="h-4 w-4 text-primary border-gray-300 rounded"
             />
             <label className="text-sm text-gray-700">Ingat Saya</label>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600"
+            className="w-full text-white py-2 rounded-md bg-button"
           >
             Login
           </button>
@@ -118,7 +118,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
           Belum punya akun?{" "}
           <button
             onClick={onSwitchToRegister}
-            className="text-orange-600 hover:underline"
+            className="text-primary hover:underline"
           >
             Register
           </button>

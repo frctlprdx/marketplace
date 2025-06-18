@@ -288,7 +288,7 @@ const Checkout = () => {
           </p>
           <button
             onClick={() => navigate("/")}
-            className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 transition"
+            className="bg-[#507969] text-white px-6 py-2 rounded hover:bg-[#2d5847] transition"
           >
             Kembali ke Beranda
           </button>
@@ -314,10 +314,10 @@ const Checkout = () => {
 
           {/* Progress Steps */}
           <div className="flex items-center gap-2 mt-4 text-sm">
-            <span className="bg-orange-500 text-white px-3 py-1 rounded-full">
+            <span className="bg-[#507969] text-white px-3 py-1 rounded-full">
               1
             </span>
-            <span className="text-orange-500 font-medium">
+            <span className="text-primary font-medium">
               Alamat Pengiriman
             </span>
             <FaChevronRight className="text-gray-400" />
@@ -325,11 +325,6 @@ const Checkout = () => {
               2
             </span>
             <span className="text-gray-500">Pembayaran</span>
-            <FaChevronRight className="text-gray-400" />
-            <span className="bg-gray-300 text-gray-600 px-3 py-1 rounded-full">
-              3
-            </span>
-            <span className="text-gray-500">Konfirmasi</span>
           </div>
         </div>
       </div>
@@ -343,8 +338,8 @@ const Checkout = () => {
               <div className="p-6 border-b bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="bg-orange-100 p-2 rounded-lg">
-                      <FaMapMarkerAlt className="text-orange-500" />
+                    <div className="bg-soft p-2 rounded-lg">
+                      <FaMapMarkerAlt className="text-primary" />
                     </div>
                     <h2 className="text-xl font-semibold text-gray-800">
                       Alamat Pengiriman
@@ -355,7 +350,7 @@ const Checkout = () => {
                     disabled={!isLoggedIn}
                     className={`flex items-center gap-2 font-medium transition ${
                       isLoggedIn
-                        ? "text-orange-500 hover:text-orange-600"
+                        ? "text-primary hover:text-[#2d5847]"
                         : "text-gray-400 cursor-not-allowed"
                     }`}
                     title={!isLoggedIn ? "Login terlebih dahulu" : ""}
@@ -382,7 +377,7 @@ const Checkout = () => {
                     </p>
                     <button
                       onClick={() => navigate("/")}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                      className="bg-[#507969] text-white px-6 py-3 rounded-lg hover:bg-[#2d5847] transition-colors font-medium"
                     >
                       Login Menggunakan Akun Customer
                     </button>
@@ -421,7 +416,7 @@ const Checkout = () => {
                         </div>
                         <button
                           onClick={() => setShowAddressDropdown(true)}
-                          className="text-orange-500 hover:text-orange-600 font-medium text-sm ml-4"
+                          className="text-primary hover:text-[#2d5847] font-medium text-sm ml-4"
                         >
                           Ubah Alamat
                         </button>
@@ -530,7 +525,7 @@ const Checkout = () => {
                     </p>
                     <button
                       onClick={() => setShowAddAddressModal(true)}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                      className="bg-[#507969] text-white px-6 py-3 rounded-lg hover:bg-[#2d5847] transition-colors font-medium"
                     >
                       <FaPlus className="inline mr-2" />
                       Tambah Alamat Pertama
@@ -547,8 +542,8 @@ const Checkout = () => {
               {/* Header */}
               <div className="p-6 border-b bg-gray-50">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <FaBox className="text-blue-500" />
+                  <div className="bg-soft p-2 rounded-lg">
+                    <FaBox className="text-primary" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800">
                     Ringkasan Pesanan
@@ -568,7 +563,7 @@ const Checkout = () => {
                     <h3 className="font-semibold text-gray-800 mb-1">
                       {product.name}
                     </h3>
-                    <p className="text-orange-500 font-bold text-lg">
+                    <p className="text-primary font-bold text-lg">
                       Rp {Number(product.price).toLocaleString("id-ID")}
                     </p>
                     <p className="text-gray-600 text-sm">
@@ -596,12 +591,12 @@ const Checkout = () => {
                     </span>
                   </div>
                   <div className="flex items-center justify-center text-gray-600 py-2 px-5 text-sm border border-dashed border-gray-300 rounded bg-gray-50">
-                    <FaTruck className="mr-2 text-orange-500" />
+                    <FaTruck className="mr-2 text-primary" />
                     Ongkir akan dihitung di halaman pembayaran
                   </div>
                   <div className="border-t pt-3 flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span className="text-orange-500">
+                    <span className="text-primary">
                       Rp {subtotal.toLocaleString("id-ID")}
                     </span>
                   </div>
@@ -621,7 +616,7 @@ const Checkout = () => {
                     isLoggedIn &&
                     !isLoadingDestination &&
                     !isCalculatingShipping
-                      ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg"
+                      ? "bg-[#507969] text-white hover:bg-[#2d5847] shadow-md hover:shadow-lg"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
@@ -680,7 +675,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     placeholder="Rumah, Kantor, Kost, dll."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                     value={newAddress.label}
                     onChange={(e) =>
                       setNewAddress({ ...newAddress, label: e.target.value })
@@ -695,7 +690,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     placeholder="Nama lengkap penerima"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                     value={newAddress.recipient_name}
                     onChange={(e) =>
                       setNewAddress({
@@ -713,7 +708,7 @@ const Checkout = () => {
                   <input
                     type="tel"
                     placeholder="08XXXXXXXXXX"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                     value={newAddress.phone}
                     onChange={(e) =>
                       setNewAddress({ ...newAddress, phone: e.target.value })
@@ -729,7 +724,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       placeholder="Provinsi"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                       value={newAddress.province}
                       onChange={(e) =>
                         setNewAddress({
@@ -746,7 +741,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       placeholder="Kota/Kabupaten"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                       value={newAddress.city}
                       onChange={(e) =>
                         setNewAddress({ ...newAddress, city: e.target.value })
@@ -763,7 +758,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       placeholder="Kecamatan"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                       value={newAddress.district}
                       onChange={(e) =>
                         setNewAddress({
@@ -780,7 +775,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       placeholder="Kelurahan/Desa"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                       value={newAddress.subdistrict}
                       onChange={(e) =>
                         setNewAddress({
@@ -799,7 +794,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     placeholder="12345"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969]"
                     value={newAddress.zip_code}
                     onChange={(e) =>
                       setNewAddress({ ...newAddress, zip_code: e.target.value })
@@ -813,7 +808,7 @@ const Checkout = () => {
                   </label>
                   <textarea
                     placeholder="Jalan, RT/RW, Patokan, No. Rumah, dll."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#507969] focus:border-[#507969] resize-none"
                     rows={3}
                     value={newAddress.detail_address}
                     onChange={(e) =>
@@ -836,7 +831,7 @@ const Checkout = () => {
                         is_default: e.target.checked,
                       })
                     }
-                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-[#507969]"
                   />
                   <label
                     htmlFor="default-address"
@@ -859,7 +854,7 @@ const Checkout = () => {
                 </button>
                 <button
                   onClick={handleAddAddress}
-                  className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition"
+                  className="flex-1 bg-[#507969] text-white py-3 rounded-lg font-medium hover:bg-[#2d5847] transition"
                 >
                   Simpan Alamat
                 </button>

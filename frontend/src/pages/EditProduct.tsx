@@ -125,7 +125,7 @@ const EditProduct = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Edit Produk</h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full mx-auto"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-green-700 to-green-500 rounded-full mx-auto"></div>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -175,9 +175,9 @@ const EditProduct = () => {
                   onChange={(e) => setNewImage(e.target.files?.[0] || null)}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <div className="flex items-center justify-center w-full h-12 px-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-200 cursor-pointer">
+                <div className="flex items-center justify-center w-full h-12 px-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all duration-200 cursor-pointer">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <Upload size={20} className="text-orange-500" />
+                    <Upload size={20} className="text-green-500" />
                     <span className="text-sm font-medium">
                       {newImage ? newImage.name : "Pilih gambar baru"}
                     </span>
@@ -199,7 +199,7 @@ const EditProduct = () => {
                   placeholder="Masukkan nama produk"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />
               </div>
 
@@ -214,7 +214,7 @@ const EditProduct = () => {
                   value={formData.description}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
                 />
               </div>
 
@@ -229,7 +229,7 @@ const EditProduct = () => {
                   placeholder="0"
                   value={formData.stocks}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />
               </div>
 
@@ -244,7 +244,7 @@ const EditProduct = () => {
                   placeholder="0"
                   value={formData.price}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />
               </div>
             </div>
@@ -254,7 +254,7 @@ const EditProduct = () => {
               {/* Save Button */}
               <button
                 onClick={handleUpdate}
-                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-amber-600 focus:ring-4 focus:ring-orange-200 transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-green-500 to-green-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-green-600 focus:ring-4 focus:ring-green-200 transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center space-x-2"
               >
                 <Save size={20} />
                 <span>Simpan Perubahan</span>
@@ -266,8 +266,8 @@ const EditProduct = () => {
                   onClick={() => handleVisibilityChange(true)}
                   className={`py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center space-x-2 ${
                     formData.show
-                      ? "bg-green-500 text-white hover:bg-green-600 focus:ring-4 focus:ring-green-200"
-                      : "bg-green-100 text-green-700 hover:bg-green-200 border border-green-300"
+                      ? "bg-orange-500 text-white hover:bg-orange-600 focus:ring-4 focus:ring-orange-200"
+                      : "bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-300"
                   }`}
                 >
                   <Eye size={18} />
