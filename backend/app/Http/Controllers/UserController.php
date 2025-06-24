@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 class UserController extends Controller
@@ -86,5 +87,50 @@ class UserController extends Controller
             'token' => $token,  // Kirim token
             'role' => $user->role,  // Kirim role
         ], 201);
+    }
+
+    public function indexuser(Request $request)
+    {
+        $userId = $request->query('user_id');
+
+        if (!$userId) {
+            return response()->json(['message' => 'User ID tidak ditemukan'], 400);
+        }
+
+        $user = DB::table('users')->where('id', $userId)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        return response()->json($user);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+        ]);
+
+        // Ambil user berdasarkan ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        // Update data
+        $user->name = $validated['name'];
+        $user->address = $validated['address'] ?? $user->address;
+        $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profil berhasil diperbarui',
+            'data' => $user,
+        ], 200);
     }
 }

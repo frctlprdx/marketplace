@@ -22,6 +22,7 @@ import SellerProducts from "./pages/SellerProducts";
 import EditProduct from "./pages/EditProduct";
 import AllTransaction from "./pages/AllTransaction";
 import TransactionDetail from "./pages/TransactionDetail";
+import Profile from "./pages/Profile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -54,6 +55,8 @@ function AppContent() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/transactionhistory" element={<TransactionHistory />} />
+        <Route path="/profile" element={<Profile />} />
+        {/* Halaman khusus */}
         <Route path="/thanks" element={<Thanks />} />
         <Route path="/error" element={<Error />} />
 

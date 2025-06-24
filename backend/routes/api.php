@@ -33,8 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store'); //Check
     Route::delete('/wishlist', [WishlistController::class, 'destroy'])->middleware('role:customer')->name('wishlist.destroy'); //Check
 
-    Route::get('/profile', [UserController::class, 'indexuser'])->middleware('role:customer')->name('profile.index');
-    Route::put('/profile/{id}', [UserController::class, 'update'])->middleware('role:customer')->name('profile.update');
+    Route::get('/profile', [UserController::class, 'indexuser'])->name('profile.index'); //Check
+    Route::put('/profile/{id}', [UserController::class, 'update'])->name('profile.update');
 
     // Route alamat user (customer)
     Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index'); //Check

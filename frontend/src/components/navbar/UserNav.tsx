@@ -1,7 +1,4 @@
-import {
-  AiOutlineUser,
-  AiOutlineLogout,
-} from "react-icons/ai";
+import { AiOutlineUser } from "react-icons/ai";
 import { IoPersonOutline } from "react-icons/io5";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
@@ -14,7 +11,6 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const UserNav = () => {
-  const [open, setOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [role, setRole] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -35,7 +31,6 @@ const UserNav = () => {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setOpen(false);
         setIsMenuOpen(false);
       }
     };
@@ -78,6 +73,11 @@ const UserNav = () => {
     }
   };
 
+  const handleClickProfile = () => {
+    const userId = localStorage.getItem("user_id");
+    navigate(`/profile?user_id=${userId}`);
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Desktop View */}
@@ -91,6 +91,10 @@ const UserNav = () => {
           {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
 
+        {/* <button onClick={handleLogout}>
+          logout
+        </button> */}
+
         <button
           className="text-primary text-2xl hover:text-black transition"
           onMouseEnter={() => setHoverCart(true)}
@@ -100,44 +104,34 @@ const UserNav = () => {
           {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
         </button>
 
-        {role === "customer" && (<button
-          className="text-primary text-2xl hover:text-black transition"
-          onMouseEnter={() => setHoverHistory(true)}
-          onMouseLeave={() => setHoverHistory(false)}
-          onClick={handleClickHistory}
-        >
-          {hoverHistory ? <RiHistoryFill /> : <RiHistoryLine />}
-        </button>)}
+        {role === "customer" && (
+          <button
+            className="text-primary text-2xl hover:text-black transition"
+            onMouseEnter={() => setHoverHistory(true)}
+            onMouseLeave={() => setHoverHistory(false)}
+            onClick={handleClickHistory}
+          >
+            {hoverHistory ? <RiHistoryFill /> : <RiHistoryLine />}
+          </button>
+        )}
 
-        {role === "seller" && (<button
-          className="text-primary text-2xl hover:text-black transition"
-          onMouseEnter={() => setHoverHistory(true)}
-          onMouseLeave={() => setHoverHistory(false)}
-           onClick={() => navigate("/allproducts")}
-        >
-          {hoverHistory ? <MdStorefront /> : <MdStorefront />}
-        </button>)}
+        {role === "seller" && (
+          <button
+            className="text-primary text-2xl hover:text-black transition"
+            onMouseEnter={() => setHoverHistory(true)}
+            onMouseLeave={() => setHoverHistory(false)}
+            onClick={() => navigate("/allproducts")}
+          >
+            {hoverHistory ? <MdStorefront /> : <MdStorefront />}
+          </button>
+        )}
 
-        
         <button
-          onClick={() => setOpen(!open)}
+          onClick={handleClickProfile}
           className="text-primary text-2xl hover:text-primary"
         >
           <AiOutlineUser />
         </button>
-
-        {open && (
-          <div className="absolute right-0 top-10 w-48 bg-white p-4 shadow-md z-50">
-
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-[#9fb5ad] transition text-sm text-red-500 border rounded-md my-2"
-            >
-              <AiOutlineLogout className="text-lg" />
-              Logout
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Mobile View */}
@@ -185,7 +179,7 @@ const UserNav = () => {
 
             <button
               onClick={() => {
-                navigate("/profile");
+                handleClickProfile();
                 setIsMenuOpen(false);
               }}
               className="flex items-center gap-2 text-primary text-lg"
@@ -204,16 +198,6 @@ const UserNav = () => {
                 <MdStorefront /> Kelola Toko
               </button>
             )}
-
-            <button
-              onClick={() => {
-                handleLogout();
-                setIsMenuOpen(false);
-              }}
-              className="flex items-center gap-2 text-red-500 text-lg"
-            >
-              <AiOutlineLogout /> Logout
-            </button>
           </div>
         )}
       </div>
