@@ -136,18 +136,20 @@ const Payment = () => {
         window.snap.pay(snapToken, {
           onSuccess: function (result: any) {
             console.log("Payment Success:", result);
-            // Redirect will be handled by Midtrans callback URL
+            window.location.href = "/thanks"; // Redirect ke halaman utama
           },
           onPending: function (result: any) {
             console.log("Payment Pending:", result);
-            // Redirect will be handled by Midtrans callback URL
+            window.location.href = "/"; // Redirect juga bisa, atau ke /pending
           },
           onError: function (result: any) {
             console.log("Payment Error:", result);
-            // Redirect will be handled by Midtrans callback URL
+            // Bisa arahkan ke /failed atau tampilkan alert
+            window.location.href = "/payment-failed";
           },
           onClose: function () {
             console.log("Payment popup closed");
+            // Tidak redirect karena user menutup sebelum selesai
           },
         });
       } else {

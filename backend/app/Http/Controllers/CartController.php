@@ -22,8 +22,9 @@ class CartController extends Controller
 
             $carts = DB::table('carts')
                 ->join('products', 'carts.product_id', '=', 'products.id')
+                ->join('users', 'carts.user_id', '=', 'users.id')
                 ->where('carts.user_id', $userId)
-                ->select('carts.*', 'products.*')
+                ->select('carts.*', 'products.*', 'users.name as user_name')
                 ->get();
 
             return response()->json($carts);

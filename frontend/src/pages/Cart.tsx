@@ -126,11 +126,11 @@ const Cart = () => {
               Cart milik {cart[0].user_name}
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-lg hover:shadow-2xl p-4 flex flex-col group hover:border transition-opacity duration-300"
+                  className="px-2 rounded-lg hover:shadow-2xl flex flex-col group hover:border transition-opacity duration-300"
                   onClick={() => navigate(`/productdetail/${item.id}`)}
                 >
                   <div className="w-full h-1/2 relative">
@@ -140,28 +140,27 @@ const Cart = () => {
                         e.stopPropagation();
                         handleRemoveFromCart(item.product_id);
                       }}
-                      className="bg-orange-500 text-white border-orange-500 hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
+                      className="bg-[#507969] text-white border-[#507969] hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
                     />
                     <img
-                      className="w-full h-full object-cover rounded-md"
+                      className="w-full aspect-[4/3] object-cover rounded-md"
                       src={item.image}
                       alt={item.name}
                     />
                   </div>
-                  <div className="h-full flex flex-col p-2">
+                  <div className="h-full flex flex-col py-8 px-2 space-y-2">
                     <p className="text-2xl">{item.name}</p>
-                    <p className="text-xs">
-                      Jumlah Barang: {item.quantity}
-                    </p>
+                    <p className="text-xs">Jumlah Barang: {item.quantity}</p>
 
-                    <p className="text-orange-500 text-center mt-auto mb-2">
+                    <p className="text-primary text-xs">
                       Total Harga: Rp{" "}
                       {(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
 
                   <button
-                    className="mt-auto rounded-xl border-2 px-4 py-2 border-black hover:bg-black hover:text-white opacity-0 group-hover:opacity-100 transition duration-300"
+                    className="sm mb-2 mt-auto rounded-xl border-2 px-4 py-2 bg-button text-white hover:bg-black hover:text-white 
+             opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition duration-300"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate("/checkout", { state: { product: item } });
@@ -174,10 +173,12 @@ const Cart = () => {
             </div>
           </div>
         )}
+        
       </div>
 
       {/* ToastContainer must be rendered in the root component */}
       <ToastContainer position="top-center" />
+      
     </div>
   );
 };

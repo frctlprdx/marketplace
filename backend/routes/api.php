@@ -8,7 +8,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\UserAddressController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index'); //Main Page //Check
@@ -44,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update'); //Check
 
     Route::post('/snaptoken', [TransactionController::class, 'getSnapToken'])->middleware('role:customer')->name('transaction.store'); //Check
+    Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification']); // tanpa middleware
     Route::get('/transactionhistory', [TransactionController::class, 'index'])->middleware('role:customer')->name('transaction.index');
     
     Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->middleware('role:customer')->name('transaction.item');

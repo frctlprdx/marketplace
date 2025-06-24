@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import Modal from "../Modals/Modal";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import logo from "../../../public/assets/logo.png";
 
 interface Props {
   onClose: () => void;
@@ -71,6 +72,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   return (
     <Modal onClose={onClose}>
       <div className="w-full max-w-xs mx-auto bg-white rounded-lg shadow-lg p-6">
+        <img className="w-30 mx-auto" src={logo} alt="" />
         <h2 className="text-lg font-semibold mb-4 text-center">Register</h2>
         <form onSubmit={handleRegister} className="space-y-3">
           <input

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Snap;
@@ -184,6 +185,38 @@ class TransactionController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function handleNotification(Request $request)
+    {
+        $notif = new \Midtrans\Notification();
+
+        $transactionStatus = $notif->transaction_status;
+        $orderId = $notif->order_id;
+
+        if (in_array($transactionStatus, ['settlement', 'capture'])) {
+            $items = DB::table('transaction_items')->where('order_id', $orderId)->get();
+
+            foreach ($items as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->reduceStock($item->quantity);
+                }
+            }
+
+            DB::table('transactions')->where('order_id', $orderId)->update([
+                'status' => 'success',
+                'updated_at' => now(),
+            ]);
+        } elseif (in_array($transactionStatus, ['expire', 'cancel'])) {
+            DB::table('transactions')->where('order_id', $orderId)->update([
+                'status' => 'failed',
+                'updated_at' => now(),
+            ]);
+        }
+
+        return response()->json(['message' => 'Notifikasi diproses']);
+    }
+
 
 
 

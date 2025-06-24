@@ -292,7 +292,7 @@ const Product = () => {
           {/* Products Grid */}
           <div className="lg:col-span-3">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div
                     key={item}
@@ -318,15 +318,12 @@ const Product = () => {
                 <p className="text-gray-600 mt-2">
                   Coba ubah filter atau cari produk lainnya
                 </p>
-                <button
-                  onClick={resetFilters}
-                  className="mt-4 text-primary"
-                >
+                <button onClick={resetFilters} className="mt-4 text-primary">
                   Reset Filter
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {products.map((product) => (
                   <div
                     key={product.id}

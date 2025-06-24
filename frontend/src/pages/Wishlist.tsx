@@ -236,7 +236,7 @@ const Wishlist = () => {
               Wishlist milik {wishlist[0].user_name}
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {wishlist.map((item) => {
                 const quantity = quantities[item.product_id] || 1;
                 const totalPrice = Number(item.price) * quantity;
@@ -258,7 +258,7 @@ const Wishlist = () => {
                           e.stopPropagation();
                           handleRemoveFromWishlist(item.product_id);
                         }}
-                        className="text-orange-500 bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
+                        className="text-primary bg-white hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
                       />
                       <img
                         className="w-full h-full object-cover rounded-md"
@@ -269,16 +269,16 @@ const Wishlist = () => {
                     <div className="py-3 space-y-4 ">
                       <p>{item.name}</p>
                       {/* Harga total sesuai quantity */}
-                      <p className="text-orange-500 font-bold">
+                      <p className="text-primary font-bold">
                         Rp {totalPrice.toLocaleString("id-ID")}
                       </p>
                       <p className="text-sm"> Stocks: {item.stocks}</p>
-                      <p className="text-xs">Posted at {item.created_at}</p>
+                      <p className="text-xs">Di Post pada {item.created_at}</p>
                     </div>
 
                     {/* Input quantity */}
                     <div
-                      className="flex items-center gap-3 my-2 text-center"
+                      className="flex items-center gap-3 sm:my-2 mb-2 text-center"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
@@ -324,15 +324,14 @@ const Wishlist = () => {
 
                     <button
                       disabled={item.addedToCart || item.stocks === 0}
-                      className={`mt-auto rounded-xl border-2 px-4 py-2 border-black 
-                    hover:bg-black hover:text-white 
-                    opacity-0 group-hover:opacity-100 transition duration-300 
-                    ${
-                      item.addedToCart || item.stocks === 0
-                        ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
-                        : ""
-                    }
-                  `}
+                      className={`mt-auto rounded-xl border-2 px-4 py-2 bg-button text-white   
+                      hover:bg-black hover:text-white 
+                      opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition duration-300 
+                      ${
+                        item.addedToCart || item.stocks === 0
+                          ? "cursor-not-allowed bg-gray-300 text-gray-600 border-gray-400 hover:bg-gray-300 hover:text-gray-600"
+                          : ""
+                      }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (item.addedToCart || item.stocks === 0) return;
