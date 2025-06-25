@@ -55,8 +55,8 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',  // password harus dikonfirmasi
             'role' => 'required',  // Role hanya bisa 'customer' atau 'seller'
-            'address' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:15',
+            'profileimage' => 'required|string'
         ]);
 
         // Jika validasi gagal
@@ -73,8 +73,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,  // Menentukan role (customer/seller)
-            'address' => $request->address,
             'phone_number' => $request->phone_number,
+            'profileimage' => $request->profileimage, // URL gambar profil opsional
         ]);
 
         // Buat token untuk user baru
@@ -111,8 +111,8 @@ class UserController extends Controller
         // Validasi input
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:20',
+            'profileimage' => 'nullable|string|max:255', // URL gambar profil opsional
         ]);
 
         // Ambil user berdasarkan ID
@@ -124,8 +124,8 @@ class UserController extends Controller
 
         // Update data
         $user->name = $validated['name'];
-        $user->address = $validated['address'] ?? $user->address;
         $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
+        $user->profileimage = $validated['profileimage'] ?? $user->profileimage;
         $user->save();
 
         return response()->json([

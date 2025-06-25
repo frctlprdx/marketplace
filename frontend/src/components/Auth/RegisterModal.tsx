@@ -45,6 +45,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       password_confirmation: password, // harus dikirim!
       role: "customer", // Role default customer
       phone_number: phoneNumber,
+      profileimage: "https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/20250625.jpg",
     };
 
     try {
@@ -147,12 +148,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
               )}
             </button>
           </div>
-
-          {/* Hidden role input */}
-          <input type="hidden" value="customer" />
-          {errors.role && (
-            <p className="text-sm text-red-500">{errors.role[0]}</p>
-          )}
 
           <input
             type="text"

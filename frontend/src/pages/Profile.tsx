@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { supabase } from "../supabase";
 
 const Profile = () => {
@@ -8,11 +9,10 @@ const Profile = () => {
     email: "",
     role: "",
     phone_number: "",
-    profile_image: "",
+    profileimage: "",
   });
 
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
@@ -44,7 +44,7 @@ const Profile = () => {
 
         const data = await response.json();
         setUser({ ...data, id: userId });
-        setOldImageUrl(data.profile_image || "");
+        setOldImageUrl(data.profileimage || ""); // Store old image URL
       } catch (err: any) {
         setError(err.message || "Terjadi kesalahan");
       } finally {
@@ -59,100 +59,69 @@ const Profile = () => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleProfileImageUpload = async () => {
-    if (!newProfileImage) {
-      setMessage("Pilih gambar terlebih dahulu");
-      return;
-    }
-
-    setUploading(true);
-    const userToken = localStorage.getItem("user_token");
-
-    try {
-      // Upload gambar baru ke Supabase
-      const fileExt = newProfileImage.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `profile/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("nogosarenmarketplace")
-        .upload(filePath, newProfileImage);
-
-      if (uploadError) {
-        throw new Error("Upload gagal: " + uploadError.message);
-      }
-
-      // Dapatkan URL publik
-      const { data: publicUrl } = supabase.storage
-        .from("nogosarenmarketplace")
-        .getPublicUrl(filePath);
-
-      // Hapus gambar lama jika ada
-      if (oldImageUrl) {
-        const oldPath = oldImageUrl.split("/nogosarenmarketplace/")[1];
-        if (oldPath) {
-          await supabase.storage.from("nogosarenmarketplace").remove([oldPath]);
-        }
-      }
-
-      // Update ke database
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/profile/${user.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: user.name,
-            phone_number: user.phone_number,
-            profile_image: publicUrl.publicUrl,
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Gagal menyimpan gambar profil");
-
-      setUser({ ...user, profile_image: publicUrl.publicUrl });
-      setOldImageUrl(publicUrl.publicUrl);
-      setNewProfileImage(null);
-      setMessage("Foto profil berhasil diperbarui.");
-      setTimeout(() => setMessage(""), 3000);
-    } catch (error: any) {
-      console.error(error);
-      setMessage("Gagal mengupload foto profil: " + error.message);
-      setTimeout(() => setMessage(""), 3000);
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const handleSubmit = async () => {
     const userToken = localStorage.getItem("user_token");
     try {
-      const response = await fetch(
+      let imageUrl = user.profileimage;
+
+      // Handle image upload if new image is selected
+      if (newProfileImage) {
+        const fileExt = newProfileImage.name.split(".").pop();
+        const fileName = `profile/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("nogosarenmarketplace")
+          .upload(fileName, newProfileImage);
+
+        if (uploadError) throw uploadError;
+
+        // Set new image URL
+        imageUrl = `${
+          import.meta.env.VITE_SUPABASE_URL
+        }/storage/v1/object/public/nogosarenmarketplace/${fileName}`;
+
+        // Delete old image if exists
+        if (oldImageUrl && oldImageUrl.includes("/nogosarenmarketplace/")) {
+          const oldPath = oldImageUrl.split("/nogosarenmarketplace/")[1];
+          if (oldPath) {
+            try {
+              await supabase.storage
+                .from("nogosarenmarketplace")
+                .remove([oldPath]);
+            } catch (deleteError) {
+              console.warn("Failed to delete old image:", deleteError);
+              // Continue with the update even if deletion fails
+            }
+          }
+        }
+      }
+
+      // Update profile using axios.put
+      const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/profile/${user.id}`,
         {
-          method: "PUT",
+          name: user.name,
+          phone_number: user.phone_number,
+          profileimage: imageUrl,
+        },
+        {
           headers: {
             Authorization: `Bearer ${userToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            name: user.name,
-            phone_number: user.phone_number,
-          }),
         }
       );
 
-      if (!response.ok) throw new Error("Gagal menyimpan perubahan");
+      // Update local state with new image URL
+      setUser((prev) => ({ ...prev, profileimage: imageUrl }));
+      setOldImageUrl(imageUrl);
+      setNewProfileImage(null);
 
       setMessage("Profil berhasil diperbarui.");
       setTimeout(() => setMessage(""), 3000);
-    } catch (error) {
-      console.error(error);
-      setMessage("Gagal menyimpan perubahan.");
+    } catch (error: any) {
+      console.error("Update error:", error);
+      setMessage(error.response?.data?.message || "Gagal menyimpan perubahan.");
       setTimeout(() => setMessage(""), 3000);
     }
   };
@@ -256,9 +225,9 @@ const Profile = () => {
             {/* Profile Header */}
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
               <div className="relative group">
-                {user.profile_image ? (
+                {user.profileimage ? (
                   <img
-                    src={user.profile_image}
+                    src={user.profileimage}
                     alt="Profile"
                     className="w-24 h-24 md:w-32 md:h-32 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-shadow duration-300"
                   />
@@ -279,39 +248,6 @@ const Profile = () => {
                     </svg>
                   </div>
                 )}
-
-                {/* Upload Profile Image Button */}
-                <div className="absolute -bottom-2 -right-2">
-                  <label className="w-8 h-8 bg-[#507969] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#2d5847] transition-colors duration-200 shadow-lg">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        setNewProfileImage(e.target.files?.[0] || null)
-                      }
-                      className="hidden"
-                    />
-                  </label>
-                </div>
               </div>
 
               <div className="text-center md:text-left flex-1">
@@ -334,40 +270,66 @@ const Profile = () => {
                 </div>
 
                 {/* Upload Profile Image Button */}
-                {newProfileImage && (
-                  <div className="mt-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <span>File terpilih: {newProfileImage.name}</span>
+                <div className="mt-4">
+                  <label
+                    style={{ color: "#507969" }}
+                    className="block text-sm font-semibold mb-2"
+                  >
+                    Ganti Foto Profil
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setNewProfileImage(e.target.files?.[0] || null)
+                      }
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="flex items-center justify-center w-full h-12 px-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#507969] hover:bg-green-50 transition-all duration-200 cursor-pointer">
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <svg
+                          className="w-5 h-5 text-[#507969]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium">
+                          {newProfileImage
+                            ? newProfileImage.name
+                            : "Pilih foto baru"}
+                        </span>
+                      </div>
                     </div>
-                    <button
-                      onClick={handleProfileImageUpload}
-                      disabled={uploading}
-                      className="px-4 py-2 bg-[#507969] text-white rounded-lg hover:bg-[#2d5847] disabled:opacity-50 transition-colors duration-200"
-                    >
-                      {uploading ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          <span>Mengupload...</span>
-                        </div>
-                      ) : (
-                        "Upload Foto"
-                      )}
-                    </button>
                   </div>
-                )}
+                  {newProfileImage && (
+                    <div className="mt-2">
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <svg
+                          className="w-4 h-4 text-green-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <span>File terpilih: {newProfileImage.name}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -520,7 +482,7 @@ const Profile = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3v1"
                     />
                   </svg>
                   Logout
