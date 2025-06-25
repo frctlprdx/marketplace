@@ -14,12 +14,6 @@ class PaymentsTableSeeder extends Seeder
      */
     public function run()
     {
-        Payment::create([
-            'transaction_id' => 1,
-            'method' => 'manual_transfer',
-            'status' => 'paid',
-            'external_id' => 'INV-20250418-001',
-            'paid_at' => now()
-        ]);
+        
     }
 }

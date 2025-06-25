@@ -14,7 +14,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +44,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       password,
       password_confirmation: password, // harus dikirim!
       role: "customer", // Role default customer
-      address,
       phone_number: phoneNumber,
     };
 
@@ -156,16 +154,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             <p className="text-sm text-red-500">{errors.role[0]}</p>
           )}
 
-          <input
-            type="text"
-            placeholder="Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
-          />
-          {errors.address && (
-            <p className="text-sm text-red-500">{errors.address[0]}</p>
-          )}
           <input
             type="text"
             placeholder="Phone Number"

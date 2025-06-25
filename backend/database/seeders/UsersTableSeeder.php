@@ -20,7 +20,6 @@ class UsersTableSeeder extends Seeder
             'email' => 'iivanpratama16@gmail.com',
             'password' => Hash::make('essereFerrar1'), // Menggunakan password yang sudah di-hash
             'role' => 'customer',
-            'address' => 'Plamongan Indah',
             'phone_number' => '081326926776',
             'remember_token' => null, // Atur sesuai kebutuhan, ini bisa null atau dihasilkan oleh Laravel
             'created_at' => now(),
@@ -32,7 +31,6 @@ class UsersTableSeeder extends Seeder
         'email' => 'sellerivan@example.com',
         'password' => Hash::make('essereFerrar1'), // Menggunakan password yang sudah di-hash
         'role' => 'seller',
-        'address' => 'Jl. Penjual 1',
         'phone_number' => '08987654321',
         'remember_token' => null, // Atur sesuai kebutuhan, ini bisa null atau dihasilkan oleh Laravel
         'created_at' => now(),

@@ -11,14 +11,6 @@ class WishlistSeeder extends Seeder
 {
     public function run(): void
     {
-        Wishlist::create([
-            'user_id' => 1,
-            'product_id' => 1,
-        ]);
-
-        Wishlist::create([
-            'user_id' => 1,
-            'product_id' => 2,
-        ]);
+        
     }
 }
