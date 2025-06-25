@@ -2,19 +2,22 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { 
-  FiPackage, 
-  FiTag, 
-  FiFileText, 
-  FiDollarSign, 
-  FiHash, 
-  FiImage, 
-  FiEye, 
-  FiEyeOff, 
+import {
+  FiPackage,
+  FiTag,
+  FiFileText,
+  FiDollarSign,
+  FiHash,
+  FiImage,
+  FiEye,
+  FiEyeOff,
   FiUpload,
   FiCheck,
-  FiLoader
+  FiLoader,
 } from "react-icons/fi";
+
+import { RiWeightLine } from "react-icons/ri";
+
 
 function AddProduct() {
   const [formData, setFormData] = useState({
@@ -22,6 +25,7 @@ function AddProduct() {
     description: "",
     stocks: "",
     price: "",
+    weight: "",
   });
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
@@ -101,6 +105,7 @@ function AddProduct() {
           description: formData.description,
           stocks: formData.stocks,
           price: formData.price,
+          weight: formData.weight,
           image: publicUrl.publicUrl, // ✅ image URL yang benar
           show: show,
         },
@@ -116,6 +121,7 @@ function AddProduct() {
         description: "",
         stocks: "",
         price: "",
+        weight: "",
       });
       setFile(null);
       setSelectedCategory("");
@@ -135,8 +141,12 @@ function AddProduct() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-300 to-green-500 rounded-full mb-4 shadow-lg">
             <FiPackage className="text-2xl text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Tambah Produk Baru</h1>
-          <p className="text-gray-600">Tambahkan produk Anda untuk mulai berjualan</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Tambah Produk Baru
+          </h1>
+          <p className="text-gray-600">
+            Tambahkan produk Anda untuk mulai berjualan
+          </p>
         </div>
 
         {/* Main Form Card */}
@@ -173,16 +183,32 @@ function AddProduct() {
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                   >
-                    <option value="" className="text-gray-400">Pilih kategori yang sesuai</option>
+                    <option value="" className="text-gray-400">
+                      Pilih kategori yang sesuai
+                    </option>
                     {categories.map((category) => (
-                      <option key={category.id} value={category.id} className="text-gray-700">
+                      <option
+                        key={category.id}
+                        value={category.id}
+                        className="text-gray-700"
+                      >
                         {category.name}
                       </option>
                     ))}
                   </select>
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -205,7 +231,7 @@ function AddProduct() {
               </div>
 
               {/* Stock and Price Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Stock */}
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
@@ -239,6 +265,21 @@ function AddProduct() {
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
+                <div className="group">
+                  <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
+                    <RiWeightLine className="mr-2 text-green-500" />
+                    Berat (Gram)
+                  </label>
+                  <input
+                    type="number"
+                    name="weight"
+                    placeholder="0"
+                    onChange={handleChange}
+                    value={formData.weight}
+                    min="0"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                  />
+                </div>
               </div>
 
               {/* Image Upload */}
@@ -253,9 +294,14 @@ function AddProduct() {
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <FiUpload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-green-500 transition-colors" />
                         <p className="mb-2 text-sm text-gray-500 group-hover:text-green-500 transition-colors">
-                          <span className="font-semibold">Klik untuk upload</span> atau drag & drop
+                          <span className="font-semibold">
+                            Klik untuk upload
+                          </span>{" "}
+                          atau drag & drop
                         </p>
-                        <p className="text-xs text-gray-400">PNG, JPG, atau JPEG (MAX. 10MB)</p>
+                        <p className="text-xs text-gray-400">
+                          PNG, JPG, atau JPEG (MAX. 10MB)
+                        </p>
                       </div>
                       <input
                         type="file"
@@ -293,7 +339,7 @@ function AddProduct() {
                 )}
                 {loading ? "Menyimpan..." : "Tampilkan ke Pembeli"}
               </button>
-              
+
               <button
                 onClick={() => handleUpload(false)}
                 disabled={loading}

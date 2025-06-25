@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/profile', [UserController::class, 'indexuser'])->name('profile.index'); //Check
     Route::put('/profile/{id}', [UserController::class, 'update'])->name('profile.update');//Check
+    Route::post('/profile/{id}/upload-image', [UserController::class, 'uploadProfileImage'])->name('profile.upload.image');
 
     // Route alamat user (customer)
     Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index'); //Check

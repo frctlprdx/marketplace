@@ -21,6 +21,7 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('essereFerrar1'), // Menggunakan password yang sudah di-hash
             'role' => 'customer',
             'phone_number' => '081326926776',
+            'profile_image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/20250625.jpg', // Gambar profil default
             'remember_token' => null, // Atur sesuai kebutuhan, ini bisa null atau dihasilkan oleh Laravel
             'created_at' => now(),
             'updated_at' => now(),
@@ -32,6 +33,7 @@ class UsersTableSeeder extends Seeder
         'password' => Hash::make('essereFerrar1'), // Menggunakan password yang sudah di-hash
         'role' => 'seller',
         'phone_number' => '08987654321',
+        'profile_image' => 'https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/20250625.jpg', // Gambar profil default
         'remember_token' => null, // Atur sesuai kebutuhan, ini bisa null atau dihasilkan oleh Laravel
         'created_at' => now(),
         'updated_at' => now(),
