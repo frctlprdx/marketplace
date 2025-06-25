@@ -38,14 +38,6 @@ const UserNav = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("role");
-    localStorage.removeItem("user_token");
-    window.location.href = "/";
-  };
-
   const handleClickWishlist = () => {
     const userId = localStorage.getItem("user_id");
     if (userId && role === "customer") {
@@ -90,10 +82,6 @@ const UserNav = () => {
         >
           {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
-
-        {/* <button onClick={handleLogout}>
-          logout
-        </button> */}
 
         <button
           className="text-primary text-2xl hover:text-black transition"

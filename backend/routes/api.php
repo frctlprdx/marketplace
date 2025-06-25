@@ -15,12 +15,10 @@ Route::get('/products/{id}', [ProductController::class, 'show']); //Check
 Route::post('/register', [UserController::class, 'register']); //Check
 Route::post('/login', [UserController::class, 'login']); //Check
 Route::get('/product', [ProductController::class, 'search'])->name('product.search');
-Route::get('/categories', function () {
-    return App\Models\Category::all(); // Mengambil semua kategori
-}); //Check
+Route::get('/categories', function () { return App\Models\Category::all();}); //Check
 
-Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
-Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
+Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');//Check
+Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');//Check
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -34,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/wishlist', [WishlistController::class, 'destroy'])->middleware('role:customer')->name('wishlist.destroy'); //Check
 
     Route::get('/profile', [UserController::class, 'indexuser'])->name('profile.index'); //Check
-    Route::put('/profile/{id}', [UserController::class, 'update'])->name('profile.update');
+    Route::put('/profile/{id}', [UserController::class, 'update'])->name('profile.update');//Check
 
     // Route alamat user (customer)
     Route::get('/addresses', [UserAddressController::class, 'index'])->middleware('role:customer')->name('addresses.index'); //Check
@@ -42,11 +40,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->middleware('role:customer')->name('addresses.delete'); //Check
     Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->middleware('role:customer')->name('addresses.update'); //Check
 
+    // Route untuk transaksi (customer)
     Route::post('/snaptoken', [TransactionController::class, 'getSnapToken'])->middleware('role:customer')->name('transaction.store'); //Check
-    Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification']); // tanpa middleware
-    Route::get('/transactionhistory', [TransactionController::class, 'index'])->middleware('role:customer')->name('transaction.index');
-    
+    Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification']); //Compromised
+    Route::get('/transactionhistory', [TransactionController::class, 'transactionIndex'])->middleware('role:customer')->name('transaction.index');//Check
     Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->middleware('role:customer')->name('transaction.item');
+    
     // Route untuk seller)
     Route::get('/allusers', [UserController::class, 'indexall'])->middleware('role:seller')->name('users.index');
     Route::post('/user', [UserController::class, 'store'])->middleware('role:seller')->name('user.store');

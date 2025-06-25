@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Transaction;
-use App\Models\User;
-use App\Models\Product;
+use Midtrans\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Snap;
@@ -13,6 +11,33 @@ use Midtrans\Config;
 
 class TransactionController extends Controller
 {
+
+    public function transactionIndex(Request $request)
+    {
+        $userId = $request->query('user_id');
+
+        if (!$userId) {
+            return response()->json(['error' => 'User ID tidak ditemukan'], 400);
+        }
+
+        $transactions = DB::table('transactions')
+            ->join('transaction_items', 'transactions.order_id', '=', 'transaction_items.order_id')
+            ->join ('products', 'transaction_items.product_id', '=', 'products.id')
+            ->where('transactions.user_id', $userId)
+            ->orderBy('transactions.created_at', 'desc')
+            ->select(
+                'transactions.order_id',
+                'transaction_items.quantity',
+                'transactions.status',
+                'transaction_items.total_price',
+                'transaction_items.courier',
+                'products.name',
+                'products.image',
+            )
+            ->get();
+
+        return response()->json($transactions);
+    }
     public function sellerindex(Request $request)
     {
         try {
@@ -186,36 +211,46 @@ class TransactionController extends Controller
         }
     }
 
-    public function handleNotification(Request $request)
-    {
-        $notif = new \Midtrans\Notification();
 
-        $transactionStatus = $notif->transaction_status;
-        $orderId = $notif->order_id;
+public function handleNotification(Request $request)
+{
+    try {
+        $notification = new Notification();
+        $transaction = $notification->transaction_status;
+        $orderId = $notification->order_id;
+        $grossAmount = $notification->gross_amount;
 
-        if (in_array($transactionStatus, ['settlement', 'capture'])) {
-            $items = DB::table('transaction_items')->where('order_id', $orderId)->get();
+        Log::info('Midtrans Notification', [
+            'transaction_status' => $transaction,
+            'order_id' => $orderId,
+            'gross_amount' => $grossAmount,
+        ]);
 
-            foreach ($items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->reduceStock($item->quantity);
-                }
+        // Update status transaksi
+        DB::table('transactions')->where('order_id', $orderId)->update([
+            'status' => $transaction,
+            'updated_at' => now(),
+        ]);
+
+        // Jika berhasil dibayar
+        if ($transaction === 'settlement' || $transaction === 'capture') {
+            $item = DB::table('transaction_items')->where('order_id', $orderId)->first();
+
+            if ($item) {
+                DB::table('products')->where('id', $item->product_id)->update([
+                    'sold' => DB::raw("sold + $item->quantity"),
+                    'stocks' => DB::raw("stocks - $item->quantity"),
+                ]);
             }
-
-            DB::table('transactions')->where('order_id', $orderId)->update([
-                'status' => 'success',
-                'updated_at' => now(),
-            ]);
-        } elseif (in_array($transactionStatus, ['expire', 'cancel'])) {
-            DB::table('transactions')->where('order_id', $orderId)->update([
-                'status' => 'failed',
-                'updated_at' => now(),
-            ]);
         }
 
-        return response()->json(['message' => 'Notifikasi diproses']);
+        return response()->json(['message' => 'Notification handled'], 200);
+    } catch (\Exception $e) {
+        Log::error('Notification Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Notification failed'], 500);
     }
+}
+
 
 
 
