@@ -4,8 +4,22 @@ import { FiCheck } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
+// 1. Define cart item structure
+interface CartItem {
+  id: number;
+  user_id: number;
+  product_id: number;
+  quantity: number;
+  name: string;
+  price: number;
+  image: string;
+  user_name: string;
+  seller_name: string;
+  seller_profile: string;
+}
+
 const Cart = () => {
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
@@ -42,7 +56,7 @@ const Cart = () => {
           throw new Error("Failed to fetch cart");
         }
 
-        const data = await response.json();
+        const data: CartItem[] = await response.json();
         setCart(data);
       } catch (error) {
         if (error instanceof Error) {
@@ -70,27 +84,19 @@ const Cart = () => {
     setRemovingProductIds((prev) => [...prev, productId]);
 
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/cart`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-            "Content-Type": "application/json",
-          },
-          data: {
-            user_id: userId,
-            product_id: productId,
-          },
-        }
-      );
+      await axios.delete(`${import.meta.env.VITE_API_URL}/cart`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "application/json",
+        },
+        data: {
+          user_id: userId,
+          product_id: productId,
+        },
+      });
 
-      // Toast after successfully removing item from cart
       toast.success("Item berhasil dihapus dari cart!");
-
-      // Immediately update cart state after successful deletion
       setCart((prev) => prev.filter((item) => item.product_id !== productId));
-
-      // Remove product ID from the list of removing products
       setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     } catch (error: any) {
       console.error("Gagal menghapus cart:", error.response?.data || error);
@@ -98,6 +104,19 @@ const Cart = () => {
       setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     }
   };
+
+  // 2. Group items by seller_name
+  const groupedBySeller = cart.reduce<Record<string, CartItem[]>>(
+    (acc, item) => {
+      const seller = item.seller_name || "Unknown Seller";
+      if (!acc[seller]) {
+        acc[seller] = [];
+      }
+      acc[seller].push(item);
+      return acc;
+    },
+    {}
+  );
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -115,6 +134,7 @@ const Cart = () => {
           </a>
         </div>
       </div>
+
       <div>
         {cart.length === 0 ? (
           <div className="max-w-7xl mx-auto px-4 items-center justify-center flex flex-col h-screen">
@@ -122,63 +142,99 @@ const Cart = () => {
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-6">
               Cart milik {cart[0].user_name}
             </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="px-2 rounded-lg hover:shadow-2xl flex flex-col group hover:border transition-opacity duration-300"
-                  onClick={() => navigate(`/productdetail/${item.id}`)}
-                >
-                  <div className="w-full h-1/2 relative">
-                    <FiCheck
-                      size={40}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveFromCart(item.product_id);
-                      }}
-                      className="bg-[#507969] text-white border-[#507969] hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
-                    />
+            {Object.entries(groupedBySeller).map(([sellerName, items]) => (
+              <div key={sellerName} className="mb-10">
+                <div className="flex items-center space-x-2 mb-4">
+                  {items[0].seller_profile ? (
                     <img
-                      className="w-full mt-2 aspect-[4/3] object-cover rounded-md"
-                      src={item.image}
-                      alt={item.name}
+                      src={items[0].seller_profile}
+                      alt="Seller"
+                      className="w-8 h-8 rounded-full"
                     />
-                  </div>
-                  <div className="h-full flex flex-col py-8 px-2 space-y-2">
-                    <p className="text-2xl">{item.name}</p>
-                    <p className="text-xs">Jumlah Barang: {item.quantity}</p>
-
-                    <p className="text-primary text-xs">
-                      Total Harga: Rp{" "}
-                      {(item.price * item.quantity).toLocaleString()}
-                    </p>
-                  </div>
-
-                  <button
-                    className="sm mb-2 mt-auto rounded-xl border-2 px-4 py-2 bg-button text-white hover:bg-black hover:text-white 
-             opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition duration-300"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate("/checkout", { state: { product: item } });
-                    }}
-                  >
-                    Checkout
-                  </button>
+                  ) : (
+                    <div className="w-8 h-8 md:w-8 md:h-8 bg-gradient-to-br from-[#507969] to-[#2d5847] rounded-2xl flex items-center justify-center p-2">
+                      <svg
+                        className="w-12 h-12 md:w-16 md:h-16 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                  <h3 className="text-lg font-bold">{sellerName}</h3>
                 </div>
-              ))}
-            </div>
+
+                {/* Mobile Layout (stack vertically) and Desktop Layout (grid) */}
+                <div className="md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4 space-y-4 md:space-y-0">
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0"
+                      onClick={() => navigate(`/productdetail/${item.id}`)}
+                    >
+                      {/* Mobile: Horizontal layout, Desktop: Vertical layout */}
+                      <div className="w-24 h-24 md:w-full md:h-1/2 relative flex-shrink-0 mr-4 md:mr-0">
+                        <FiCheck
+                          size={24}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveFromCart(item.product_id);
+                          }}
+                          className="bg-[#507969] text-white border-[#507969] hover:shadow-lg m-1 md:m-2 rounded-full p-1 md:p-3 absolute opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-300 cursor-pointer z-10 top-0 right-0"
+                        />
+                        <img
+                          className="w-full h-full md:mt-2 md:aspect-[4/3] object-cover rounded-md"
+                          src={item.image}
+                          alt={item.name}
+                        />
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="flex-1 md:h-full flex flex-col md:py-8 md:px-2 justify-between md:space-y-2">
+                        <div className="space-y-1 md:space-y-2">
+                          <p className="text-lg md:text-2xl font-medium md:font-normal line-clamp-2 md:line-clamp-none">
+                            {item.name}
+                          </p>
+                          <p className="text-sm md:text-xs text-gray-600">
+                            Jumlah: {item.quantity}
+                          </p>
+                          <p className="text-[#507969] font-semibold md:text-primary md:text-xs md:font-normal">
+                            Rp {(item.price * item.quantity).toLocaleString()}
+                          </p>
+                        </div>
+
+                        <button
+                          className="mt-3 md:mt-auto md:mb-2 rounded-xl border-2 px-4 py-2 bg-button text-white hover:bg-black hover:text-white 
+                            opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-300 text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/checkout", { state: { product: item } });
+                          }}
+                        >
+                          Checkout
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-        
       </div>
 
-      {/* ToastContainer must be rendered in the root component */}
       <ToastContainer position="top-center" />
-      
     </div>
   );
 };
