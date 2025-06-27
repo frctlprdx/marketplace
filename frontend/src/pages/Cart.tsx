@@ -143,7 +143,7 @@ const Cart = () => {
                       className="bg-[#507969] text-white border-[#507969] hover:shadow-lg m-2 rounded-full p-3 absolute opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer z-10"
                     />
                     <img
-                      className="w-full aspect-[4/3] object-cover rounded-md"
+                      className="w-full mt-2 aspect-[4/3] object-cover rounded-md"
                       src={item.image}
                       alt={item.name}
                     />

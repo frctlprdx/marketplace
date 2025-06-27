@@ -15,6 +15,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [role, setRole] = useState("customer"); // ✅ default role
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmationPassword, setShowConfirmationPassword] =
@@ -23,7 +24,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Memastikan password dan konfirmasi password cocok
     if (password !== confirmPassword) {
       setErrors({
         ...errors,
@@ -32,7 +32,6 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       return;
     }
 
-    // Menghapus error jika password valid
     setErrors((prevErrors) => {
       const { confirm_password, ...rest } = prevErrors;
       return rest;
@@ -42,10 +41,11 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       name,
       email,
       password,
-      password_confirmation: password, // harus dikirim!
-      role: "customer", // Role default customer
+      password_confirmation: password,
+      role, // ✅ kirim role langsung
       phone_number: phoneNumber,
-      profileimage: "https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/20250625.jpg",
+      profileimage:
+        "https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/default.jpg",
     };
 
     try {
@@ -61,7 +61,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
         error.response.data &&
         error.response.data.message
       ) {
-        setErrors(error.response.data.message); // <- gunakan message di sini
+        setErrors(error.response.data.message);
       } else {
         console.error("Unknown error", error);
       }
@@ -82,9 +82,8 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
             required
           />
-          {errors.name && (
-            <p className="text-sm text-red-500">{errors.name[0]}</p>
-          )}
+          {errors.name && <p className="text-sm text-red-500">{errors.name[0]}</p>}
+
           <input
             type="email"
             placeholder="Email"
@@ -93,11 +92,9 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
             required
           />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email[0]}</p>
-          )}
+          {errors.email && <p className="text-sm text-red-500">{errors.email[0]}</p>}
 
-          {/* Input for Password */}
+          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -110,21 +107,14 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2  text-primary"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary"
             >
-              {showPassword ? (
-                <AiOutlineEyeInvisible size={20} />
-              ) : (
-                <AiOutlineEye size={20} />
-              )}
+              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
             </button>
           </div>
-          {/* Display Password Error */}
-          {errors.password && (
-            <p className="text-sm text-red-500">{errors.password[0]}</p>
-          )}
+          {errors.password && <p className="text-sm text-red-500">{errors.password[0]}</p>}
 
-          {/* Input for Confirm Password */}
+          {/* Confirm Password */}
           <div className="relative">
             <input
               type={showConfirmationPassword ? "text" : "password"}
@@ -136,19 +126,14 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             />
             <button
               type="button"
-              onClick={() =>
-                setShowConfirmationPassword(!showConfirmationPassword)
-              }
+              onClick={() => setShowConfirmationPassword(!showConfirmationPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary"
             >
-              {showConfirmationPassword ? (
-                <AiOutlineEyeInvisible size={20} />
-              ) : (
-                <AiOutlineEye size={20} />
-              )}
+              {showConfirmationPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
             </button>
           </div>
 
+          {/* Phone Number */}
           <input
             type="text"
             placeholder="Phone Number"
@@ -156,28 +141,51 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"
           />
-          {errors.phone_number && (
-            <p className="text-sm text-red-500">{errors.phone_number[0]}</p>
-          )}
-          {/* Display Confirm Password Error */}
+          {errors.phone_number && <p className="text-sm text-red-500">{errors.phone_number[0]}</p>}
+
+          {/* Role Selection */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Daftar sebagai:</label>
+            <div className="flex items-center space-x-4 mt-1">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={role === "customer"}
+                  onChange={() => setRole("customer")}
+                  className="form-radio text-[#507969]"
+                />
+                <span className="text-sm">Pembeli</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="seller"
+                  checked={role === "seller"}
+                  onChange={() => setRole("seller")}
+                  className="form-radio text-[#507969]"
+                />
+                <span className="text-sm">Penjual</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Error Confirm Password */}
           {errors.confirm_password && (
             <p className="text-sm text-red-500 text-center">
               {errors.confirm_password[0]}
             </p>
           )}
-          <button
-            type="submit"
-            className="w-full text-white py-2 rounded-md bg-button"
-          >
+
+          <button type="submit" className="w-full text-white py-2 rounded-md bg-button">
             Register
           </button>
         </form>
         <p className="text-sm text-center mt-4">
           Sudah punya akun?{" "}
-          <button
-            onClick={onSwitchToLogin}
-            className="text-primary hover:underline"
-          >
+          <button onClick={onSwitchToLogin} className="text-primary hover:underline">
             Login
           </button>
         </p>

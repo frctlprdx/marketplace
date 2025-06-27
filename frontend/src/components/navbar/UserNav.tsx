@@ -88,9 +88,9 @@ const UserNav = () => {
           {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
 
-        <button onClick={handleLogout}>
+        {/* <button onClick={handleLogout}>
             logout
-        </button>
+        </button> */}
 
         <button
           className="text-primary text-2xl hover:text-black transition"

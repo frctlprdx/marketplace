@@ -18,7 +18,7 @@ class CreateCartsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
-            $table->timestamps();  // Menambahkan created_at dan updated_at
+            $table->timestamps();  // Menambahkan created_at dan updated_at`
         });
     }
 

@@ -54,9 +54,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',  // password harus dikonfirmasi
-            'role' => 'required',  // Role hanya bisa 'customer' atau 'seller'
+            'role' => 'required|in:customer,seller',  // Role hanya bisa 'customer' atau 'seller'
             'phone_number' => 'nullable|string|max:15',
-            'profileimage' => 'required|string'
         ]);
 
         // Jika validasi gagal
@@ -74,7 +73,6 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,  // Menentukan role (customer/seller)
             'phone_number' => $request->phone_number,
-            'profileimage' => $request->profileimage, // URL gambar profil opsional
         ]);
 
         // Buat token untuk user baru
