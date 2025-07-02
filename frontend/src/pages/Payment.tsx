@@ -6,6 +6,7 @@ import {
   FaChevronRight,
   FaTruck,
   FaClock,
+  FaWeight,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -18,19 +19,94 @@ type Courier = {
   etd?: string;
 };
 
+// Interface untuk cart items
+interface CartItem {
+  id: number;
+  user_id: number;
+  product_id: number;
+  quantity: number;
+  name: string;
+  price: number;
+  image: string;
+  user_name: string;
+  seller_name: string;
+  seller_profile: string;
+  weight?: number;
+}
+
+// Interface untuk single product
+interface SingleProduct {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  weight?: number;
+  totalweight?: number;
+  user_id?: number;
+}
+
+// Interface untuk address
+interface Address {
+  id: number;
+  recipient_name: string;
+  phone: string;
+  detail_address: string;
+  district: string;
+  city: string;
+  province: string;
+  zip_code: string;
+  label?: string;
+  is_default?: number;
+}
+
+// Interface untuk shipping data
+interface ShippingData {
+  data: {
+    data: Courier[];
+  };
+}
+
+// Interface untuk location state
+interface LocationState {
+  address: Address;
+  product?: SingleProduct;
+  products?: (CartItem | SingleProduct)[];
+  destinationId: number;
+  shippingData: ShippingData;
+  isCartCheckout: boolean;
+}
+
+// Interface untuk Midtrans response
+interface MidtransResponse {
+  token: string;
+  redirect_url?: string;
+}
+
+// Type untuk checkout items
+type CheckoutItem = CartItem | SingleProduct;
+
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Get the data passed from Checkout page
-  const { address, product, destinationId, shippingData } =
-    location.state || {};
+  // Get the data passed from Checkout page - handle both single product and multiple products
+  const { 
+    address, 
+    product, 
+    products, 
+    destinationId, 
+    shippingData, 
+    isCartCheckout 
+  } = (location.state as LocationState) || {};
+
+  // Determine if we're dealing with cart items or single product
+  const checkoutItems: CheckoutItem[] = isCartCheckout ? products || [] : product ? [product] : [];
 
   // States
   const [selectedCourier, setSelectedCourier] = useState<Courier | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [snapToken, setSnapToken] = useState("");
-  const [midtransResponse, setMidtransResponse] = useState<any>(null);
+  const [midtransResponse, setMidtransResponse] = useState<MidtransResponse | null>(null);
 
   // Get user authentication from localStorage
   const userId = localStorage.getItem("user_id");
@@ -39,18 +115,31 @@ const Payment = () => {
 
   // Verify that we have all required data
   useEffect(() => {
-    if (!address || !product || !destinationId || !shippingData) {
+    if (!address || !checkoutItems.length || !destinationId || !shippingData) {
       navigate("/checkout");
     }
-  }, [address, product, destinationId, shippingData, navigate]);
+  }, [address, checkoutItems, destinationId, shippingData, navigate]);
 
   // Return null if no data
-  if (!address || !product || !destinationId || !shippingData) {
+  if (!address || !checkoutItems.length || !destinationId || !shippingData) {
     return null;
   }
 
-  // Calculate total price
-  const subtotal = product ? product.price * product.quantity : 0;
+  // Calculate totals for multiple items
+  const subtotal = checkoutItems.reduce((total: number, item: CheckoutItem) => {
+    return total + item.price * item.quantity;
+  }, 0);
+
+  const totalWeight = checkoutItems.reduce((total: number, item: CheckoutItem) => {
+    const itemWeight = item.weight || 0;
+    return total + itemWeight * item.quantity;
+  }, 0);
+
+  const totalItems = checkoutItems.reduce(
+    (total: number, item: CheckoutItem) => total + item.quantity,
+    0
+  );
+
   const shippingCost = selectedCourier ? selectedCourier.cost : 0;
   const totalPrice = subtotal + shippingCost;
 
@@ -59,46 +148,90 @@ const Payment = () => {
     setSelectedCourier(courier);
   };
 
-  // Get Snap Token from Midtrans
-  const getSnapToken = async () => {
-    if (!userId || !address || !selectedCourier || !product) {
+  // Get Snap Token from Midtrans - updated to handle multiple products
+  const getSnapToken = async (): Promise<string | null> => {
+    if (!userId || !address || !selectedCourier || !checkoutItems.length) {
       console.error("Data tidak lengkap untuk membuat transaksi");
       return null;
     }
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/snaptoken`,
-        {
-          // Midtrans required data
+      // For cart checkout, we need to handle multiple products
+      if (isCartCheckout) {
+        // Group products by seller if needed or create separate transactions
+        // For now, we'll assume all products are from the same seller or handle them as one transaction
+        const transactionData = {
           userID: parseInt(userId),
           totalPrice: totalPrice,
           recipient_name: address.recipient_name,
           phone: address.phone,
           frontend_url: window.location.origin,
-
-          // Transaction data
-          seller_id: product.user_id, // Make sure this exists in your product data
-
-          // Transaction items data
-          product_id: product.id,
-          quantity: product.quantity,
-          subtotal: subtotal, // This will be total_price in transaction_items
           courier: selectedCourier.name,
           destination_id: address.id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+          
+          // For multiple products, we might need to adjust the backend to handle this
+          products: checkoutItems.map((item: CheckoutItem) => ({
+            product_id: 'product_id' in item ? item.product_id : item.id,
+            seller_id: item.user_id || 0,
+            quantity: item.quantity,
+            subtotal: item.price * item.quantity,
+          })),
+          
+          // Additional data for cart checkout
+          isCartCheckout: true,
+        };
+
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/snaptoken`,
+          transactionData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Midtrans Response (Cart):", response.data);
+        setMidtransResponse(response.data);
+        return response.data.token;
+      } else {
+        // Original single product logic
+        const singleProduct = checkoutItems[0];
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/snaptoken`,
+          {
+            // Midtrans required data
+            userID: parseInt(userId),
+            totalPrice: totalPrice,
+            recipient_name: address.recipient_name,
+            phone: address.phone,
+            frontend_url: window.location.origin,
+
+            // Transaction data
+            seller_id: singleProduct.user_id || singleProduct.id, // Adjust based on data structure
+
+            // Transaction items data
+            product_id: singleProduct.id,
+            quantity: singleProduct.quantity,
+            subtotal: subtotal,
+            courier: selectedCourier.name,
+            destination_id: address.id,
+            
+            isCartCheckout: false,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      console.log("Midtrans Response:", response.data);
-      setMidtransResponse(response.data);
-
-      return response.data.token;
+        console.log("Midtrans Response (Single):", response.data);
+        setMidtransResponse(response.data);
+        return response.data.token;
+      }
     } catch (error: any) {
       console.error("Error getting snap token:", error);
 
@@ -127,8 +260,6 @@ const Payment = () => {
         return;
       }
 
-      setSnapToken(snapToken);
-
       // Load Midtrans Snap
       // @ts-ignore
       if (window.snap) {
@@ -136,20 +267,18 @@ const Payment = () => {
         window.snap.pay(snapToken, {
           onSuccess: function (result: any) {
             console.log("Payment Success:", result);
-            window.location.href = "/thanks"; // Redirect ke halaman utama
+            window.location.href = "/thanks";
           },
           onPending: function (result: any) {
             console.log("Payment Pending:", result);
-            window.location.href = "/"; // Redirect juga bisa, atau ke /pending
+            window.location.href = "/";
           },
           onError: function (result: any) {
             console.log("Payment Error:", result);
-            // Bisa arahkan ke /failed atau tampilkan alert
             window.location.href = "/payment-failed";
           },
           onClose: function () {
             console.log("Payment popup closed");
-            // Tidak redirect karena user menutup sebelum selesai
           },
         });
       } else {
@@ -190,6 +319,9 @@ const Payment = () => {
               ← Kembali
             </button>
             <h1 className="text-2xl font-bold text-gray-800">Pembayaran</h1>
+            <span className="text-sm text-gray-600">
+              ({checkoutItems.length} {checkoutItems.length === 1 ? "produk" : "produk"})
+            </span>
           </div>
 
           {/* Progress Steps */}
@@ -264,7 +396,7 @@ const Payment = () => {
               </div>
               <div className="p-6">
                 <div className="space-y-3">
-                  {shippingData?.data?.data?.map((courier) => (
+                  {shippingData?.data?.data?.map((courier: Courier) => (
                     <div
                       key={`${courier.code}-${courier.service}`}
                       onClick={() => handleSelectCourier(courier)}
@@ -326,39 +458,55 @@ const Payment = () => {
 
               {/* Product Details */}
               <div className="p-6">
-                <div className="flex gap-4 mb-6">
-                  <img
-                    src={product?.image}
-                    alt={product?.name}
-                    className="w-20 h-20 rounded-lg object-cover border"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 mb-1">
-                      {product?.name}
-                    </h3>
-                    <p className="text-primary font-bold text-lg">
-                      Rp {Number(product?.price || 0).toLocaleString("id-ID")}
-                    </p>
-                    <p className="text-gray-600 text-sm">
-                      Qty: {product?.quantity}
-                    </p>
-                  </div>
+                {/* Product List */}
+                <div className="space-y-4 mb-6 max-h-60 overflow-y-auto">
+                  {checkoutItems.map((item: CheckoutItem, index: number) => (
+                    <div key={index} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-800 text-sm line-clamp-2 mb-1">
+                          {item.name}
+                        </h4>
+                        <div className="flex items-center justify-between text-xs text-gray-600">
+                          <span>Qty: {item.quantity}</span>
+                          <span className="text-primary font-semibold">
+                            Rp {(item.price * item.quantity).toLocaleString("id-ID")}
+                          </span>
+                        </div>
+                        {item.weight && (
+                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                            <FaWeight size={10} />
+                            <span>
+                              {(item.weight * item.quantity).toLocaleString("id-ID")}g
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Price Breakdown */}
                 <div className="border-t pt-4 space-y-3">
                   <div className="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
+                    <span>Subtotal ({totalItems} item)</span>
                     <span>Rp {subtotal.toLocaleString("id-ID")}</span>
+                  </div>
+
+                  <div className="flex justify-between text-gray-600">
+                    <span>Berat Total</span>
+                    <span>{Number(totalWeight).toLocaleString("id-ID")} gram</span>
                   </div>
 
                   <div className="flex justify-between text-gray-600">
                     <span>Ongkos Kirim</span>
                     <span>
                       {selectedCourier
-                        ? `Rp ${Number(selectedCourier.cost).toLocaleString(
-                            "id-ID"
-                          )}`
+                        ? `Rp ${Number(selectedCourier.cost).toLocaleString("id-ID")}`
                         : "Pilih kurir"}
                     </span>
                   </div>
@@ -382,18 +530,17 @@ const Payment = () => {
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isLoading || !selectedCourier || !isLoggedIn}
-                  className={`w-full py-3 rounded-lg text-white font-semibold mt-4 ${
+                  className={`w-full py-3 rounded-lg text-white font-semibold mt-4 transition-all ${
                     !selectedCourier || !isLoggedIn
                       ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-[#507969] hover:bg-[#2d5847]"
+                      : "bg-[#507969] hover:bg-[#2d5847] shadow-md hover:shadow-lg"
                   }`}
                 >
                   {isLoading ? "Memproses..." : "Bayar Sekarang"}
                 </button>
 
                 <p className="text-center text-gray-500 text-xs mt-3">
-                  Dengan membuat pesanan, Anda menyetujui syarat dan ketentuan
-                  kami
+                  Dengan membuat pesanan, Anda menyetujui syarat dan ketentuan kami
                 </p>
               </div>
             </div>
