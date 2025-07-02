@@ -4,7 +4,6 @@ import { FiCheck } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
-// 1. Define cart item structure
 interface CartItem {
   id: number;
   user_id: number;
@@ -16,6 +15,7 @@ interface CartItem {
   user_name: string;
   seller_name: string;
   seller_profile: string;
+  weight?: number; // Add weight field
 }
 
 const Cart = () => {
@@ -23,6 +23,8 @@ const Cart = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [activeSeller, setActiveSeller] = useState<string | null>(null); // Track active seller
 
   const navigate = useNavigate();
 
@@ -59,11 +61,7 @@ const Cart = () => {
         const data: CartItem[] = await response.json();
         setCart(data);
       } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("An unknown error occurred");
-        }
+        setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -89,34 +87,96 @@ const Cart = () => {
           Authorization: `Bearer ${userToken}`,
           "Content-Type": "application/json",
         },
-        data: {
-          user_id: userId,
-          product_id: productId,
-        },
+        data: { user_id: userId, product_id: productId },
       });
 
       toast.success("Item berhasil dihapus dari cart!");
       setCart((prev) => prev.filter((item) => item.product_id !== productId));
-      setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
+      setSelectedItems((prev) => prev.filter((id) => id !== productId));
     } catch (error: any) {
       console.error("Gagal menghapus cart:", error.response?.data || error);
       toast.error("Gagal menghapus cart");
+    } finally {
       setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     }
   };
 
-  // 2. Group items by seller_name
+  const isSelected = (productId: number) => selectedItems.includes(productId);
+
+  const toggleItem = (productId: number) => {
+    const item = cart.find(cartItem => cartItem.product_id === productId);
+    if (!item) return;
+
+    const itemSeller = item.seller_name || "Unknown Seller";
+
+    // If no seller is active, set this item's seller as active
+    if (!activeSeller) {
+      setActiveSeller(itemSeller);
+      setSelectedItems([productId]);
+      return;
+    }
+
+    // If trying to select item from different seller, show warning and switch seller
+    if (activeSeller !== itemSeller) {
+      toast.warning(`Beralih ke seller: ${itemSeller}. Pilihan sebelumnya dibatalkan.`);
+      setActiveSeller(itemSeller);
+      setSelectedItems([productId]);
+      return;
+    }
+
+    // If same seller, toggle normally
+    setSelectedItems((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
+
+    // If no items selected, clear active seller
+    const newSelectedItems = selectedItems.includes(productId)
+      ? selectedItems.filter((id) => id !== productId)
+      : [...selectedItems, productId];
+    
+    if (newSelectedItems.length === 0) {
+      setActiveSeller(null);
+    }
+  };
+
+  // Select all items for a seller
+  const toggleSellerItems = (items: CartItem[]) => {
+    const sellerName = items[0]?.seller_name || "Unknown Seller";
+    const sellerProductIds = items.map(item => item.product_id);
+    const allSelected = sellerProductIds.every(id => selectedItems.includes(id));
+    
+    if (allSelected) {
+      // Deselect all items from this seller
+      setSelectedItems([]);
+      setActiveSeller(null);
+    } else {
+      // Select all items from this seller
+      setActiveSeller(sellerName);
+      setSelectedItems(sellerProductIds);
+    }
+  };
+
   const groupedBySeller = cart.reduce<Record<string, CartItem[]>>(
     (acc, item) => {
       const seller = item.seller_name || "Unknown Seller";
-      if (!acc[seller]) {
-        acc[seller] = [];
-      }
+      if (!acc[seller]) acc[seller] = [];
       acc[seller].push(item);
       return acc;
     },
     {}
   );
+
+  // Helper function to check if seller is active
+  const isSellerActive = (sellerName: string) => {
+    return !activeSeller || activeSeller === sellerName;
+  };
+
+  // Helper function to check if seller has any selected items
+  const sellerHasSelectedItems = (sellerName: string) => {
+    return activeSeller === sellerName && selectedItems.length > 0;
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -124,11 +184,11 @@ const Cart = () => {
   return (
     <div>
       <div className="max-w-7xl h-16 mx-auto px-4">
-        <div className="max-w-7xl h-16 mx-auto flex items-center text-sm text-gray-600 space-x-2">
+        <div className="flex items-center text-sm text-gray-600 space-x-2">
           <a href="/" className="hover:underline cursor-pointer">
             Home
           </a>
-          <span>{"/"}</span>
+          <span>/</span>
           <a href="/cart" className="hover:underline cursor-pointer">
             Cart
           </a>
@@ -137,7 +197,7 @@ const Cart = () => {
 
       <div>
         {cart.length === 0 ? (
-          <div className="max-w-7xl mx-auto px-4 items-center justify-center flex flex-col h-screen">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col h-screen justify-center items-center">
             <p className="text-3xl pb-12">Keranjang kosong.</p>
           </div>
         ) : (
@@ -146,90 +206,193 @@ const Cart = () => {
               Cart milik {cart[0].user_name}
             </h2>
 
-            {Object.entries(groupedBySeller).map(([sellerName, items]) => (
-              <div key={sellerName} className="mb-10">
-                <div className="flex items-center space-x-2 mb-4">
-                  {items[0].seller_profile ? (
-                    <img
-                      src={items[0].seller_profile}
-                      alt="Seller"
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 md:w-8 md:h-8 bg-gradient-to-br from-[#507969] to-[#2d5847] rounded-2xl flex items-center justify-center p-2">
-                      <svg
-                        className="w-12 h-12 md:w-16 md:h-16 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                  <h3 className="text-lg font-bold">{sellerName}</h3>
-                </div>
+            {/* Info text about seller selection */}
+            {/* {activeSeller && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  <span className="font-medium">Seller aktif:</span> {activeSeller}
+                  <br />
+                  <span className="text-xs">Anda hanya dapat memilih produk dari satu seller dalam satu waktu untuk memudahkan pembayaran.</span>
+                </p>
+              </div>
+            )} */}
 
-                {/* Mobile Layout (stack vertically) and Desktop Layout (grid) */}
-                <div className="md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4 space-y-4 md:space-y-0">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0"
-                      onClick={() => navigate(`/productdetail/${item.id}`)}
-                    >
-                      {/* Mobile: Horizontal layout, Desktop: Vertical layout */}
-                      <div className="w-24 h-24 md:w-full md:h-1/2 relative flex-shrink-0 mr-4 md:mr-0">
-                        <FiCheck
-                          size={24}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveFromCart(item.product_id);
-                          }}
-                          className="bg-[#507969] text-white border-[#507969] hover:shadow-lg m-1 md:m-2 rounded-full p-1 md:p-3 absolute opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-300 cursor-pointer z-10 top-0 right-0"
-                        />
+            {Object.entries(groupedBySeller).map(([sellerName, items]) => {
+              const selectedSellerItems = items.filter(item =>
+                selectedItems.includes(item.product_id)
+              );
+              const allSellerItemsSelected = items.length > 0 && 
+                items.every(item => selectedItems.includes(item.product_id));
+              const sellerActive = isSellerActive(sellerName);
+
+              return (
+                <div key={sellerName} className={`mb-10 ${!sellerActive ? 'opacity-50' : ''}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      {items[0].seller_profile ? (
                         <img
-                          className="w-full h-full md:mt-2 md:aspect-[4/3] object-cover rounded-md"
-                          src={item.image}
-                          alt={item.name}
+                          src={items[0].seller_profile}
+                          alt="Seller"
+                          className="w-8 h-8 rounded-full"
                         />
-                      </div>
+                      ) : (
+                        <div className="w-8 h-8 bg-[#507969] rounded-full flex items-center justify-center text-white">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                      <h3 className="text-lg font-bold">{sellerName}</h3>
+                      {!sellerActive && (
+                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
+                          Tidak aktif
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Select All Button for Seller */}
+                    <button
+                      onClick={() => toggleSellerItems(items)}
+                      disabled={!sellerActive}
+                      className={`flex items-center space-x-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        !sellerActive
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : allSellerItemsSelected
+                          ? "bg-[#507969] text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      <FiCheck size={16} />
+                      <span>{allSellerItemsSelected ? "Batalkan Semua" : "Pilih Semua"}</span>
+                    </button>
+                  </div>
 
-                      {/* Content Section */}
-                      <div className="flex-1 md:h-full flex flex-col md:py-8 md:px-2 justify-between md:space-y-2">
-                        <div className="space-y-1 md:space-y-2">
-                          <p className="text-lg md:text-2xl font-medium md:font-normal line-clamp-2 md:line-clamp-none">
-                            {item.name}
-                          </p>
-                          <p className="text-sm md:text-xs text-gray-600">
-                            Jumlah: {item.quantity}
-                          </p>
-                          <p className="text-[#507969] font-semibold md:text-primary md:text-xs md:font-normal">
-                            Rp {(item.price * item.quantity).toLocaleString()}
-                          </p>
+                  <div className="md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 space-y-4 md:space-y-0">
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0 ${
+                          !sellerActive ? 'cursor-not-allowed' : ''
+                        }`}
+                        onClick={() => {
+                          if (sellerActive) {
+                            navigate(`/productdetail/${item.id}`);
+                          }
+                        }}
+                      >
+                        <div className="w-24 h-24 md:w-full md:h-1/2 relative flex-shrink-0 mr-4 md:mr-0">
+                          <FiCheck
+                            size={32}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (sellerActive) {
+                                toggleItem(item.product_id);
+                              }
+                            }}
+                            className={`${
+                              isSelected(item.product_id)
+                                ? "bg-[#507969] text-white"
+                                : sellerActive
+                                ? "bg-white text-gray-400 border hover:shadow-lg"
+                                : "bg-gray-100 text-gray-300 border cursor-not-allowed"
+                            } border-[#507969] rounded-full p-1 md:p-2 absolute transition duration-300 cursor-pointer z-20 top-2 right-2`}
+                            title={sellerActive ? "Pilih produk" : "Pilih seller ini terlebih dahulu"}
+                          />
+
+                          <img
+                            className="w-full h-full md:mt-2 md:aspect-[4/3] object-cover rounded-md"
+                            src={item.image}
+                            alt={item.name}
+                          />
                         </div>
 
-                        <button
-                          className="mt-3 md:mt-auto md:mb-2 rounded-xl border-2 px-4 py-2 bg-button text-white hover:bg-black hover:text-white 
-                            opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-300 text-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/checkout", { state: { product: item } });
-                          }}
-                        >
-                          Checkout
-                        </button>
+                        <div className="flex-1 md:h-full flex flex-col md:py-8 md:px-2 justify-between md:space-y-2">
+                          <div className="space-y-1 md:space-y-2">
+                            <p className="text-lg md:text-2xl font-medium line-clamp-2">
+                              {item.name}
+                            </p>
+                            <p className="text-sm md:text-xs text-gray-600">
+                              Jumlah: {item.quantity}
+                            </p>
+                            <p className="text-[#507969] font-semibold">
+                              Rp {(item.price * item.quantity).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Checkout button per seller */}
+                  {selectedSellerItems.length > 0 && sellerHasSelectedItems(sellerName) && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-600">
+                          {selectedSellerItems.length} item dipilih
+                        </span>
+                        <span className="font-semibold text-[#507969]">
+                          Total: Rp {selectedSellerItems.reduce((total, item) => 
+                            total + (item.price * item.quantity), 0
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                      <button
+                        className="text-sm bg-[#507969] hover:bg-[#2d5847] text-white px-6 py-2 rounded-xl w-full"
+                        onClick={() => {
+                          navigate("/checkout", {
+                            state: { products: selectedSellerItems },
+                          });
+                        }}
+                      >
+                        Checkout ({selectedSellerItems.length} item)
+                      </button>
                     </div>
-                  ))}
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Global Selected Items Summary */}
+            {selectedItems.length > 0 && (
+              <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t p-4 z-30">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                  <div>
+                    <span className="text-sm text-gray-600">
+                      {selectedItems.length} item dipilih dari seller: {activeSeller}
+                    </span>
+                    <div className="font-semibold text-[#507969]">
+                      Total: Rp {cart
+                        .filter(item => selectedItems.includes(item.product_id))
+                        .reduce((total, item) => total + (item.price * item.quantity), 0)
+                        .toLocaleString()}
+                    </div>
+                  </div>
+                  <button
+                    className="bg-[#507969] hover:bg-black text-white px-6 py-3 rounded-xl font-medium"
+                    onClick={() => {
+                      const allSelectedItems = cart.filter(item => 
+                        selectedItems.includes(item.product_id)
+                      );
+                      navigate("/checkout", {
+                        state: { products: allSelectedItems },
+                      });
+                    }}
+                  >
+                    Checkout Semua ({selectedItems.length})
+                  </button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>

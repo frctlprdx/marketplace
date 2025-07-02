@@ -62,4 +62,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sellertransactionpage', [TransactionController::class, 'sellerindex'])->middleware('role:seller')->name('seller.transaction.index'); //Check
     Route::get('/transactiondetail/{id}', [TransactionController::class, 'getDetail'])->middleware('role:seller')->name('seller.transaction.detail'); //Check
 });
-
