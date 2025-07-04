@@ -43,7 +43,7 @@ const UserNav = () => {
     if (userId && role === "customer") {
       navigate(`/wishlist?user_id=${userId}`);
     } else {
-      toast.error("Login akun customer terlebih dahulu");
+      toast.error("Fitur tersedia hanya untuk pelanggan.");
     }
   };
 
@@ -52,7 +52,7 @@ const UserNav = () => {
     if (userId && role === "customer") {
       navigate(`/cart?user_id=${userId}`);
     } else {
-      toast.error("Login akun customer terlebih dahulu");
+      toast.error("Fitur tersedia hanya untuk pelanggan.");
     }
   };
 
@@ -61,7 +61,7 @@ const UserNav = () => {
     if (userId && role === "customer") {
       navigate(`/history?user_id=${userId}`);
     } else {
-      toast.error("Login akun customer terlebih dahulu");
+      toast.error("Fitur tersedia hanya untuk pelanggan.");
     }
   };
 

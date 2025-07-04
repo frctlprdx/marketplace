@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiCheck } from "react-icons/fi";
+import { FiCheck, FiTrash2 } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
@@ -281,7 +281,7 @@ const Cart = () => {
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className={`md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0 ${
+                        className={`md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0 relative ${
                           !sellerActive ? 'cursor-not-allowed' : ''
                         }`}
                         onClick={() => {
@@ -308,6 +308,23 @@ const Cart = () => {
                             } border-[#507969] rounded-full p-1 md:p-2 absolute transition duration-300 cursor-pointer z-20 top-2 right-2`}
                             title={sellerActive ? "Pilih produk" : "Pilih seller ini terlebih dahulu"}
                           />
+
+                          {/* Remove Button - Hidden on desktop hover, always visible on mobile */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFromCart(item.product_id);
+                            }}
+                            disabled={removingProductIds.includes(item.product_id)}
+                            className={`absolute top-2 left-2 z-20 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 md:p-2 transition-all duration-300 border ${
+                              removingProductIds.includes(item.product_id)
+                                ? "opacity-50 cursor-not-allowed"
+                                : "md:opacity-0 md:invisible group-hover:opacity-100 group-hover:visible opacity-100 visible"
+                            }`}
+                            title="Hapus dari keranjang"
+                          >
+                            <FiTrash2 size={16} className="md:w-4 md:h-4" />
+                          </button>
 
                           <img
                             className="w-full h-full md:mt-2 md:aspect-[4/3] object-cover rounded-md"
