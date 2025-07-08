@@ -104,7 +104,6 @@ function AppContent() {
           }
         />
       </Routes>
-      <ToastContainer />
     </div>
   );
 }

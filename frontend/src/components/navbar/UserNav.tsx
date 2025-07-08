@@ -70,17 +70,12 @@ const UserNav = () => {
     navigate(`/profile?user_id=${userId}`);
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/";
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Desktop View */}
       <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
         <button
-          className="text-primary text-2xl hover:text-red-500 transition"
+          className="text-primary text-2xl hover:text-red-500 transition cursor-pointer"
           onMouseEnter={() => setHoverHeart(true)}
           onMouseLeave={() => setHoverHeart(false)}
           onClick={handleClickWishlist}
@@ -93,7 +88,7 @@ const UserNav = () => {
         </button> */}
 
         <button
-          className="text-primary text-2xl hover:text-black transition"
+          className="text-primary text-2xl hover:text-black transition cursor-pointer"
           onMouseEnter={() => setHoverCart(true)}
           onMouseLeave={() => setHoverCart(false)}
           onClick={handleClickCart}
@@ -103,7 +98,7 @@ const UserNav = () => {
 
         {role === "customer" && (
           <button
-            className="text-primary text-2xl hover:text-black transition"
+            className="text-primary text-2xl hover:text-black transition cursor-pointer"
             onMouseEnter={() => setHoverHistory(true)}
             onMouseLeave={() => setHoverHistory(false)}
             onClick={handleClickHistory}
@@ -114,7 +109,7 @@ const UserNav = () => {
 
         {role === "seller" && (
           <button
-            className="text-primary text-2xl hover:text-black transition"
+            className="text-primary text-2xl hover:text-black transition cursor-pointer"
             onMouseEnter={() => setHoverHistory(true)}
             onMouseLeave={() => setHoverHistory(false)}
             onClick={() => navigate("/allproducts")}
@@ -125,7 +120,7 @@ const UserNav = () => {
 
         <button
           onClick={handleClickProfile}
-          className="text-primary text-2xl hover:text-primary"
+          className="text-primary text-2xl hover:text-primary cursor-pointer"
         >
           <AiOutlineUser />
         </button>
@@ -135,7 +130,7 @@ const UserNav = () => {
       <div className="sm:hidden flex items-center">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="text-3xl text-primary"
+          className="text-3xl text-primary cursor-pointer"
         >
           {isMenuOpen ? <HiX /> : <HiMenu />}
         </button>
@@ -147,7 +142,7 @@ const UserNav = () => {
                 handleClickWishlist();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-2 text-primary text-lg"
+              className="flex items-center gap-2 text-primary text-lg cursor-pointer"
             >
               <FiHeart /> Wishlist
             </button>
@@ -157,7 +152,7 @@ const UserNav = () => {
                 handleClickCart();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-2 text-primary text-lg"
+              className="flex items-center gap-2 text-primary text-lg cursor-pointer"
             >
               <FiShoppingCart /> Cart
             </button>
@@ -168,7 +163,7 @@ const UserNav = () => {
                   handleClickHistory();
                   setIsMenuOpen(false);
                 }}
-                className="flex items-center gap-2 text-primary text-lg"
+                className="flex items-center gap-2 text-primary text-lg cursor-pointer"
               >
                 <RiHistoryLine /> History Transaksi
               </button>
@@ -179,7 +174,7 @@ const UserNav = () => {
                 handleClickProfile();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-2 text-primary text-lg"
+              className="flex items-center gap-2 text-primary text-lg cursor-pointer"
             >
               <IoPersonOutline /> Profile
             </button>
@@ -190,7 +185,7 @@ const UserNav = () => {
                   navigate("/allproducts");
                   setIsMenuOpen(false);
                 }}
-                className="flex items-center gap-2 text-primary text-lg"
+                className="flex items-center gap-2 text-primary text-lg cursor-pointer"
               >
                 <MdStorefront /> Kelola Toko
               </button>
