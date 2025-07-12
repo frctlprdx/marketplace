@@ -10,10 +10,9 @@ const EditProduct = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
     price: "",
-    stocks: "",
     image: "",
+    linkshopping: "",
     show: true, // ✅ gunakan show, bukan status
   });
 
@@ -75,9 +74,8 @@ const EditProduct = () => {
         `${import.meta.env.VITE_API_URL}/product/${id}`,
         {
           name: formData.name,
-          description: formData.description,
-          stocks: formData.stocks,
           price: formData.price,
+          linkshopping: formData.linkshopping,
           image: imageUrl,
           show: formData.show, // ✅ kirim 'show' ke backend
         },
@@ -204,7 +202,7 @@ const EditProduct = () => {
               </div>
 
               {/* Description */}
-              <div className="sm:col-span-2 space-y-2">
+              {/* <div className="sm:col-span-2 space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Deskripsi Produk
                 </label>
@@ -216,10 +214,10 @@ const EditProduct = () => {
                   rows={4}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
                 />
-              </div>
+              </div> */}
 
               {/* Stock */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Stok
                 </label>
@@ -231,10 +229,10 @@ const EditProduct = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />
-              </div>
+              </div> */}
 
               {/* Price */}
-              <div className="space-y-2">
+              <div className="sm:col-span-2 space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Harga (Rp)
                 </label>
@@ -243,6 +241,20 @@ const EditProduct = () => {
                   name="price"
                   placeholder="0"
                   value={formData.price}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Link Produk
+                </label>
+                <input
+                  type="text"
+                  name="linkshopping"
+                  placeholder="Masukkan link produk"
+                  value={formData.linkshopping}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />

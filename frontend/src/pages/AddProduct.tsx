@@ -4,10 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   FiPackage,
-  FiTag,
-  FiFileText,
   FiDollarSign,
-  FiHash,
   FiImage,
   FiEye,
   FiEyeOff,
@@ -15,21 +12,15 @@ import {
   FiCheck,
   FiLoader,
 } from "react-icons/fi";
-
-import { RiWeightLine } from "react-icons/ri";
-
+import { link } from "fs";
 
 function AddProduct() {
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
-    stocks: "",
     price: "",
-    weight: "",
+    linkshopping: "",
   });
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,18 +36,6 @@ function AddProduct() {
       return;
     }
 
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/categories`
-        );
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Gagal mengambil kategori:", error);
-      }
-    };
-
-    fetchCategories();
   }, []);
 
   const handleChange = (
@@ -67,7 +46,6 @@ function AddProduct() {
 
   const handleUpload = async (show: boolean) => {
     if (!file) return alert("Pilih gambar terlebih dahulu");
-    if (!selectedCategory) return alert("Pilih kategori terlebih dahulu");
     setLoading(true);
 
     const fileExt = file.name.split(".").pop();
@@ -101,13 +79,10 @@ function AddProduct() {
         {
           user_id: userId,
           name: formData.name,
-          category_id: selectedCategory,
-          description: formData.description,
-          stocks: formData.stocks,
           price: formData.price,
-          weight: formData.weight,
           image: publicUrl.publicUrl, // ✅ image URL yang benar
           show: show,
+          linkshopping: formData.linkshopping,
         },
         {
           headers: {
@@ -118,10 +93,8 @@ function AddProduct() {
       setMessage("Produk berhasil ditambahkan!");
       setFormData({
         name: "",
-        description: "",
-        stocks: "",
         price: "",
-        weight: "",
+        linkshopping: "",
       });
       setFile(null);
       setSelectedCategory("");
@@ -172,7 +145,7 @@ function AddProduct() {
               </div>
 
               {/* Category */}
-              <div className="group">
+              {/* <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                   <FiTag className="mr-2 text-green-500" />
                   Kategori Produk
@@ -212,10 +185,10 @@ function AddProduct() {
                     </svg>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Description */}
-              <div className="group">
+              {/* <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                   <FiFileText className="mr-2 text-green-500" />
                   Deskripsi Produk
@@ -228,12 +201,12 @@ function AddProduct() {
                   rows={4}
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400 resize-none"
                 />
-              </div>
+              </div> */}
 
               {/* Stock and Price Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {/* Stock */}
-                <div className="group">
+                {/* <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiHash className="mr-2 text-green-500" />
                     Jumlah Stok
@@ -247,7 +220,7 @@ function AddProduct() {
                     min="0"
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
-                </div>
+                </div> */}
 
                 {/* Price */}
                 <div className="group">
@@ -265,7 +238,7 @@ function AddProduct() {
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
-                <div className="group">
+                {/* <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <RiWeightLine className="mr-2 text-green-500" />
                     Berat (Gram)
@@ -277,6 +250,23 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.weight}
                     min="0"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                  />
+                </div> */}
+              </div>
+
+              <div className="group">
+                <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
+                  <FiPackage className="mr-2 text-green-500" />
+                  Link Produk
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="linkshopping"
+                    placeholder="Masukkan link produk"
+                    onChange={handleChange}
+                    value={formData.linkshopping}
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>

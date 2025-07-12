@@ -23,32 +23,32 @@ const GuestNav = () => {
     <>
       {/* Desktop View */}
       <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
-        <button
+        {/* <button
           className="flex items-center justify-center text-primary text-2xl hover:text-[#507969]"
           onMouseEnter={() => setHoverHeart(true)}
           onMouseLeave={() => setHoverHeart(false)}
           onClick={handleProtectedClick}
         >
           {hoverHeart ? <FaHeart /> : <FiHeart />}
-        </button>
+        </button> */}
 
-        <button
+        {/* <button
           className="flex items-center justify-center text-primary text-2xl hover:text-[#507969]"
           onMouseEnter={() => setHoverCart(true)}
           onMouseLeave={() => setHoverCart(false)}
           onClick={handleProtectedClick}
         >
           {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
-        </button>
+        </button> */}
 
-        <button
+        {/* <button
           className="flex items-center justify-center text-primary text-2xl hover:text-[#507969]"
           onMouseEnter={() => setHoverHistory(true)}
           onMouseLeave={() => setHoverHistory(false)}
           onClick={handleProtectedClick}
         >
           {hoverHistory ? <RiHistoryFill /> : <RiHistoryLine />}
-        </button>
+        </button> */}
 
         <button
           className="text-[15px] font-medium text-white bg-button sm:px-6 px-4 py-1 rounded-full"
@@ -69,7 +69,7 @@ const GuestNav = () => {
 
         {isMenuOpen && (
           <div className="absolute top-14 right-4 bg-white shadow-md rounded-lg p-4 flex flex-col space-y-3 z-50">
-            <button
+            {/* <button
               className="flex items-center justify-start text-primary text-xl"
               onClick={() => {
                 setIsMenuOpen(false);
@@ -78,9 +78,9 @@ const GuestNav = () => {
             >
               <FiHeart />
               <span className="ml-2">Wishlist</span>
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               className="flex items-center justify-start text-primary text-xl"
               onClick={() => {
                 setIsMenuOpen(false);
@@ -89,9 +89,9 @@ const GuestNav = () => {
             >
               <FiShoppingCart />
               <span className="ml-2">Cart</span>
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               className="flex items-center justify-start text-primary text-xl"
               onClick={() => {
                 setIsMenuOpen(false);
@@ -100,7 +100,7 @@ const GuestNav = () => {
             >
               <RiHistoryLine />
               <span className="ml-2">History</span>
-            </button>
+            </button> */}
 
             <button
               className="text-[15px] font-medium text-white bg-button px-4 py-1 rounded-full"

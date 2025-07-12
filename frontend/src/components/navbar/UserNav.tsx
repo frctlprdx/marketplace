@@ -70,33 +70,38 @@ const UserNav = () => {
     navigate(`/profile?user_id=${userId}`);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Desktop View */}
       <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
-        <button
+        {/* <button
           className="text-primary text-2xl hover:text-red-500 transition cursor-pointer"
           onMouseEnter={() => setHoverHeart(true)}
           onMouseLeave={() => setHoverHeart(false)}
           onClick={handleClickWishlist}
         >
           {hoverHeart ? <FaHeart /> : <FiHeart />}
-        </button>
+        </button> */}
 
         {/* <button onClick={handleLogout}>
             logout
         </button> */}
 
-        <button
+        {/* <button
           className="text-primary text-2xl hover:text-black transition cursor-pointer"
           onMouseEnter={() => setHoverCart(true)}
           onMouseLeave={() => setHoverCart(false)}
           onClick={handleClickCart}
         >
           {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
-        </button>
+        </button> */}
 
-        {role === "customer" && (
+        {/* {role === "customer" && (
           <button
             className="text-primary text-2xl hover:text-black transition cursor-pointer"
             onMouseEnter={() => setHoverHistory(true)}
@@ -105,7 +110,29 @@ const UserNav = () => {
           >
             {hoverHistory ? <RiHistoryFill /> : <RiHistoryLine />}
           </button>
-        )}
+        )} */}
+
+        {/* <button
+          onClick={handleLogout}
+          className="flex-1 md:flex-initial text-red-600 border-2 border-red-200 px-6 py-3 rounded-xl font-semibold hover:bg-red-50 hover:border-red-300 transition-all duration-200 transform hover:scale-[1.02]"
+        >
+          <div className="flex items-center justify-center">
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3v1"
+              />
+            </svg>
+            Logout
+          </div>
+        </button> */}
 
         {role === "seller" && (
           <button

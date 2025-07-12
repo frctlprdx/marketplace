@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  FiShoppingCart,
-  FiCheck,
-  FiArrowLeft,
-  FiMinus,
-  FiPlus,
-} from "react-icons/fi";
-import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { FiArrowLeft } from "react-icons/fi";
 import axios from "axios";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
-  const [weight, setWeight] = useState(1);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -247,7 +239,7 @@ const ProductDetail = () => {
                   className="h-full w-full object-contain"
                 />
 
-                <button
+                {/* <button
                   onClick={handleWishlist}
                   disabled={wishlistLoading}
                   className="absolute top-4 right-4 bg-white shadow-md rounded-full p-2 hover:shadow-lg transition-shadow duration-300"
@@ -262,7 +254,7 @@ const ProductDetail = () => {
                       className="text-gray-400 hover:text-[#507969]"
                     />
                   )}
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -285,7 +277,7 @@ const ProductDetail = () => {
                 </p>
 
                 <div className="flex items-center space-x-2 mb-6">
-                  <span
+                  {/* <span
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                       product.stocks > 10
                         ? "bg-green-50 text-green-700"
@@ -298,7 +290,7 @@ const ProductDetail = () => {
                   </span>
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-soft text-primary">
                     Berat: {product.weight} gram
-                  </span>
+                  </span> */}
                 </div>
               </div>
 
@@ -306,7 +298,7 @@ const ProductDetail = () => {
 
               {/* Quantity Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                {/* <label className="block text-sm font-medium text-gray-700 mb-2">
                   Jumlah
                 </label>
                 <div className="flex items-center">
@@ -329,7 +321,7 @@ const ProductDetail = () => {
                   >
                     <FiPlus size={16} />
                   </button>
-                </div>
+                </div> */}
               </div>
 
               {/* Subtotal */}
@@ -341,18 +333,18 @@ const ProductDetail = () => {
                   </span>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
+              {/* <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Berat Total</span>
                   <span className="text-lg font-bold text-gray-800">
                     {Number(totalweight).toLocaleString("id-ID")} gram
                   </span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Action Buttons */}
               <div className="grid grid-cols-4 gap-3">
-                <button
+                {/* <button
                   onClick={handleCart}
                   disabled={cartLoading}
                   className={`col-span-1 h-12 flex items-center justify-center rounded-lg transition-all duration-300 ${
@@ -368,21 +360,13 @@ const ProductDetail = () => {
                   ) : (
                     <FiShoppingCart size={20} />
                   )}
-                </button>
+                </button> */}
 
                 <button
                   onClick={() => {
-                    navigate("/checkout", {
-                      state: {
-                        product: {
-                          ...product,
-                          quantity,
-                          totalweight,
-                        },
-                      },
-                    });
+                    navigate("");
                   }}
-                  className="col-span-3 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
+                  className="col-span-4 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
                 >
                   Beli Sekarang
                 </button>
@@ -397,7 +381,7 @@ const ProductDetail = () => {
                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
                 className="w-full flex items-center justify-between text-lg font-medium text-gray-800 mb-4"
               >
-                <span>Deskripsi Produk</span>
+                {/* <span>Deskripsi Produk</span>
                 <svg
                   className={`w-5 h-5 transition-transform duration-300 ${
                     isDescriptionOpen ? "rotate-180" : ""
@@ -412,10 +396,10 @@ const ProductDetail = () => {
                     strokeWidth={2}
                     d="M19 9l-7 7-7-7"
                   />
-                </svg>
+                </svg> */}
               </button>
 
-              <div
+              {/* <div
                 className={`transition-all duration-300 overflow-hidden ${
                   isDescriptionOpen
                     ? "max-h-screen opacity-100"
@@ -428,7 +412,7 @@ const ProductDetail = () => {
                       "Tidak ada deskripsi untuk produk ini."}
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
