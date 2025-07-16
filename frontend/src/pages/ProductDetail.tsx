@@ -149,7 +149,6 @@ const ProductDetail = () => {
   };
 
   const subtotal = product ? product.price * quantity : 0;
-  const totalweight = product ? product.weight * quantity : 0;
 
   if (loading) {
     return (
@@ -364,7 +363,7 @@ const ProductDetail = () => {
 
                 <button
                   onClick={() => {
-                    navigate("");
+                    window.open(product.linkshopping, "_blank"); // Buka di tab baru
                   }}
                   className="col-span-4 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
                 >

@@ -459,7 +459,7 @@ const Profile = () => {
                   >
                     <path
                       strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinejoin="round"t
                       strokeWidth={2}
                       d="M5 13l4 4L19 7"
                     />
