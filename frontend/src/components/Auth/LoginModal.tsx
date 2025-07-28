@@ -2,7 +2,7 @@ import Modal from "../Modals/Modal";
 import { useState } from "react";
 import axios from "axios";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import logo from "../../../public/assets/logo.png";
+import logo from "../../../assets/logo.png";
 
 interface Props {
   onClose: () => void;
@@ -47,7 +47,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       onClose(); // Tutup modal setelah login
     } catch (error: any) {
       console.error("Login error", error);
-      
+
       if (error.response) {
         // Server merespons dengan error status
         if (error.response.status === 422) {
@@ -56,37 +56,38 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
         } else if (error.response.status === 401) {
           // Unauthorized - kredensial salah
           setErrors({
-            general: "Email atau password tidak sesuai. Silakan coba lagi."
+            general: "Email atau password tidak sesuai. Silakan coba lagi.",
           });
         } else if (error.response.status === 404) {
           // User tidak ditemukan
           setErrors({
-            general: "Akun dengan email tersebut tidak ditemukan."
+            general: "Akun dengan email tersebut tidak ditemukan.",
           });
         } else if (error.response.status >= 500) {
           // Server error
           setErrors({
-            general: "Terjadi kesalahan server. Silakan coba lagi nanti."
+            general: "Terjadi kesalahan server. Silakan coba lagi nanti.",
           });
         } else if (error.response.data?.message) {
           // Custom error message dari server
           setErrors({
-            general: error.response.data.message
+            general: error.response.data.message,
           });
         } else {
           setErrors({
-            general: "Gagal login. Silakan coba lagi."
+            general: "Gagal login. Silakan coba lagi.",
           });
         }
       } else if (error.request) {
         // Network error
         setErrors({
-          general: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda."
+          general:
+            "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
         });
       } else {
         // Something else happened
         setErrors({
-          general: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi."
+          general: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
         });
       }
     } finally {
@@ -99,7 +100,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       <div className="w-full max-w-xs mx-auto bg-white rounded-lg shadow-lg p-6">
         <img className="w-30 mx-auto" src={logo} alt="" />
         <h2 className="text-lg font-semibold mb-4 text-center">Login</h2>
-        
+
         {/* Display general error at the top */}
         {errors.general && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -115,7 +116,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969] ${
-                errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                errors.email ? "border-red-300 bg-red-50" : "border-gray-300"
               }`}
               required
               disabled={isLoading}
@@ -134,7 +135,9 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969] pr-10 ${
-                  errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  errors.password
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-300"
                 }`}
                 required
                 disabled={isLoading}

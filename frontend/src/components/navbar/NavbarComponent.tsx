@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import GuestNav from "./GuestNav";
 import UserNav from "./UserNav";
 import { useNavigate } from "react-router-dom";
-import logo from "../../../public/assets/logo cerah.png";
+import logo from "../../../assets/logo cerah.png";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

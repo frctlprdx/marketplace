@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import Modal from "../Modals/Modal";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import logo from "../../../public/assets/logo.png";
+import logo from "../../../assets/logo.png";
 
 interface Props {
   onClose: () => void;
