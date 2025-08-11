@@ -276,7 +276,7 @@ const ProductDetail = () => {
                 </p>
 
                 <div className="flex items-center space-x-2 mb-6">
-                  {/* <span
+                  <span
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                       product.stocks > 10
                         ? "bg-green-50 text-green-700"
@@ -287,7 +287,7 @@ const ProductDetail = () => {
                   >
                     Stok: {product.stocks}
                   </span>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-soft text-primary">
+                  {/* <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-soft text-primary">
                     Berat: {product.weight} gram
                   </span> */}
                 </div>
@@ -360,6 +360,18 @@ const ProductDetail = () => {
                     <FiShoppingCart size={20} />
                   )}
                 </button> */}
+
+                <button
+                  onClick={() => {
+                    const rawPhone = product.phone_number; // Misalnya: "081234567890"
+                    const formattedPhone = rawPhone.replace(/^0/, "62"); // Hasil: "6281234567890"
+                    const whatsappLink = `https://wa.me/${formattedPhone}?text=Halo%20saya%20tertarik%20dengan%20produk%20${product.name}%20Anda`;
+                    window.open(whatsappLink, "_blank");
+                  }}
+                  className="col-span-4 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
+                >
+                  Hubungi Penjual
+                </button>
 
                 <button
                   onClick={() => {

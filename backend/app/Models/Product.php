@@ -13,6 +13,7 @@ class Product extends Model
     'user_id',
     'name',
     'price',
+    'stocks',
     'image',
     'show',
     'linkshopping'

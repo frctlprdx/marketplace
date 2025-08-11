@@ -136,7 +136,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
           {/* Phone Number */}
           <input
             type="text"
-            placeholder="Phone Number"
+            placeholder="Phone Number (08xxxx)"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#507969]"

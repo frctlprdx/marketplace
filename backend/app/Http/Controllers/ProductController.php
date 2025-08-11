@@ -30,6 +30,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'image' => 'required|string', // URL dari Supabase
             'linkshopping' => 'required|string',
+            'stocks' => 'required|numeric|min:0',
         ]);
 
         $product = Product::create($request->all());
@@ -42,7 +43,11 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::find($id);
+        $product = DB::table('products')
+            ->join('users', 'products.user_id', '=', 'users.id')
+            ->where('products.id', $id)
+            ->select('products.*', 'users.phone_number')
+            ->first();
 
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
@@ -85,7 +90,7 @@ class ProductController extends Controller
             ->firstOrFail();
 
         // Update data produk termasuk gambar baru (kalau ada)
-        $product->update($request->only(['name', 'price', 'image', 'show', 'linkshopping']));
+        $product->update($request->only(['name', 'price', 'image', 'show', 'linkshopping', 'stocks']));
 
         return response()->json(['message' => 'Produk berhasil diperbarui']);
     }

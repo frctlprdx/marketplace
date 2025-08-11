@@ -11,6 +11,7 @@ import {
   FiUpload,
   FiCheck,
   FiLoader,
+  FiHash
 } from "react-icons/fi";
 import { link } from "fs";
 
@@ -19,6 +20,7 @@ function AddProduct() {
     name: "",
     price: "",
     linkshopping: "",
+    stocks: "",
   });
 
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -81,6 +83,7 @@ function AddProduct() {
           name: formData.name,
           price: formData.price,
           image: publicUrl.publicUrl, // ✅ image URL yang benar
+          stocks: formData.stocks,
           show: show,
           linkshopping: formData.linkshopping,
         },
@@ -95,6 +98,7 @@ function AddProduct() {
         name: "",
         price: "",
         linkshopping: "",
+        stocks: ""
       });
       setFile(null);
       setSelectedCategory("");
@@ -206,7 +210,7 @@ function AddProduct() {
               {/* Stock and Price Row */}
               <div className="grid grid-cols-1 gap-6">
                 {/* Stock */}
-                {/* <div className="group">
+                <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiHash className="mr-2 text-green-500" />
                     Jumlah Stok
@@ -220,7 +224,7 @@ function AddProduct() {
                     min="0"
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
-                </div> */}
+                </div>
 
                 {/* Price */}
                 <div className="group">

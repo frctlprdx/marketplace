@@ -13,6 +13,7 @@ class CreateProductsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // penjual
             $table->string('name');
             $table->decimal('price', 11, 0);
+            $table->decimal('stocks', 11, 0);
             $table->string('image')->nullable();
             $table->boolean('show')->default(true); // ✅ tambahkan ini
             $table->text('linkshopping')->nullable(); // Deskripsi produk

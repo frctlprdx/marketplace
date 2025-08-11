@@ -13,6 +13,7 @@ const EditProduct = () => {
     price: "",
     image: "",
     linkshopping: "",
+    stocks: "",
     show: true, // ✅ gunakan show, bukan status
   });
 
@@ -77,6 +78,7 @@ const EditProduct = () => {
           price: formData.price,
           linkshopping: formData.linkshopping,
           image: imageUrl,
+          stocks: formData.stocks, // ✅ kirim stok ke backend
           show: formData.show, // ✅ kirim 'show' ke backend
         },
         {
@@ -217,7 +219,7 @@ const EditProduct = () => {
               </div> */}
 
               {/* Stock */}
-              {/* <div className="space-y-2">
+              <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Stok
                 </label>
@@ -229,7 +231,7 @@ const EditProduct = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                 />
-              </div> */}
+              </div>
 
               {/* Price */}
               <div className="sm:col-span-2 space-y-2">

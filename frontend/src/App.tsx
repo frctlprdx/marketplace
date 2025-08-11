@@ -24,7 +24,6 @@ import AllTransaction from "./pages/AllTransaction";
 import TransactionDetail from "./pages/TransactionDetail";
 import Profile from "./pages/Profile";
 import History from "./pages/TransactionHistory";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Component to handle conditional navbar rendering
