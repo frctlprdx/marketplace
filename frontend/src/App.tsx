@@ -5,7 +5,7 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import Navbar from "./components/Navbar/NavbarComponent";
+import Navbar from "./components/Navbar/NavbarComponent.tsx";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Wishlist from "./pages/Wishlist";
