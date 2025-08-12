@@ -5,7 +5,7 @@ import UserNav from "./UserNav";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../public/assets/logo cerah.png";
 
-const Navbar = () => {
+const NavbarComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
@@ -58,4 +58,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarComponent;
