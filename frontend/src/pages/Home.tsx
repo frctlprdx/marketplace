@@ -1,4 +1,4 @@
-// import HeroSection from "../components/Hero/HeroSection";
+import HeroSection from "../components/Hero/HeroSection";
 import Showcase from "../components/showcase/Showcase";
 import Location from "../components/Location/Location";
 import Review from "../components/ReviewComponents/Review";
@@ -8,9 +8,9 @@ import Footer from "../components/Footer/Footer";
 const Home = () => {
   return (
     <div className="w-screen">
-      {/* <div>
+      <div>
         <HeroSection />
-      </div> */}
+      </div>
       <div>
         <Showcase />
       </div>
