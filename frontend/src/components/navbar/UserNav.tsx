@@ -70,6 +70,11 @@ const UserNav = () => {
     navigate(`/profile?user_id=${userId}`);
   };
 
+  // const handleLogout = () => {
+  //   localStorage.clear();
+  //   window.location.href = "/";
+  // };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Desktop View */}

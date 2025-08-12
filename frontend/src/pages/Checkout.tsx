@@ -35,6 +35,10 @@ interface SingleProduct {
   quantity: number;
   weight?: number;
   totalweight?: number;
+  user_id?: number;
+  category_name?: string;
+  seller_name?: string;
+  seller_profile?: string;
 }
 
 // Interface untuk address
@@ -65,6 +69,21 @@ interface NewAddress {
   detail_address: string;
   is_default: boolean;
 }
+
+// Type untuk normalized checkout item
+interface NormalizedCheckoutItem {
+  id: number;
+  product_id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  weight?: number;
+  user_id?: number;
+  seller_name?: string;
+  seller_profile?: string;
+}
+
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,9 +96,53 @@ const Checkout = () => {
       products?: CartItem[];
     }) || {};
 
-  // Determine if we're dealing with cart items or single product
+  // Normalize data untuk memastikan struktur yang konsisten
+  // Di file Checkout.tsx, ganti fungsi normalizeCheckoutItems dengan ini:
+
+  const normalizeCheckoutItems = (): NormalizedCheckoutItem[] => {
+    console.log("Debug - Raw data:", { product, products }); // Untuk debugging
+
+    if (products && Array.isArray(products)) {
+      // Dari cart checkout
+      console.log("Processing cart checkout with", products.length, "items");
+      return products.map((item) => ({
+        id: item.id,
+        product_id: item.product_id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+        weight: item.weight,
+        user_id: item.user_id,
+        seller_name: item.seller_name,
+        seller_profile: item.seller_profile,
+      }));
+    } else if (product) {
+      // Dari product detail - "Beli Sekarang"
+      console.log("Processing direct purchase:", product);
+      return [
+        {
+          id: product.id,
+          product_id: product.id, // Gunakan id sebagai product_id untuk direct purchase
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: product.quantity,
+          weight: product.weight,
+          user_id: product.user_id || parseInt(userId || "0"),
+          seller_name: product.seller_name || "Direct Purchase",
+          seller_profile: product.seller_profile || "",
+        },
+      ];
+    }
+
+    console.log("No valid data found");
+    return [];
+  };
+
+  // Get normalized checkout items
+  const checkoutItems = normalizeCheckoutItems();
   const isCartCheckout = !!products;
-  const checkoutItems = isCartCheckout ? products : product ? [product] : [];
 
   // State declarations
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -125,6 +188,16 @@ const Checkout = () => {
     (total, item) => total + item.quantity,
     0
   );
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Checkout Debug Info:");
+    console.log("Original product:", product);
+    console.log("Original products:", products);
+    console.log("Normalized checkoutItems:", checkoutItems);
+    console.log("isCartCheckout:", isCartCheckout);
+  }, [product, products, checkoutItems, isCartCheckout]);
+
   // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -227,6 +300,7 @@ const Checkout = () => {
       alert("Gagal menambahkan alamat.");
     }
   };
+
   // Search destination for shipping
   const searchDestination = async (district: string) => {
     try {
@@ -333,39 +407,61 @@ const Checkout = () => {
       return; // Error message already shown in calculateShippingPrice
     }
 
-    // Navigate to payment page with all necessary data
+    // Navigate to payment page with normalized data
     navigate("/payment", {
       state: {
         address: selectedAddress,
-        products: checkoutItems, // Always send as products array
+        products: checkoutItems, // Always send normalized data as products array
         destinationId: destinationId,
         shippingData: shippingData,
         isCartCheckout: isCartCheckout,
       },
     });
   };
+
+  useEffect(() => {
+    console.log("=== Checkout Debug Info ===");
+    console.log("Original product:", product);
+    console.log("Original products:", products);
+    console.log("Normalized checkoutItems:", checkoutItems);
+    console.log("isCartCheckout:", isCartCheckout);
+    console.log("userId from localStorage:", userId);
+    console.log("========================");
+  }, [product, products, checkoutItems, isCartCheckout]);
+
   // Redirect if no product
   if (!checkoutItems || checkoutItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-lg shadow-md">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Data tidak ditemukan
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Produk yang akan di-checkout tidak ditemukan.
-          </p>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-[#507969] text-white px-6 py-2 rounded hover:bg-[#2d5847] transition"
-          >
-            Kembali ke Beranda
-          </button>
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center p-8 bg-white rounded-lg shadow-md">
+        <div className="text-red-500 text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          Data tidak ditemukan
+        </h2>
+        <p className="text-gray-600 mb-4">
+          {!product && !products 
+            ? "Tidak ada data produk yang ditemukan. Pastikan Anda mengakses halaman ini dari tombol 'Beli Sekarang' atau 'Checkout'."
+            : "Produk yang akan di-checkout tidak dapat diproses."}
+        </p>
+        <div className="text-xs text-gray-400 mb-4">
+          Debug: product={!!product}, products={!!products && products.length}, items={checkoutItems.length}
         </div>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-[#507969] text-white px-6 py-2 rounded hover:bg-[#2d5847] transition mr-2"
+        >
+          Kembali ke Beranda
+        </button>
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition"
+        >
+          Kembali
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -432,6 +528,7 @@ const Checkout = () => {
                   </button>
                 </div>
               </div>
+
               {/* Content */}
               <div className="p-6">
                 {!isLoggedIn ? (
@@ -637,6 +734,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
       {/* Address Dropdown */}
       {showAddressDropdown && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 md:p-0">

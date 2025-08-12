@@ -351,7 +351,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid  w-full ">
                 <button
                   onClick={handleCart}
                   disabled={cartLoading}
@@ -370,14 +370,22 @@ const ProductDetail = () => {
                   )}
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => {
                     navigate("/checkout", {
                       state: {
                         product: {
-                          ...product,
-                          quantity,
-                          totalweight,
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          image: product.image,
+                          quantity: quantity,
+                          weight: product.weight,
+                          totalweight: totalweight, // Ini akan diabaikan di checkout, karena akan dihitung ulang
+                          user_id: parseInt(userId || "0"),
+                          seller_name: "Direct Purchase",
+                          seller_profile: "",
+                          category_name: product.category_name, // Tambahkan ini jika ada
                         },
                       },
                     });
@@ -385,7 +393,7 @@ const ProductDetail = () => {
                   className="col-span-3 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
                 >
                   Beli Sekarang
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
