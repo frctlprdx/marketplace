@@ -5,7 +5,7 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import Navbar from "./components/Navbar/NavbarComponent";
+// import Navbar from "./components/Navbar/NavbarComponent";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Wishlist from "./pages/Wishlist";
@@ -39,11 +39,11 @@ function AppContent() {
   return (
     <div className="w-screen">
       {/* Conditionally render navbar */}
-      {!shouldHideNavbar && (
+      {/* {!shouldHideNavbar && (
         <div className="sticky top-0 z-50">
           <Navbar />
         </div>
-      )}
+      )} */}
 
       <Routes>
         {/* Halaman umum */}
