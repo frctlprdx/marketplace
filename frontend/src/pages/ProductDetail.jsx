@@ -12,16 +12,15 @@ import axios from "axios";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [weight, setWeight] = useState(1);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
-  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
+  const [wishlistIds, setWishlistIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wishlistLoading, setWishlistLoading] = useState(false);
-  const [notifMessage, setNotifMessage] = useState<string | null>(null);
+  const [notifMessage, setNotifMessage] = useState(null);
   const [showNotif, setShowNotif] = useState(false);
-  const [cartIds, setCartIds] = useState<number[]>([]);
+  const [cartIds, setCartIds] = useState([]);
   const [cartLoading, setCartLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -45,7 +44,7 @@ const ProductDetail = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const ids = res.data.map((item: any) => Number(item.product_id));
+        const ids = res.data.map((item) => Number(item.product_id));
         setWishlistIds(ids);
       })
       .catch((err) => {
@@ -61,7 +60,7 @@ const ProductDetail = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const ids = res.data.map((item: any) => Number(item.product_id));
+        const ids = res.data.map((item) => Number(item.product_id));
         setCartIds(ids);
       })
       .catch((err) => {
@@ -369,31 +368,6 @@ const ProductDetail = () => {
                     <FiShoppingCart size={20} />
                   )}
                 </button>
-
-                {/* <button
-                  onClick={() => {
-                    navigate("/checkout", {
-                      state: {
-                        product: {
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          image: product.image,
-                          quantity: quantity,
-                          weight: product.weight,
-                          totalweight: totalweight, // Ini akan diabaikan di checkout, karena akan dihitung ulang
-                          user_id: parseInt(userId || "0"),
-                          seller_name: "Direct Purchase",
-                          seller_profile: "",
-                          category_name: product.category_name, // Tambahkan ini jika ada
-                        },
-                      },
-                    });
-                  }}
-                  className="col-span-3 bg-[#507969] hover:bg-[#2d5847] text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300"
-                >
-                  Beli Sekarang
-                </button> */}
               </div>
             </div>
           </div>

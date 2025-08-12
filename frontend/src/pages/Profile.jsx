@@ -13,9 +13,9 @@ const Profile = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
-  const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+  const [newProfileImage, setNewProfileImage] = useState(null);
   const [oldImageUrl, setOldImageUrl] = useState("");
 
   useEffect(() => {
@@ -44,8 +44,8 @@ const Profile = () => {
 
         const data = await response.json();
         setUser({ ...data, id: userId });
-        setOldImageUrl(data.profileimage || ""); // Store old image URL
-      } catch (err: any) {
+        setOldImageUrl(data.profileimage || "");
+      } catch (err) {
         setError(err.message || "Terjadi kesalahan");
       } finally {
         setLoading(false);
@@ -55,7 +55,7 @@ const Profile = () => {
     fetchUser();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
@@ -64,7 +64,6 @@ const Profile = () => {
     try {
       let imageUrl = user.profileimage;
 
-      // Handle image upload if new image is selected
       if (newProfileImage) {
         const fileExt = newProfileImage.name.split(".").pop();
         const fileName = `profile/${Date.now()}.${fileExt}`;
@@ -75,29 +74,21 @@ const Profile = () => {
 
         if (uploadError) throw uploadError;
 
-        // Set new image URL
-        imageUrl = `${
-          import.meta.env.VITE_SUPABASE_URL
-        }/storage/v1/object/public/nogosarenmarketplace/${fileName}`;
+        imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/nogosarenmarketplace/${fileName}`;
 
-        // Delete old image if exists
         if (oldImageUrl && oldImageUrl.includes("/nogosarenmarketplace/")) {
           const oldPath = oldImageUrl.split("/nogosarenmarketplace/")[1];
           if (oldPath) {
             try {
-              await supabase.storage
-                .from("nogosarenmarketplace")
-                .remove([oldPath]);
+              await supabase.storage.from("nogosarenmarketplace").remove([oldPath]);
             } catch (deleteError) {
               console.warn("Failed to delete old image:", deleteError);
-              // Continue with the update even if deletion fails
             }
           }
         }
       }
 
-      // Update profile using axios.put
-      const response = await axios.put(
+      await axios.put(
         `${import.meta.env.VITE_API_URL}/profile/${user.id}`,
         {
           name: user.name,
@@ -112,16 +103,17 @@ const Profile = () => {
         }
       );
 
-      // Update local state with new image URL
       setUser((prev) => ({ ...prev, profileimage: imageUrl }));
       setOldImageUrl(imageUrl);
       setNewProfileImage(null);
 
       setMessage("Profil berhasil diperbarui.");
       setTimeout(() => setMessage(""), 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Update error:", error);
-      setMessage(error.response?.data?.message || "Gagal menyimpan perubahan.");
+      setMessage(
+        error.response?.data?.message || "Gagal menyimpan perubahan."
+      );
       setTimeout(() => setMessage(""), 3000);
     }
   };
@@ -282,7 +274,7 @@ const Profile = () => {
                       type="file"
                       accept="image/*"
                       onChange={(e) =>
-                        setNewProfileImage(e.target.files?.[0] || null)
+                        setNewProfileImage(e.target.files ? e.target.files[0] : null)
                       }
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
@@ -302,9 +294,7 @@ const Profile = () => {
                           />
                         </svg>
                         <span className="text-sm font-medium">
-                          {newProfileImage
-                            ? newProfileImage.name
-                            : "Pilih foto baru"}
+                          {newProfileImage ? newProfileImage.name : "Pilih foto baru"}
                         </span>
                       </div>
                     </div>
@@ -405,7 +395,6 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Message Display */}
                 {message && (
                   <div
                     className={`p-4 rounded-xl border-2 ${

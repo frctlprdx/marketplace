@@ -12,8 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const UserNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [role, setRole] = useState(null);
+  const dropdownRef = useRef(null);
   const [hoverHeart, setHoverHeart] = useState(false);
   const [hoverCart, setHoverCart] = useState(false);
   const [hoverHistory, setHoverHistory] = useState(false);
@@ -26,11 +26,8 @@ const UserNav = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
@@ -70,11 +67,6 @@ const UserNav = () => {
     navigate(`/profile?user_id=${userId}`);
   };
 
-  // const handleLogout = () => {
-  //   localStorage.clear();
-  //   window.location.href = "/";
-  // };
-
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Desktop View */}
@@ -87,10 +79,6 @@ const UserNav = () => {
         >
           {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
-
-        {/* <button onClick={handleLogout}>
-            logout
-        </button> */}
 
         <button
           className="text-primary text-2xl hover:text-black transition cursor-pointer"
@@ -119,7 +107,7 @@ const UserNav = () => {
             onMouseLeave={() => setHoverHistory(false)}
             onClick={() => navigate("/allproducts")}
           >
-            {hoverHistory ? <MdStorefront /> : <MdStorefront />}
+            <MdStorefront />
           </button>
         )}
 

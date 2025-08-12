@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GuestNav from "./GuestNav";
 import UserNav from "./UserNav";
-import { useNavigate } from "react-router-dom";
 import logo from "../../../public/assets/logo cerah.png";
 
 const NavbarComponent = () => {
@@ -10,7 +9,7 @@ const NavbarComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     // Navigate to the /product page with the search query
     navigate(`/product?search=${searchQuery}`);

@@ -10,26 +10,13 @@ import {
   FiDollarSign,
   FiHash,
   FiLoader,
-  FiAlertTriangle
+  FiAlertTriangle,
 } from "react-icons/fi";
-
-interface TransactionDetail {
-  name: string;
-  label: string;
-  recipient_name: string;
-  province: string;
-  city: string;
-  subdistrict: string;
-  amount: number;
-  total_price: string;
-  courier: string;
-  image: string; // Tambahan: gambar produk
-}
 
 const TransactionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [detail, setDetail] = useState<TransactionDetail | null>(null);
+  const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
@@ -95,7 +82,7 @@ const TransactionDetail = () => {
             <FiArrowLeft />
             <span>Kembali</span>
           </button>
-          
+
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Detail Transaksi</h1>
           <p className="text-gray-600">Informasi lengkap pesanan #{id}</p>
         </div>
@@ -131,10 +118,10 @@ const TransactionDetail = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Product Info */}
                 <h3 className="text-lg font-bold text-gray-800 mb-3">{detail.name}</h3>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <div className="flex items-center space-x-2 mb-1">
@@ -143,13 +130,15 @@ const TransactionDetail = () => {
                     </div>
                     <p className="font-semibold text-gray-800">{detail.amount} pcs</p>
                   </div>
-                  
+
                   <div className="bg-green-50 p-3 rounded-lg">
                     <div className="flex items-center space-x-2 mb-1">
                       <FiDollarSign className="text-green-600 text-sm" />
                       <span className="text-sm text-green-600 font-medium">Total</span>
                     </div>
-                    <p className="font-semibold text-gray-800">Rp {Number(detail.total_price).toLocaleString("id-ID")}</p>
+                    <p className="font-semibold text-gray-800">
+                      Rp {Number(detail.total_price).toLocaleString("id-ID")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -198,19 +187,19 @@ const TransactionDetail = () => {
                     <span className="font-medium">{detail.label}</span>
                   </p>
                 </div>
-                
+
                 {/* Address Details */}
                 <div className="space-y-3">
                   <div>
                     <p className="text-xs text-gray-500 font-medium mb-1">PROVINSI</p>
                     <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded">{detail.province}</p>
                   </div>
-                  
+
                   <div>
                     <p className="text-xs text-gray-500 font-medium mb-1">KOTA/KABUPATEN</p>
                     <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded">{detail.city}</p>
                   </div>
-                  
+
                   <div>
                     <p className="text-xs text-gray-500 font-medium mb-1">KECAMATAN</p>
                     <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded">{detail.subdistrict}</p>

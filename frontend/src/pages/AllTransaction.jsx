@@ -16,20 +16,8 @@ import {
   FiTag,
 } from "react-icons/fi";
 
-interface Transaction {
-  id: number;
-  transaction_item: number;
-  user_id: string; // nama user
-  product_name: string;
-  category_name: string; // nama kategori
-  stocks: number;
-  status: string;
-  created_at: string;
-  category?: string; // category name
-}
-
 const AllTransactionTable = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +46,7 @@ const AllTransactionTable = () => {
     fetchTransactions();
   }, [navigate]);
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
       case "paid":
       case "dibayar":
@@ -68,7 +56,7 @@ const AllTransactionTable = () => {
         return <FiCheckCircle className="text-green-500" />;
       case "pending":
       case "menunggu":
-        return <FiAlertCircle className="text-orange -500" />;
+        return <FiAlertCircle className="text-orange-500" />;
       case "cancelled":
       case "dibatalkan":
         return <FiXCircle className="text-red-500" />;
@@ -81,7 +69,7 @@ const AllTransactionTable = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "paid":
       case "dibayar":
@@ -200,7 +188,7 @@ const AllTransactionTable = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {transactions.map((trx, index) => (
+                  {transactions.map((trx) => (
                     <tr
                       key={trx.id}
                       onClick={() =>

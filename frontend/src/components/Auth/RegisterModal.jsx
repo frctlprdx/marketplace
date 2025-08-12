@@ -4,24 +4,18 @@ import Modal from "../Modals/Modal";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import logo from "../../../public/assets/logo.png";
 
-interface Props {
-  onClose: () => void;
-  onSwitchToLogin: () => void;
-}
-
-const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
+const RegisterModal = ({ onClose, onSwitchToLogin }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [role, setRole] = useState("customer"); // ✅ default role
-  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const [role, setRole] = useState("customer"); // default role
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmationPassword, setShowConfirmationPassword] =
-    useState(false);
+  const [showConfirmationPassword, setShowConfirmationPassword] = useState(false);
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -42,7 +36,7 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       email,
       password,
       password_confirmation: password,
-      role, // ✅ kirim role langsung
+      role, // kirim role langsung
       phone_number: phoneNumber,
       profileimage:
         "https://bllwkvhdvpklldubcotn.supabase.co/storage/v1/object/public/nogosarenmarketplace/profile/default.jpg",
@@ -55,12 +49,8 @@ const RegisterModal = ({ onClose, onSwitchToLogin }: Props) => {
       );
       console.log("Registration successful", response.data);
       onClose();
-    } catch (error: any) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
         setErrors(error.response.data.message);
       } else {
         console.error("Unknown error", error);

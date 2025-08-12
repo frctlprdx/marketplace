@@ -15,7 +15,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const Location = () => {
-  const center: [number, number] = [-7.250445, 112.768845]; // Ganti dengan koordinat lokasi desamu
+  const center = [-7.250445, 112.768845]; // Ganti dengan koordinat lokasi desamu
 
   return (
     <div className="w-screen flex flex-col items-center py-10 max-w-7xl px-4 sm:px-0 mx-auto h-screen">
@@ -28,7 +28,7 @@ const Location = () => {
           center={center}
           zoom={6}
           scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%' }} // Map menyesuaikan lebar div
+          style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

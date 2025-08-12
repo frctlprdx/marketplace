@@ -6,14 +6,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Wishlist = () => {
-  const [wishlist, setWishlist] = useState<any[]>([]);
-  const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [cart, setCart] = useState<any[]>([]); // State untuk menyimpan data cart
-  const [quantities, setQuantities] = useState<{ [productId: number]: number }>(
-    {}
-  );
+  const [wishlist, setWishlist] = useState([]);
+  const [removingProductIds, setRemovingProductIds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,7 +21,6 @@ const Wishlist = () => {
   useEffect(() => {
     if (userId) {
       const fetchWishlist = async () => {
-        const userId = localStorage.getItem("user_id");
         const userToken = localStorage.getItem("user_token");
 
         if (!userToken) {
@@ -52,18 +49,13 @@ const Wishlist = () => {
           const data = await response.json();
           setWishlist(data);
         } catch (error) {
-          if (error instanceof Error) {
-            setError(error.message);
-          } else {
-            setError("An unknown error occurred");
-          }
+          setError(error.message || "An unknown error occurred");
         } finally {
           setLoading(false);
         }
       };
 
       const fetchCart = async () => {
-        const userId = localStorage.getItem("user_id");
         const userToken = localStorage.getItem("user_token");
 
         if (!userToken) {
@@ -92,11 +84,7 @@ const Wishlist = () => {
           const data = await response.json();
           setCart(data);
         } catch (error) {
-          if (error instanceof Error) {
-            setError(error.message);
-          } else {
-            setError("An unknown error occurred");
-          }
+          setError(error.message || "An unknown error occurred");
         }
       };
 
@@ -105,7 +93,7 @@ const Wishlist = () => {
     }
   }, [userId]);
 
-  const handleRemoveFromWishlist = async (productId: number) => {
+  const handleRemoveFromWishlist = async (productId) => {
     const userId = localStorage.getItem("user_id");
     const userToken = localStorage.getItem("user_token");
 
@@ -117,19 +105,16 @@ const Wishlist = () => {
     setRemovingProductIds((prev) => [...prev, productId]);
 
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/wishlist`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-            "Content-Type": "application/json",
-          },
-          data: {
-            user_id: userId,
-            product_id: productId,
-          },
-        }
-      );
+      await axios.delete(`${import.meta.env.VITE_API_URL}/wishlist`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "application/json",
+        },
+        data: {
+          user_id: userId,
+          product_id: productId,
+        },
+      });
 
       toast.success("Item berhasil dihapus dari wishlist!");
 
@@ -138,15 +123,15 @@ const Wishlist = () => {
           prev.filter((item) => item.product_id !== productId)
         );
         setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
-      }, 300); // delay untuk animasi
-    } catch (error: any) {
+      }, 300);
+    } catch (error) {
       console.error("Gagal menghapus wishlist:", error.response?.data || error);
       toast.error("Gagal menghapus wishlist");
       setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     }
   };
 
-  const handleAddToCart = async (productId: number) => {
+  const handleAddToCart = async (productId) => {
     const userId = localStorage.getItem("user_id");
     const userToken = localStorage.getItem("user_token");
 
@@ -155,9 +140,8 @@ const Wishlist = () => {
       return;
     }
 
-    const quantity = quantities[productId] || 1; // default quantity = 1
+    const quantity = quantities[productId] || 1;
 
-    // Check if quantity exceeds available stock
     const item = wishlist.find((item) => item.product_id === productId);
     if (item && quantity > item.stocks) {
       toast.error(`Stok tidak mencukupi! Hanya tersedia ${item.stocks} item.`);
@@ -167,7 +151,7 @@ const Wishlist = () => {
     setRemovingProductIds((prev) => [...prev, productId]);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL}/cart`,
         {
           product_id: productId,
@@ -183,13 +167,12 @@ const Wishlist = () => {
 
       toast.success("Item berhasil ditambahkan ke keranjang!");
 
-      // update UI (tandai bahwa item sudah di cart)
       setWishlist((prev) =>
         prev.map((item) =>
           item.product_id === productId ? { ...item, addedToCart: true } : item
         )
       );
-    } catch (error: any) {
+    } catch (error) {
       console.error(
         "Gagal menambahkan ke keranjang:",
         error.response?.data || error
@@ -198,10 +181,6 @@ const Wishlist = () => {
     } finally {
       setRemovingProductIds((prev) => prev.filter((id) => id !== productId));
     }
-  };
-
-  const isInCart = (productId: number) => {
-    return cart.some((item) => item.product_id === productId);
   };
 
   if (loading) {
@@ -268,7 +247,6 @@ const Wishlist = () => {
                     </div>
                     <div className="py-3 space-y-4 ">
                       <p>{item.name}</p>
-                      {/* Harga total sesuai quantity */}
                       <p className="text-primary font-bold">
                         Rp {totalPrice.toLocaleString("id-ID")}
                       </p>
@@ -276,7 +254,6 @@ const Wishlist = () => {
                       <p className="text-xs">Di Post pada {item.created_at}</p>
                     </div>
 
-                    {/* Input quantity */}
                     <div
                       className="flex items-center gap-3 sm:my-2 mb-2 text-center"
                       onClick={(e) => e.stopPropagation()}

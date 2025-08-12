@@ -1,10 +1,4 @@
-// components/modals/Modal.tsx
-interface ModalProps {
-  children: React.ReactNode;
-  onClose: () => void;
-}
-
-const Modal = ({ children, onClose }: ModalProps) => {
+const Modal = ({ children, onClose }) => {
   return (
     <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg min-w-[300px] relative">

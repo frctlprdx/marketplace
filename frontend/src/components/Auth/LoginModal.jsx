@@ -4,20 +4,15 @@ import axios from "axios";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import logo from "../../../public/assets/logo.png";
 
-interface Props {
-  onClose: () => void;
-  onSwitchToRegister: () => void;
-}
-
-const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
+const LoginModal = ({ onClose, onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrors({}); // Reset errors sebelum request
@@ -45,7 +40,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }: Props) => {
       localStorage.setItem("role", response.data.role);
       window.dispatchEvent(new Event("login"));
       onClose(); // Tutup modal setelah login
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error", error);
       
       if (error.response) {

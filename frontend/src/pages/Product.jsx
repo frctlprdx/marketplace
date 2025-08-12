@@ -7,12 +7,12 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Product = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [minPrice, setMinPrice] = useState<number | "">("");
-  const [maxPrice, setMaxPrice] = useState<number | "">("");
-  const [selectedCategory, setSelectedCategory] = useState<string | "">("");
+  const [products, setProducts] = useState([]);
+  const [wishlistIds, setWishlistIds] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -73,14 +73,14 @@ const Product = () => {
           },
         })
         .then((res) => {
-          const ids = res.data.map((item: any) => item.product_id);
+          const ids = res.data.map((item) => item.product_id);
           setWishlistIds(ids);
         })
         .catch(console.error);
     }
   }, [location.search, userId, token]);
 
-  const handleWishlist = (productId: number) => {
+  const handleWishlist = (productId) => {
     if (!userId || !token) {
       toast.error("Login terlebih dahulu!");
       return;
@@ -130,10 +130,8 @@ const Product = () => {
   const updateUrlWithFilters = () => {
     const params = new URLSearchParams();
     if (selectedCategory) params.set("category", selectedCategory);
-    if (minPrice)
-      params.set("minPrice", Math.floor(Number(minPrice)).toString());
-    if (maxPrice)
-      params.set("maxPrice", Math.floor(Number(maxPrice)).toString());
+    if (minPrice) params.set("minPrice", Math.floor(Number(minPrice)).toString());
+    if (maxPrice) params.set("maxPrice", Math.floor(Number(maxPrice)).toString());
 
     navigate(`/product?${params.toString()}`);
     if (window.innerWidth < 1024) {
@@ -245,9 +243,7 @@ const Product = () => {
                         placeholder="Min"
                         value={minPrice}
                         onChange={(e) =>
-                          setMinPrice(
-                            e.target.value ? parseInt(e.target.value) : ""
-                          )
+                          setMinPrice(e.target.value ? parseInt(e.target.value) : "")
                         }
                       />
                     </div>
@@ -259,9 +255,7 @@ const Product = () => {
                         placeholder="Max"
                         value={maxPrice}
                         onChange={(e) =>
-                          setMaxPrice(
-                            e.target.value ? parseInt(e.target.value) : ""
-                          )
+                          setMaxPrice(e.target.value ? parseInt(e.target.value) : "")
                         }
                       />
                     </div>

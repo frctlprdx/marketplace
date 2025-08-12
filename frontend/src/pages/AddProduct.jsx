@@ -15,9 +15,7 @@ import {
   FiCheck,
   FiLoader,
 } from "react-icons/fi";
-
 import { RiWeightLine } from "react-icons/ri";
-
 
 function AddProduct() {
   const [formData, setFormData] = useState({
@@ -27,11 +25,9 @@ function AddProduct() {
     price: "",
     weight: "",
   });
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -57,22 +53,20 @@ function AddProduct() {
     };
 
     fetchCategories();
-  }, []);
+  }, [navigate]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUpload = async (show: boolean) => {
+  const handleUpload = async (show) => {
     if (!file) return alert("Pilih gambar terlebih dahulu");
     if (!selectedCategory) return alert("Pilih kategori terlebih dahulu");
     setLoading(true);
 
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `produk/${fileName}`; // ✅ simpan di folder 'produk'
+    const filePath = `produk/${fileName}`;
 
     const { error } = await supabase.storage
       .from("nogosarenmarketplace")
@@ -85,7 +79,7 @@ function AddProduct() {
 
     const { data: publicUrl } = supabase.storage
       .from("nogosarenmarketplace")
-      .getPublicUrl(filePath); // ✅ ambil dari folder 'produk'
+      .getPublicUrl(filePath);
 
     const userId = localStorage.getItem("user_id");
     const token = localStorage.getItem("user_token");
@@ -106,7 +100,7 @@ function AddProduct() {
           stocks: formData.stocks,
           price: formData.price,
           weight: formData.weight,
-          image: publicUrl.publicUrl, // ✅ image URL yang benar
+          image: publicUrl.publicUrl,
           show: show,
         },
         {
@@ -134,7 +128,7 @@ function AddProduct() {
   };
 
   return (
-    <div className="min-h-screen  py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -222,17 +216,16 @@ function AddProduct() {
                 </label>
                 <textarea
                   name="description"
-                  placeholder="Deskripsikan produk Anda secara detail untuk menarik pembeli..."
+                  placeholder="Deskripsikan produk Anda secara detail..."
                   onChange={handleChange}
                   value={formData.description}
                   rows={4}
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400 resize-none"
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400 resize-none"
                 />
               </div>
 
               {/* Stock and Price Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Stock */}
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiHash className="mr-2 text-green-500" />
@@ -245,11 +238,10 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.stocks}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
 
-                {/* Price */}
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiDollarSign className="mr-2 text-green-500" />
@@ -262,9 +254,10 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.price}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
+
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <RiWeightLine className="mr-2 text-green-500" />
@@ -277,7 +270,7 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.weight}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -292,8 +285,8 @@ function AddProduct() {
                   <div className="flex items-center justify-center w-full">
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200 group">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <FiUpload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-green-500 transition-colors" />
-                        <p className="mb-2 text-sm text-gray-500 group-hover:text-green-500 transition-colors">
+                        <FiUpload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-green-500" />
+                        <p className="mb-2 text-sm text-gray-500 group-hover:text-green-500">
                           <span className="font-semibold">
                             Klik untuk upload
                           </span>{" "}
@@ -330,7 +323,7 @@ function AddProduct() {
               <button
                 onClick={() => handleUpload(true)}
                 disabled={loading}
-                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {loading ? (
                   <FiLoader className="animate-spin mr-2" />
@@ -343,7 +336,7 @@ function AddProduct() {
               <button
                 onClick={() => handleUpload(false)}
                 disabled={loading}
-                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl hover:from-gray-600 hover:to-gray-700 focus:ring-4 focus:ring-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl hover:from-gray-600 hover:to-gray-700 focus:ring-4 focus:ring-gray-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {loading ? (
                   <FiLoader className="animate-spin mr-2" />

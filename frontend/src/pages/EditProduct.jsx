@@ -18,7 +18,7 @@ const EditProduct = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [newImage, setNewImage] = useState<File | null>(null);
+  const [newImage, setNewImage] = useState(null);
   const [oldImageUrl, setOldImageUrl] = useState("");
 
   useEffect(() => {
@@ -41,9 +41,7 @@ const EditProduct = () => {
       .catch((err) => console.error(err));
   }, [id]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -95,7 +93,7 @@ const EditProduct = () => {
     }
   };
 
-  const handleVisibilityChange = async (visible: boolean) => {
+  const handleVisibilityChange = async (visible) => {
     const token = localStorage.getItem("user_token");
     try {
       await axios.put(

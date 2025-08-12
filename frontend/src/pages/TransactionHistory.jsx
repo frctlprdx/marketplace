@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 
-type Transaction = {
-  image: string;
-  name: string;
-  quantity: number;
-  total_price: number;
-  courier: string;
-  status: string;
-};
-
 const TransactionHistory = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Your original API logic with localStorage
@@ -20,12 +11,9 @@ const TransactionHistory = () => {
     const fetchHistory = async () => {
       try {
         const token = localStorage.getItem("user_token");
-        ``;
 
         const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/transactionhistory?user_id=${userId}`,
+          `${import.meta.env.VITE_API_URL}/transactionhistory?user_id=${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,7 +34,7 @@ const TransactionHistory = () => {
     }
   }, [userId]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "delivered":
         return "bg-green-100 text-green-800";
@@ -138,7 +126,7 @@ const TransactionHistory = () => {
                           style={{ color: "#507969" }}
                           className="text-xl font-bold transition-colors duration-300 group-hover:!text-[#2d5847]"
                         >
-                          Rp {(item.total_price).toLocaleString("id-ID")}
+                          Rp {item.total_price.toLocaleString("id-ID")}
                         </span>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
@@ -223,7 +211,7 @@ const TransactionHistory = () => {
                           style={{ color: "#507969" }}
                           className="text-2xl font-bold transition-colors duration-300 group-hover:!text-[#2d5847]"
                         >
-                          Rp {(item.total_price).toLocaleString("id-ID")}
+                          Rp {item.total_price.toLocaleString("id-ID")}
                         </span>
                       </div>
                     </div>

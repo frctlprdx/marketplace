@@ -1,7 +1,6 @@
-import { ReactNode } from "react";
 import SellerSidebar from "../Sidebar/SellerSidebar";
 
-const SellerLayout = ({ children }: { children: ReactNode }) => {
+const SellerLayout = ({ children }) => {
   return (
     <>
       <SellerSidebar />

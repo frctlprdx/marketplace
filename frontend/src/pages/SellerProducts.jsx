@@ -2,15 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-}
-
 const SellerProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,12 +17,9 @@ const SellerProducts = () => {
 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/sellerpage`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/sellerpage`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setProducts(res.data);
       } catch (error) {
         console.error("Gagal memuat produk:", error);
@@ -71,15 +61,9 @@ const SellerProducts = () => {
                   <thead>
                     <tr className="bg-gradient-to-r from-[#507969] to-[#00a867] text-white">
                       <th className="px-6 py-4 text-left font-semibold">ID</th>
-                      <th className="px-6 py-4 text-left font-semibold">
-                        Gambar
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold">
-                        Nama Produk
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold">
-                        Harga
-                      </th>
+                      <th className="px-6 py-4 text-left font-semibold">Gambar</th>
+                      <th className="px-6 py-4 text-left font-semibold">Nama Produk</th>
+                      <th className="px-6 py-4 text-left font-semibold">Harga</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">

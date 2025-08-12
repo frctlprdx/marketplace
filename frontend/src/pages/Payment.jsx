@@ -10,156 +10,74 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 
-type Courier = {
-  code: string;
-  service: string;
-  cost: number;
-  name: string;
-  description?: string;
-  etd?: string;
-};
-
-// Interface untuk cart items
-interface CartItem {
-  id: number;
-  user_id: number;
-  product_id: number;
-  quantity: number;
-  name: string;
-  price: number;
-  image: string;
-  user_name: string;
-  seller_name: string;
-  seller_profile: string;
-  weight?: number;
-}
-
-// Interface untuk single product
-interface SingleProduct {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  weight?: number;
-  totalweight?: number;
-  user_id?: number;
-}
-
-// Interface untuk address
-interface Address {
-  id: number;
-  recipient_name: string;
-  phone: string;
-  detail_address: string;
-  district: string;
-  city: string;
-  province: string;
-  zip_code: string;
-  label?: string;
-  is_default?: number;
-}
-
-// Interface untuk shipping data
-interface ShippingData {
-  data: {
-    data: Courier[];
-  };
-}
-
-// Interface untuk location state
-interface LocationState {
-  address: Address;
-  product?: SingleProduct;
-  products?: (CartItem | SingleProduct)[];
-  destinationId: number;
-  shippingData: ShippingData;
-  isCartCheckout: boolean;
-}
-
-// Interface untuk Midtrans response
-interface MidtransResponse {
-  token: string;
-  redirect_url?: string;
-}
-
-// Type untuk checkout items
-type CheckoutItem = CartItem | SingleProduct;
-
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Get the data passed from Checkout page - handle both single product and multiple products
-  const { 
-    address, 
-    product, 
-    products, 
-    destinationId, 
-    shippingData, 
-    isCartCheckout 
-  } = (location.state as LocationState) || {};
+  // Ambil data dari location.state
+  const {
+    address,
+    product,
+    products,
+    destinationId,
+    shippingData,
+    isCartCheckout,
+  } = location.state || {};
 
-  // Determine if we're dealing with cart items or single product
-  const checkoutItems: CheckoutItem[] = isCartCheckout ? products || [] : product ? [product] : [];
+  // Tentukan checkoutItems sesuai kondisi cart atau single product
+  const checkoutItems = isCartCheckout ? products || [] : product ? [product] : [];
 
-  // States
-  const [selectedCourier, setSelectedCourier] = useState<Courier | null>(null);
+  const [selectedCourier, setSelectedCourier] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [midtransResponse, setMidtransResponse] = useState<MidtransResponse | null>(null);
+  const [midtransResponse, setMidtransResponse] = useState(null);
 
-  // Get user authentication from localStorage
+  // Auth data dari localStorage
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("user_token");
   const isLoggedIn = !!(userId && token);
 
-  // Verify that we have all required data
+  // Redirect jika data kurang lengkap
   useEffect(() => {
     if (!address || !checkoutItems.length || !destinationId || !shippingData) {
       navigate("/checkout");
     }
   }, [address, checkoutItems, destinationId, shippingData, navigate]);
 
-  // Return null if no data
   if (!address || !checkoutItems.length || !destinationId || !shippingData) {
     return null;
   }
 
-  // Calculate totals for multiple items
-  const subtotal = checkoutItems.reduce((total: number, item: CheckoutItem) => {
+  // Hitung subtotal, berat total dan total item
+  const subtotal = checkoutItems.reduce((total, item) => {
     return total + item.price * item.quantity;
   }, 0);
 
-  const totalWeight = checkoutItems.reduce((total: number, item: CheckoutItem) => {
+  const totalWeight = checkoutItems.reduce((total, item) => {
     const itemWeight = item.weight || 0;
     return total + itemWeight * item.quantity;
   }, 0);
 
   const totalItems = checkoutItems.reduce(
-    (total: number, item: CheckoutItem) => total + item.quantity,
+    (total, item) => total + item.quantity,
     0
   );
 
   const shippingCost = selectedCourier ? selectedCourier.cost : 0;
   const totalPrice = subtotal + shippingCost;
 
-  // Handle courier selection
-  const handleSelectCourier = (courier: Courier) => {
+  const handleSelectCourier = (courier) => {
     setSelectedCourier(courier);
   };
 
-  // Get Snap Token from Midtrans - updated to handle multiple products
-  const getSnapToken = async (): Promise<string | null> => {
+  // Mendapatkan Snap Token Midtrans
+  const getSnapToken = async () => {
     if (!userId || !address || !selectedCourier || !checkoutItems.length) {
       console.error("Data tidak lengkap untuk membuat transaksi");
       return null;
     }
 
     try {
-      // For cart checkout, we need to handle multiple products
       if (isCartCheckout) {
-        // Group products by seller if needed or create separate transactions
-        // For now, we'll assume all products are from the same seller or handle them as one transaction
         const transactionData = {
           userID: parseInt(userId),
           totalPrice: totalPrice,
@@ -168,16 +86,12 @@ const Payment = () => {
           frontend_url: window.location.origin,
           courier: selectedCourier.name,
           destination_id: address.id,
-          
-          // For multiple products, we might need to adjust the backend to handle this
-          products: checkoutItems.map((item: CheckoutItem) => ({
-            product_id: 'product_id' in item ? item.product_id : item.id,
+          products: checkoutItems.map((item) => ({
+            product_id: item.product_id ? item.product_id : item.id,
             seller_id: item.user_id || 0,
             quantity: item.quantity,
             subtotal: item.price * item.quantity,
           })),
-          
-          // Additional data for cart checkout
           isCartCheckout: true,
         };
 
@@ -196,28 +110,21 @@ const Payment = () => {
         setMidtransResponse(response.data);
         return response.data.token;
       } else {
-        // Original single product logic
         const singleProduct = checkoutItems[0];
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/snaptoken`,
           {
-            // Midtrans required data
             userID: parseInt(userId),
             totalPrice: totalPrice,
             recipient_name: address.recipient_name,
             phone: address.phone,
             frontend_url: window.location.origin,
-
-            // Transaction data
-            seller_id: singleProduct.user_id || singleProduct.id, // Adjust based on data structure
-
-            // Transaction items data
+            seller_id: singleProduct.user_id || singleProduct.id,
             product_id: singleProduct.id,
             quantity: singleProduct.quantity,
             subtotal: subtotal,
             courier: selectedCourier.name,
             destination_id: address.id,
-            
             isCartCheckout: false,
           },
           {
@@ -232,19 +139,17 @@ const Payment = () => {
         setMidtransResponse(response.data);
         return response.data.token;
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error getting snap token:", error);
-
       if (error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
       }
-
       return null;
     }
   };
 
-  // Handle place order
+  // Fungsi tombol bayar
   const handlePlaceOrder = async () => {
     if (!selectedCourier || !isLoggedIn) {
       return;
@@ -260,20 +165,19 @@ const Payment = () => {
         return;
       }
 
-      // Load Midtrans Snap
       // @ts-ignore
       if (window.snap) {
         // @ts-ignore
         window.snap.pay(snapToken, {
-          onSuccess: function (result: any) {
+          onSuccess: function (result) {
             console.log("Payment Success:", result);
             window.location.href = "/thanks";
           },
-          onPending: function (result: any) {
+          onPending: function (result) {
             console.log("Payment Pending:", result);
             window.location.href = "/";
           },
-          onError: function (result: any) {
+          onError: function (result) {
             console.log("Payment Error:", result);
             window.location.href = "/payment-failed";
           },
@@ -291,7 +195,7 @@ const Payment = () => {
     }
   };
 
-  // Load Midtrans Snap script
+  // Load Midtrans Snap JS
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -320,7 +224,7 @@ const Payment = () => {
             </button>
             <h1 className="text-2xl font-bold text-gray-800">Pembayaran</h1>
             <span className="text-sm text-gray-600">
-              ({checkoutItems.length} {checkoutItems.length === 1 ? "produk" : "produk"})
+              ({checkoutItems.length} produk)
             </span>
           </div>
 
@@ -396,7 +300,7 @@ const Payment = () => {
               </div>
               <div className="p-6">
                 <div className="space-y-3">
-                  {shippingData?.data?.data?.map((courier: Courier) => (
+                  {shippingData?.data?.data?.map((courier) => (
                     <div
                       key={`${courier.code}-${courier.service}`}
                       onClick={() => handleSelectCourier(courier)}
@@ -460,7 +364,7 @@ const Payment = () => {
               <div className="p-6">
                 {/* Product List */}
                 <div className="space-y-4 mb-6 max-h-60 overflow-y-auto">
-                  {checkoutItems.map((item: CheckoutItem, index: number) => (
+                  {checkoutItems.map((item, index) => (
                     <div key={index} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
                       <img
                         src={item.image}

@@ -4,27 +4,13 @@ import { FiCheck, FiTrash2 } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
-interface CartItem {
-  id: number;
-  user_id: number;
-  product_id: number;
-  quantity: number;
-  name: string;
-  price: number;
-  image: string;
-  user_name: string;
-  seller_name: string;
-  seller_profile: string;
-  weight?: number; // Add weight field
-}
-
 const Cart = () => {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [removingProductIds, setRemovingProductIds] = useState<number[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [activeSeller, setActiveSeller] = useState<string | null>(null); // Track active seller
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [removingProductIds, setRemovingProductIds] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [activeSeller, setActiveSeller] = useState(null);
 
   const navigate = useNavigate();
 
@@ -58,7 +44,7 @@ const Cart = () => {
           throw new Error("Failed to fetch cart");
         }
 
-        const data: CartItem[] = await response.json();
+        const data = await response.json();
         setCart(data);
       } catch (error) {
         setError(error instanceof Error ? error.message : "Unknown error");
@@ -70,7 +56,7 @@ const Cart = () => {
     fetchCart();
   }, []);
 
-  const handleRemoveFromCart = async (productId: number) => {
+  const handleRemoveFromCart = async (productId) => {
     const userId = localStorage.getItem("user_id");
     const userToken = localStorage.getItem("user_token");
 
@@ -93,7 +79,7 @@ const Cart = () => {
       toast.success("Item berhasil dihapus dari cart!");
       setCart((prev) => prev.filter((item) => item.product_id !== productId));
       setSelectedItems((prev) => prev.filter((id) => id !== productId));
-    } catch (error: any) {
+    } catch (error) {
       console.error("Gagal menghapus cart:", error.response?.data || error);
       toast.error("Gagal menghapus cart");
     } finally {
@@ -101,22 +87,20 @@ const Cart = () => {
     }
   };
 
-  const isSelected = (productId: number) => selectedItems.includes(productId);
+  const isSelected = (productId) => selectedItems.includes(productId);
 
-  const toggleItem = (productId: number) => {
-    const item = cart.find(cartItem => cartItem.product_id === productId);
+  const toggleItem = (productId) => {
+    const item = cart.find((cartItem) => cartItem.product_id === productId);
     if (!item) return;
 
     const itemSeller = item.seller_name || "Unknown Seller";
 
-    // If no seller is active, set this item's seller as active
     if (!activeSeller) {
       setActiveSeller(itemSeller);
       setSelectedItems([productId]);
       return;
     }
 
-    // If trying to select item from different seller, show warning and switch seller
     if (activeSeller !== itemSeller) {
       toast.warning(`Beralih ke seller: ${itemSeller}. Pilihan sebelumnya dibatalkan.`);
       setActiveSeller(itemSeller);
@@ -124,57 +108,47 @@ const Cart = () => {
       return;
     }
 
-    // If same seller, toggle normally
     setSelectedItems((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
         : [...prev, productId]
     );
 
-    // If no items selected, clear active seller
     const newSelectedItems = selectedItems.includes(productId)
       ? selectedItems.filter((id) => id !== productId)
       : [...selectedItems, productId];
-    
+
     if (newSelectedItems.length === 0) {
       setActiveSeller(null);
     }
   };
 
-  // Select all items for a seller
-  const toggleSellerItems = (items: CartItem[]) => {
+  const toggleSellerItems = (items) => {
     const sellerName = items[0]?.seller_name || "Unknown Seller";
-    const sellerProductIds = items.map(item => item.product_id);
-    const allSelected = sellerProductIds.every(id => selectedItems.includes(id));
-    
+    const sellerProductIds = items.map((item) => item.product_id);
+    const allSelected = sellerProductIds.every((id) => selectedItems.includes(id));
+
     if (allSelected) {
-      // Deselect all items from this seller
       setSelectedItems([]);
       setActiveSeller(null);
     } else {
-      // Select all items from this seller
       setActiveSeller(sellerName);
       setSelectedItems(sellerProductIds);
     }
   };
 
-  const groupedBySeller = cart.reduce<Record<string, CartItem[]>>(
-    (acc, item) => {
-      const seller = item.seller_name || "Unknown Seller";
-      if (!acc[seller]) acc[seller] = [];
-      acc[seller].push(item);
-      return acc;
-    },
-    {}
-  );
+  const groupedBySeller = cart.reduce((acc, item) => {
+    const seller = item.seller_name || "Unknown Seller";
+    if (!acc[seller]) acc[seller] = [];
+    acc[seller].push(item);
+    return acc;
+  }, {});
 
-  // Helper function to check if seller is active
-  const isSellerActive = (sellerName: string) => {
+  const isSellerActive = (sellerName) => {
     return !activeSeller || activeSeller === sellerName;
   };
 
-  // Helper function to check if seller has any selected items
-  const sellerHasSelectedItems = (sellerName: string) => {
+  const sellerHasSelectedItems = (sellerName) => {
     return activeSeller === sellerName && selectedItems.length > 0;
   };
 
@@ -206,27 +180,17 @@ const Cart = () => {
               Cart milik {cart[0].user_name}
             </h2>
 
-            {/* Info text about seller selection */}
-            {/* {activeSeller && (
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  <span className="font-medium">Seller aktif:</span> {activeSeller}
-                  <br />
-                  <span className="text-xs">Anda hanya dapat memilih produk dari satu seller dalam satu waktu untuk memudahkan pembayaran.</span>
-                </p>
-              </div>
-            )} */}
-
             {Object.entries(groupedBySeller).map(([sellerName, items]) => {
-              const selectedSellerItems = items.filter(item =>
+              const selectedSellerItems = items.filter((item) =>
                 selectedItems.includes(item.product_id)
               );
-              const allSellerItemsSelected = items.length > 0 && 
-                items.every(item => selectedItems.includes(item.product_id));
+              const allSellerItemsSelected =
+                items.length > 0 &&
+                items.every((item) => selectedItems.includes(item.product_id));
               const sellerActive = isSellerActive(sellerName);
 
               return (
-                <div key={sellerName} className={`mb-10 ${!sellerActive ? 'opacity-50' : ''}`}>
+                <div key={sellerName} className={`mb-10 ${!sellerActive ? "opacity-50" : ""}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       {items[0].seller_profile ? (
@@ -259,8 +223,7 @@ const Cart = () => {
                         </span>
                       )}
                     </div>
-                    
-                    {/* Select All Button for Seller */}
+
                     <button
                       onClick={() => toggleSellerItems(items)}
                       disabled={!sellerActive}
@@ -282,7 +245,7 @@ const Cart = () => {
                       <div
                         key={item.id}
                         className={`md:px-2 rounded-lg hover:shadow-2xl flex md:flex-col group hover:border transition-opacity duration-300 bg-white border md:border-0 p-4 md:p-0 relative ${
-                          !sellerActive ? 'cursor-not-allowed' : ''
+                          !sellerActive ? "cursor-not-allowed" : ""
                         }`}
                         onClick={() => {
                           if (sellerActive) {
@@ -309,7 +272,6 @@ const Cart = () => {
                             title={sellerActive ? "Pilih produk" : "Pilih seller ini terlebih dahulu"}
                           />
 
-                          {/* Remove Button - Hidden on desktop hover, always visible on mobile */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -350,7 +312,6 @@ const Cart = () => {
                     ))}
                   </div>
 
-                  {/* Checkout button per seller */}
                   {selectedSellerItems.length > 0 && sellerHasSelectedItems(sellerName) && (
                     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
@@ -358,9 +319,13 @@ const Cart = () => {
                           {selectedSellerItems.length} item dipilih
                         </span>
                         <span className="font-semibold text-[#507969]">
-                          Total: Rp {selectedSellerItems.reduce((total, item) => 
-                            total + (item.price * item.quantity), 0
-                          ).toLocaleString()}
+                          Total: Rp{" "}
+                          {selectedSellerItems
+                            .reduce(
+                              (total, item) => total + item.price * item.quantity,
+                              0
+                            )
+                            .toLocaleString()}
                         </span>
                       </div>
                       <button
@@ -379,7 +344,6 @@ const Cart = () => {
               );
             })}
 
-            {/* Global Selected Items Summary */}
             {selectedItems.length > 0 && (
               <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t p-4 z-30">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -388,16 +352,20 @@ const Cart = () => {
                       {selectedItems.length} item dipilih dari seller: {activeSeller}
                     </span>
                     <div className="font-semibold text-[#507969]">
-                      Total: Rp {cart
-                        .filter(item => selectedItems.includes(item.product_id))
-                        .reduce((total, item) => total + (item.price * item.quantity), 0)
+                      Total: Rp{" "}
+                      {cart
+                        .filter((item) => selectedItems.includes(item.product_id))
+                        .reduce(
+                          (total, item) => total + item.price * item.quantity,
+                          0
+                        )
                         .toLocaleString()}
                     </div>
                   </div>
                   <button
                     className="bg-[#507969] hover:bg-black text-white px-6 py-3 rounded-xl font-medium"
                     onClick={() => {
-                      const allSelectedItems = cart.filter(item => 
+                      const allSelectedItems = cart.filter((item) =>
                         selectedItems.includes(item.product_id)
                       );
                       navigate("/checkout", {

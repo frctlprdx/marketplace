@@ -26,9 +26,9 @@ const faqList = [
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
-  const toggleFAQ = (index: number) => {
+  const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -42,7 +42,7 @@ const FAQ = () => {
           <div
             key={index}
             className="rounded-xl bg-transparent backdrop-blur-sm transition-all border-b-2 border-gray-500 shadow-sm"
-            >
+          >
             <button
               className="w-full flex justify-between items-center px-6 py-4 font-medium text-left hover:bg-gray-100/20 transition"
               onClick={() => toggleFAQ(index)}
