@@ -120,10 +120,7 @@ const Checkout = () => {
   // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowAddressDropdown(false);
       }
     };
@@ -269,7 +266,6 @@ const Checkout = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -355,12 +351,13 @@ const Checkout = () => {
             Data tidak ditemukan
           </h2>
           <p className="text-gray-600 mb-4">
-            {!product && !products 
+            {!product && !products
               ? "Tidak ada data produk yang ditemukan. Pastikan Anda mengakses halaman ini dari tombol 'Beli Sekarang' atau 'Checkout'."
               : "Produk yang akan di-checkout tidak dapat diproses."}
           </p>
           <div className="text-xs text-gray-400 mb-4">
-            Debug: product={!!product}, products={!!products && products.length}, items={checkoutItems.length}
+            Debug: product={!!product}, products={!!products && products.length}
+            , items={checkoutItems.length}
           </div>
           <button
             onClick={() => navigate("/")}
@@ -385,22 +382,29 @@ const Checkout = () => {
       {/* Your checkout component JSX content would be rendered here */}
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Checkout</h1>
-        
+
         {/* Address Selection */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center mb-4">
             <FaMapMarkerAlt className="text-[#507969] mr-2" />
             <h2 className="text-lg font-semibold">Alamat Pengiriman</h2>
           </div>
-          
+
           {selectedAddress ? (
             <div className="border rounded-lg p-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium">{selectedAddress.recipient_name}</p>
-                  <p className="text-sm text-gray-600">{selectedAddress.phone}</p>
+                  <p className="font-medium">
+                    {selectedAddress.recipient_name}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {selectedAddress.phone}
+                  </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    {selectedAddress.detail_address}, {selectedAddress.subdistrict}, {selectedAddress.district}, {selectedAddress.city}, {selectedAddress.province} {selectedAddress.zip_code}
+                    {selectedAddress.detail_address},{" "}
+                    {selectedAddress.subdistrict}, {selectedAddress.district},{" "}
+                    {selectedAddress.city}, {selectedAddress.province}{" "}
+                    {selectedAddress.zip_code}
                   </p>
                 </div>
                 <button
@@ -413,7 +417,9 @@ const Checkout = () => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">Belum ada alamat yang dipilih</p>
+              <p className="text-gray-500 mb-4">
+                Belum ada alamat yang dipilih
+              </p>
               <button
                 onClick={() => setShowAddAddressModal(true)}
                 className="bg-[#507969] text-white px-6 py-2 rounded hover:bg-[#2d5847] transition"
@@ -431,9 +437,12 @@ const Checkout = () => {
             <FaBox className="text-[#507969] mr-2" />
             <h2 className="text-lg font-semibold">Produk Dipesan</h2>
           </div>
-          
+
           {checkoutItems.map((item, index) => (
-            <div key={index} className="flex items-center border-b border-gray-200 py-4 last:border-b-0">
+            <div
+              key={index}
+              className="flex items-center border-b border-gray-200 py-4 last:border-b-0"
+            >
               <img
                 src={item.image}
                 alt={item.name}
@@ -446,7 +455,7 @@ const Checkout = () => {
                 </p>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-lg font-semibold text-[#507969]">
-                    Rp {item.price.toLocaleString('id-ID')}
+                    Rp {item.price.toLocaleString("id-ID")}
                   </span>
                   <span className="text-sm text-gray-600">
                     Qty: {item.quantity}
@@ -460,11 +469,11 @@ const Checkout = () => {
         {/* Order Summary */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Ringkasan Pesanan</h2>
-          
+
           <div className="space-y-2 mb-4">
             <div className="flex justify-between">
               <span>Subtotal ({totalItems} produk)</span>
-              <span>Rp {subtotal.toLocaleString('id-ID')}</span>
+              <span>Rp {subtotal.toLocaleString("id-ID")}</span>
             </div>
             <div className="flex justify-between">
               <span>Total Berat</span>
@@ -475,12 +484,12 @@ const Checkout = () => {
               <span>Akan dihitung di halaman pembayaran</span>
             </div>
           </div>
-          
+
           <div className="border-t pt-4">
             <div className="flex justify-between text-lg font-semibold">
               <span>Total</span>
               <span className="text-[#507969]">
-                Rp {subtotal.toLocaleString('id-ID')} + Ongkir
+                Rp {subtotal.toLocaleString("id-ID")} + Ongkir
               </span>
             </div>
           </div>
@@ -489,13 +498,14 @@ const Checkout = () => {
         {/* Proceed Button */}
         <button
           onClick={handleProceedToPayment}
-          disabled={!selectedAddress || isLoadingDestination || isCalculatingShipping}
+          disabled={
+            !selectedAddress || isLoadingDestination || isCalculatingShipping
+          }
           className="w-full bg-[#507969] text-white py-3 rounded-lg hover:bg-[#2d5847] transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          {isLoadingDestination || isCalculatingShipping 
-            ? "Memproses..." 
-            : "Lanjutkan ke Pembayaran"
-          }
+          {isLoadingDestination || isCalculatingShipping
+            ? "Memproses..."
+            : "Lanjutkan ke Pembayaran"}
         </button>
       </div>
     </div>
