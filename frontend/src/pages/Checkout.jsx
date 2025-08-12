@@ -248,34 +248,95 @@ const Checkout = () => {
   };
 
   // Calculate shipping price
+  // Calculate shipping price dengan debugging lengkap
   const calculateShippingPrice = async (destinationId, weight) => {
     try {
       setIsCalculatingShipping(true);
 
-      // Fixed origin code
       const origin = "68246";
+      const requestData = {
+        origin: origin,
+        destination: destinationId,
+        weight: weight,
+        courier: "jne:jnt",
+      };
 
-      // API call to count shipping price
+      // DEBUGGING: Log semua data request
+      console.log("🚚 === SHIPPING CALCULATION DEBUG ===");
+      console.log("📍 Origin:", origin);
+      console.log("📍 Destination ID:", destinationId);
+      console.log("⚖️ Weight:", weight);
+      console.log("🚛 Courier:", requestData.courier);
+      console.log("🌐 API URL:", `${import.meta.env.VITE_API_URL}/countprice`);
+      console.log("📦 Full Request Data:", requestData);
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/countprice`,
-        {
-          origin: origin,
-          destination: destinationId,
-          weight: weight,
-          courier: "jne:jnt", // Only getting JNE and JNT options
-        },
+        requestData,
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
           },
         }
       );
 
-      console.log("Shipping price response:", response.data);
+      // DEBUGGING: Log response sukses
+      console.log("✅ Response Status:", response.status);
+      console.log("✅ Response Headers:", response.headers);
+      console.log("✅ Response Data:", response.data);
+      console.log("=== END SHIPPING DEBUG ===");
+
       return response.data;
     } catch (error) {
-      console.error("Error calculating shipping price:", error);
-      alert("Gagal menghitung ongkos kirim. Silakan coba lagi.");
+      // DEBUGGING: Log error detail
+      console.log("❌ === SHIPPING ERROR DEBUG ===");
+      console.log("💥 Error Type:", error.name);
+      console.log("💥 Error Message:", error.message);
+
+      if (error.response) {
+        // Server responded with error status
+        console.log("🔴 Response Error:");
+        console.log("   Status:", error.response.status);
+        console.log("   Status Text:", error.response.statusText);
+        console.log("   Headers:", error.response.headers);
+        console.log("   Data:", error.response.data);
+
+        // Specific error handling
+        if (error.response.status === 419) {
+          console.log("🔐 CSRF Error - Token mismatch");
+          alert("CSRF Error: Silakan refresh halaman dan coba lagi.");
+        } else if (error.response.status === 500) {
+          console.log("🔧 Server Error - Internal server error");
+          alert("Server Error: Ada masalah di server. Coba lagi nanti.");
+        } else if (error.response.status === 422) {
+          console.log("📝 Validation Error - Data tidak valid");
+          alert("Validation Error: Data yang dikirim tidak valid.");
+        } else {
+          alert(
+            `Server Error (${error.response.status}): ${
+              error.response.data?.message || "Unknown error"
+            }`
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        console.log("🌐 Network Error:");
+        console.log("   Request:", error.request);
+        console.log("   No response received from server");
+        alert(
+          "Network Error: Tidak dapat terhubung ke server. Periksa koneksi internet."
+        );
+      } else {
+        // Something else happened
+        console.log("⚠️ Other Error:", error.message);
+        alert("Unexpected Error: " + error.message);
+      }
+
+      console.log("💾 Full Error Object:", error);
+      console.log("=== END ERROR DEBUG ===");
+
       return null;
     } finally {
       setIsCalculatingShipping(false);
@@ -331,15 +392,15 @@ const Checkout = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("=== Checkout Debug Info ===");
-    console.log("Original product:", product);
-    console.log("Original products:", products);
-    console.log("Normalized checkoutItems:", checkoutItems);
-    console.log("isCartCheckout:", isCartCheckout);
-    console.log("userId from localStorage:", userId);
-    console.log("========================");
-  }, [product, products, checkoutItems, isCartCheckout]);
+  // useEffect(() => {
+  //   console.log("=== Checkout Debug Info ===");
+  //   console.log("Original product:", product);
+  //   console.log("Original products:", products);
+  //   console.log("Normalized checkoutItems:", checkoutItems);
+  //   console.log("isCartCheckout:", isCartCheckout);
+  //   console.log("userId from localStorage:", userId);
+  //   console.log("========================");
+  // }, [product, products, checkoutItems, isCartCheckout]);
 
   // Redirect if no product
   if (!checkoutItems || checkoutItems.length === 0) {
