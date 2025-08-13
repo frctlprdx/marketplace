@@ -102,7 +102,9 @@ const Cart = () => {
     }
 
     if (activeSeller !== itemSeller) {
-      toast.warning(`Beralih ke seller: ${itemSeller}. Pilihan sebelumnya dibatalkan.`);
+      toast.warning(
+        `Beralih ke seller: ${itemSeller}. Pilihan sebelumnya dibatalkan.`
+      );
       setActiveSeller(itemSeller);
       setSelectedItems([productId]);
       return;
@@ -126,7 +128,9 @@ const Cart = () => {
   const toggleSellerItems = (items) => {
     const sellerName = items[0]?.seller_name || "Unknown Seller";
     const sellerProductIds = items.map((item) => item.product_id);
-    const allSelected = sellerProductIds.every((id) => selectedItems.includes(id));
+    const allSelected = sellerProductIds.every((id) =>
+      selectedItems.includes(id)
+    );
 
     if (allSelected) {
       setSelectedItems([]);
@@ -190,7 +194,10 @@ const Cart = () => {
               const sellerActive = isSellerActive(sellerName);
 
               return (
-                <div key={sellerName} className={`mb-10 ${!sellerActive ? "opacity-50" : ""}`}>
+                <div
+                  key={sellerName}
+                  className={`mb-10 ${!sellerActive ? "opacity-50" : ""}`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       {items[0].seller_profile ? (
@@ -236,7 +243,11 @@ const Cart = () => {
                       }`}
                     >
                       <FiCheck size={16} />
-                      <span>{allSellerItemsSelected ? "Batalkan Semua" : "Pilih Semua"}</span>
+                      <span>
+                        {allSellerItemsSelected
+                          ? "Batalkan Semua"
+                          : "Pilih Semua"}
+                      </span>
                     </button>
                   </div>
 
@@ -269,7 +280,11 @@ const Cart = () => {
                                 ? "bg-white text-gray-400 border hover:shadow-lg"
                                 : "bg-gray-100 text-gray-300 border cursor-not-allowed"
                             } border-[#507969] rounded-full p-1 md:p-2 absolute transition duration-300 cursor-pointer z-20 top-2 right-2`}
-                            title={sellerActive ? "Pilih produk" : "Pilih seller ini terlebih dahulu"}
+                            title={
+                              sellerActive
+                                ? "Pilih produk"
+                                : "Pilih seller ini terlebih dahulu"
+                            }
                           />
 
                           <button
@@ -277,7 +292,9 @@ const Cart = () => {
                               e.stopPropagation();
                               handleRemoveFromCart(item.product_id);
                             }}
-                            disabled={removingProductIds.includes(item.product_id)}
+                            disabled={removingProductIds.includes(
+                              item.product_id
+                            )}
                             className={`absolute top-2 left-2 z-20 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 md:p-2 transition-all duration-300 border ${
                               removingProductIds.includes(item.product_id)
                                 ? "opacity-50 cursor-not-allowed"
@@ -312,34 +329,36 @@ const Cart = () => {
                     ))}
                   </div>
 
-                  {selectedSellerItems.length > 0 && sellerHasSelectedItems(sellerName) && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">
-                          {selectedSellerItems.length} item dipilih
-                        </span>
-                        <span className="font-semibold text-[#507969]">
-                          Total: Rp{" "}
-                          {selectedSellerItems
-                            .reduce(
-                              (total, item) => total + item.price * item.quantity,
-                              0
-                            )
-                            .toLocaleString()}
-                        </span>
+                  {selectedSellerItems.length > 0 &&
+                    sellerHasSelectedItems(sellerName) && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-gray-600">
+                            {selectedSellerItems.length} item dipilih
+                          </span>
+                          <span className="font-semibold text-[#507969]">
+                            Total: Rp{" "}
+                            {selectedSellerItems
+                              .reduce(
+                                (total, item) =>
+                                  total + item.price * item.quantity,
+                                0
+                              )
+                              .toLocaleString()}
+                          </span>
+                        </div>
+                        <button
+                          className="text-sm bg-[#507969] hover:bg-[#2d5847] text-white px-6 py-2 rounded-xl w-full"
+                          onClick={() => {
+                            navigate("/checkout", {
+                              state: { products: selectedSellerItems },
+                            });
+                          }}
+                        >
+                          Checkout ({selectedSellerItems.length} item)
+                        </button>
                       </div>
-                      <button
-                        className="text-sm bg-[#507969] hover:bg-[#2d5847] text-white px-6 py-2 rounded-xl w-full"
-                        onClick={() => {
-                          navigate("/checkout", {
-                            state: { products: selectedSellerItems },
-                          });
-                        }}
-                      >
-                        Checkout ({selectedSellerItems.length} item)
-                      </button>
-                    </div>
-                  )}
+                    )}
                 </div>
               );
             })}
@@ -349,12 +368,15 @@ const Cart = () => {
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                   <div>
                     <span className="text-sm text-gray-600">
-                      {selectedItems.length} item dipilih dari seller: {activeSeller}
+                      {selectedItems.length} item dipilih dari seller:{" "}
+                      {activeSeller}
                     </span>
                     <div className="font-semibold text-[#507969]">
                       Total: Rp{" "}
                       {cart
-                        .filter((item) => selectedItems.includes(item.product_id))
+                        .filter((item) =>
+                          selectedItems.includes(item.product_id)
+                        )
                         .reduce(
                           (total, item) => total + item.price * item.quantity,
                           0

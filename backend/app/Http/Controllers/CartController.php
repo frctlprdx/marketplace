@@ -21,25 +21,30 @@ class CartController extends Controller
             $userId = $user->id;
 
             $carts = DB::table('carts')
-            ->join('products', 'carts.product_id', '=', 'products.id')
-            ->join('users as buyers', 'carts.user_id', '=', 'buyers.id') // alias pembeli
-            ->join('users as sellers', 'products.user_id', '=', 'sellers.id') // alias penjual
-            ->where('carts.user_id', 1)
-            ->select(
-                'carts.*',
-                'products.*',
-                'products.user_id as seller_id',
-                'sellers.name as seller_name',               // ✅ penjual
-                'sellers.profileimage as seller_profile',    // ✅ penjual
-                'buyers.name as user_name'                   // ✅ pembeli
-            )
-            ->get();
+                ->join('products', 'carts.product_id', '=', 'products.id')
+                ->join('users as buyers', 'carts.user_id', '=', 'buyers.id') // alias pembeli
+                ->join('users as sellers', 'products.user_id', '=', 'sellers.id') // alias penjual
+                ->where('carts.user_id', $userId) // pakai ID dari token login
+                ->select(
+                    'carts.*',
+                    'products.*',
+                    'products.user_id as seller_id',
+                    'sellers.name as seller_name',               // ✅ penjual
+                    'sellers.profileimage as seller_profile',    // ✅ penjual
+                    'buyers.name as user_name'                   // ✅ pembeli
+                )
+                ->get();
 
             return response()->json($carts);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
+
 
     
     public function store(Request $request)

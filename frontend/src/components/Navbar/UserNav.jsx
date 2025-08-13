@@ -21,8 +21,7 @@ const UserNav = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("role");
-    setRole(storedRole);
+    setRole(localStorage.getItem("role"));
   }, []);
 
   useEffect(() => {
@@ -35,36 +34,28 @@ const UserNav = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleClickWishlist = () => {
-    const userId = localStorage.getItem("user_id");
-    if (userId && role === "customer") {
-      navigate(`/wishlist?user_id=${userId}`);
+  const requireCustomer = (callback) => {
+    if (role === "customer") {
+      callback();
     } else {
       toast.error("Fitur tersedia hanya untuk pelanggan.");
     }
+  };
+
+  const handleClickWishlist = () => {
+    requireCustomer(() => navigate("/wishlist"));
   };
 
   const handleClickCart = () => {
-    const userId = localStorage.getItem("user_id");
-    if (userId && role === "customer") {
-      navigate(`/cart?user_id=${userId}`);
-    } else {
-      toast.error("Fitur tersedia hanya untuk pelanggan.");
-    }
+    requireCustomer(() => navigate("/cart"));
   };
 
   const handleClickHistory = () => {
-    const userId = localStorage.getItem("user_id");
-    if (userId && role === "customer") {
-      navigate(`/history?user_id=${userId}`);
-    } else {
-      toast.error("Fitur tersedia hanya untuk pelanggan.");
-    }
+    requireCustomer(() => navigate("/history"));
   };
 
   const handleClickProfile = () => {
-    const userId = localStorage.getItem("user_id");
-    navigate(`/profile?user_id=${userId}`);
+    navigate("/profile");
   };
 
   return (
