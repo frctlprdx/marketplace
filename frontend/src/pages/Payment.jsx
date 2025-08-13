@@ -97,7 +97,8 @@ const Payment = () => {
         totalPrice: totalPrice,
         recipient_name: address.recipient_name,
         phone: address.phone,
-        frontend_url: window.location.origin,
+        // UBAH INI: Ganti dengan URL production Anda
+        frontend_url: "https://marketplace-xi-puce.vercel.app", // Bukan window.location.origin
         courier: selectedCourier.name,
         destination_id: address.id,
         isCartCheckout: isCartCheckout,

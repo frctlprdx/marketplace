@@ -133,6 +133,7 @@ class TransactionController extends Controller
             'item_details' => 'required|array|min:1',
             'customer_details' => 'required|array',
             'products_data' => 'required|array|min:1',
+            'frontend_url' => 'required|string', // Tambahkan validasi ini
         ]);
 
         $userID = $request->input('userID');
@@ -141,6 +142,7 @@ class TransactionController extends Controller
         $phone = $request->input('phone');
         $itemDetails = $request->input('item_details');
         $customerDetails = $request->input('customer_details');
+        $frontendUrl = $request->input('frontend_url'); // Ambil frontend URL
 
         // Get user email
         $email = DB::table('users')->where('id', $userID)->value('email');
@@ -159,10 +161,14 @@ class TransactionController extends Controller
                 'phone' => $phone,
             ],
             'item_details' => $itemDetails,
+            // TAMBAHKAN KONFIGURASI CALLBACK URLs
+            'callbacks' => [
+                'finish' => $frontendUrl . '/thanks?order_id=' . $orderId
+            ]
         ];
 
         try {
-            // HANYA generate Snap token, TIDAK menyimpan ke database
+            // Generate Snap token
             $snapToken = Snap::getSnapToken($params);
             
             return response()->json([
@@ -178,178 +184,178 @@ class TransactionController extends Controller
     }
 
     public function processPayment(Request $request)
-{
-    // Validation
-    $request->validate([
-        'order_id' => 'required|string',
-        'payment_result' => 'required|array',
-        'user_id' => 'required|integer',
-        'total_price' => 'required|numeric',
-        'recipient_name' => 'required|string',
-        'phone' => 'required|string',
-        'courier' => 'required|string',
-        'destination_id' => 'required|integer',
-        'is_cart_checkout' => 'required|boolean',
-        'products' => 'required|array|min:1',
-        'products.*.product_id' => 'required|integer',
-        'products.*.seller_id' => 'required|integer',
-        'products.*.quantity' => 'required|integer|min:1',
-        'products.*.subtotal' => 'required|numeric',
-    ]);
+    {
+        // Validation
+        $request->validate([
+            'order_id' => 'required|string',
+            'payment_result' => 'required|array',
+            'user_id' => 'required|integer',
+            'total_price' => 'required|numeric',
+            'recipient_name' => 'required|string',
+            'phone' => 'required|string',
+            'courier' => 'required|string',
+            'destination_id' => 'required|integer',
+            'is_cart_checkout' => 'required|boolean',
+            'products' => 'required|array|min:1',
+            'products.*.product_id' => 'required|integer',
+            'products.*.seller_id' => 'required|integer',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.subtotal' => 'required|numeric',
+        ]);
 
-    $orderId = $request->input('order_id');
-    $paymentResult = $request->input('payment_result');
-    $userId = $request->input('user_id');
-    $totalPrice = $request->input('total_price');
-    $recipientName = $request->input('recipient_name');
-    $phone = $request->input('phone');
-    $courier = $request->input('courier');
-    $destinationId = $request->input('destination_id');
-    $isCartCheckout = $request->input('is_cart_checkout');
-    $products = $request->input('products');
+        $orderId = $request->input('order_id');
+        $paymentResult = $request->input('payment_result');
+        $userId = $request->input('user_id');
+        $totalPrice = $request->input('total_price');
+        $recipientName = $request->input('recipient_name');
+        $phone = $request->input('phone');
+        $courier = $request->input('courier');
+        $destinationId = $request->input('destination_id');
+        $isCartCheckout = $request->input('is_cart_checkout');
+        $products = $request->input('products');
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        // Check duplicate order
-        $existingTransaction = DB::table('transactions')
-            ->where('order_id', $orderId)
-            ->first();
-        
-        if ($existingTransaction) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Order already processed',
-            ], 400);
-        }
-
-        // Verify products and stock - menggunakan field 'stocks' sesuai schema
-        foreach ($products as $product) {
-            $productData = DB::table('products')
-                ->where('id', $product['product_id'])
+            // Check duplicate order
+            $existingTransaction = DB::table('transactions')
+                ->where('order_id', $orderId)
                 ->first();
             
-            if (!$productData) {
-                throw new \Exception("Product ID {$product['product_id']} not found");
+            if ($existingTransaction) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order already processed',
+                ], 400);
             }
-            
-            if ($productData->stocks < $product['quantity']) {
-                throw new \Exception("Insufficient stock for {$productData->name}");
-            }
-        }
 
-        if ($isCartCheckout) {
-            // Cart checkout - group by seller
-            $productsBySeller = collect($products)->groupBy('seller_id');
-            
-            foreach ($productsBySeller as $sellerId => $sellerProducts) {
-                $sellerTotal = $sellerProducts->sum('subtotal');
+            // Verify products and stock - menggunakan field 'stocks' sesuai schema
+            foreach ($products as $product) {
+                $productData = DB::table('products')
+                    ->where('id', $product['product_id'])
+                    ->first();
                 
-                // Create transaction per seller - TANPA total_amount, recipient_name, phone, payment_result
-                DB::table('transactions')->insert([
-                    'order_id' => $orderId . '-SELLER-' . $sellerId,
+                if (!$productData) {
+                    throw new \Exception("Product ID {$product['product_id']} not found");
+                }
+                
+                if ($productData->stocks < $product['quantity']) {
+                    throw new \Exception("Insufficient stock for {$productData->name}");
+                }
+            }
+
+            if ($isCartCheckout) {
+                // Cart checkout - group by seller
+                $productsBySeller = collect($products)->groupBy('seller_id');
+                
+                foreach ($productsBySeller as $sellerId => $sellerProducts) {
+                    $sellerTotal = $sellerProducts->sum('subtotal');
+                    
+                    // Create transaction per seller - TANPA total_amount, recipient_name, phone, payment_result
+                    DB::table('transactions')->insert([
+                        'order_id' => $orderId . '-SELLER-' . $sellerId,
+                        'user_id' => $userId,
+                        'seller_id' => $sellerId,
+                        'status' => 'paid',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+                    // Create transaction items and update stocks
+                    foreach ($sellerProducts as $product) {
+                        DB::table('transaction_items')->insert([
+                            'order_id' => $orderId . '-SELLER-' . $sellerId,
+                            'product_id' => $product['product_id'],
+                            'quantity' => $product['quantity'],
+                            'total_price' => $product['subtotal'],
+                            'courier' => $courier,
+                            'destination_id' => $destinationId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        
+                        // Update stocks (field name: stocks) dan sold
+                        DB::table('products')
+                            ->where('id', $product['product_id'])
+                            ->decrement('stocks', $product['quantity']);
+                        
+                        DB::table('products')
+                            ->where('id', $product['product_id'])
+                            ->increment('sold', $product['quantity']);
+                    }
+                }
+                
+                // Clear cart
+                DB::table('carts')
+                    ->where('user_id', $userId)
+                    ->whereIn('product_id', collect($products)->pluck('product_id'))
+                    ->delete();
+                    
+            } else {
+                // Single product checkout
+                $product = $products[0];
+                
+                // Create transaction - TANPA total_amount, recipient_name, phone, payment_result
+                $transactionId = DB::table('transactions')->insertGetId([
+                    'order_id' => $orderId,
                     'user_id' => $userId,
-                    'seller_id' => $sellerId,
+                    'seller_id' => $product['seller_id'],
                     'status' => 'paid',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
                 
-                // Create transaction items and update stocks
-                foreach ($sellerProducts as $product) {
-                    DB::table('transaction_items')->insert([
-                        'order_id' => $orderId . '-SELLER-' . $sellerId,
-                        'product_id' => $product['product_id'],
-                        'quantity' => $product['quantity'],
-                        'total_price' => $product['subtotal'],
-                        'courier' => $courier,
-                        'destination_id' => $destinationId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    
-                    // Update stocks (field name: stocks) dan sold
-                    DB::table('products')
-                        ->where('id', $product['product_id'])
-                        ->decrement('stocks', $product['quantity']);
-                    
-                    DB::table('products')
-                        ->where('id', $product['product_id'])
-                        ->increment('sold', $product['quantity']);
-                }
+                // Create transaction item - TANPA transaction_id
+                DB::table('transaction_items')->insert([
+                    'order_id' => $orderId,
+                    'product_id' => $product['product_id'],
+                    'quantity' => $product['quantity'],
+                    'total_price' => $product['subtotal'],
+                    'courier' => $courier,
+                    'destination_id' => $destinationId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                
+                // Update stocks (field name: stocks) dan sold
+                DB::table('products')
+                    ->where('id', $product['product_id'])
+                    ->decrement('stocks', $product['quantity']);
+                
+                DB::table('products')
+                    ->where('id', $product['product_id'])
+                    ->increment('sold', $product['quantity']);
             }
             
-            // Clear cart
-            DB::table('carts')
-                ->where('user_id', $userId)
-                ->whereIn('product_id', collect($products)->pluck('product_id'))
-                ->delete();
-                
-        } else {
-            // Single product checkout
-            $product = $products[0];
+            DB::commit();
             
-            // Create transaction - TANPA total_amount, recipient_name, phone, payment_result
-            $transactionId = DB::table('transactions')->insertGetId([
+            Log::info('Payment Processed Successfully', [
                 'order_id' => $orderId,
                 'user_id' => $userId,
-                'seller_id' => $product['seller_id'],
-                'status' => 'paid',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'total_amount' => $totalPrice
             ]);
             
-            // Create transaction item - TANPA transaction_id
-            DB::table('transaction_items')->insert([
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment processed successfully',
                 'order_id' => $orderId,
-                'product_id' => $product['product_id'],
-                'quantity' => $product['quantity'],
-                'total_price' => $product['subtotal'],
-                'courier' => $courier,
-                'destination_id' => $destinationId,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
             
-            // Update stocks (field name: stocks) dan sold
-            DB::table('products')
-                ->where('id', $product['product_id'])
-                ->decrement('stocks', $product['quantity']);
+        } catch (\Exception $e) {
+            DB::rollBack();
             
-            DB::table('products')
-                ->where('id', $product['product_id'])
-                ->increment('sold', $product['quantity']);
+            Log::error('Payment Processing Error', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment processing failed: ' . $e->getMessage(),
+            ], 500);
         }
-        
-        DB::commit();
-        
-        Log::info('Payment Processed Successfully', [
-            'order_id' => $orderId,
-            'user_id' => $userId,
-            'total_amount' => $totalPrice
-        ]);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Payment processed successfully',
-            'order_id' => $orderId,
-        ]);
-        
-    } catch (\Exception $e) {
-        DB::rollBack();
-        
-        Log::error('Payment Processing Error', [
-            'order_id' => $orderId,
-            'error' => $e->getMessage()
-        ]);
-        
-        return response()->json([
-            'success' => false,
-            'message' => 'Payment processing failed: ' . $e->getMessage(),
-        ], 500);
     }
-}
 
 
 }
