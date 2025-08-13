@@ -25,7 +25,11 @@ const Payment = () => {
     isCartCheckout,
   } = location.state || {};
 
-  const checkoutItems = isCartCheckout ? products || [] : product ? [product] : [];
+  const checkoutItems = isCartCheckout
+    ? products || []
+    : product
+    ? [product]
+    : [];
   const [selectedCourier, setSelectedCourier] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,35 +71,37 @@ const Payment = () => {
     }
 
     try {
-      const transactionData = isCartCheckout ? {
-        userID: parseInt(userId),
-        totalPrice: totalPrice,
-        recipient_name: address.recipient_name,
-        phone: address.phone,
-        frontend_url: window.location.origin,
-        courier: selectedCourier.name,
-        destination_id: address.id,
-        products: checkoutItems.map((item) => ({
-          product_id: item.product_id ? item.product_id : item.id,
-          seller_id: item.user_id || 0,
-          quantity: item.quantity,
-          subtotal: item.price * item.quantity,
-        })),
-        isCartCheckout: true,
-      } : {
-        userID: parseInt(userId),
-        totalPrice: totalPrice,
-        recipient_name: address.recipient_name,
-        phone: address.phone,
-        frontend_url: window.location.origin,
-        seller_id: checkoutItems[0].user_id || checkoutItems[0].id,
-        product_id: checkoutItems[0].id,
-        quantity: checkoutItems[0].quantity,
-        subtotal: subtotal,
-        courier: selectedCourier.name,
-        destination_id: address.id,
-        isCartCheckout: false,
-      };
+      const transactionData = isCartCheckout
+        ? {
+            userID: parseInt(userId),
+            totalPrice: totalPrice,
+            recipient_name: address.recipient_name,
+            phone: address.phone,
+            frontend_url: window.location.origin,
+            courier: selectedCourier.name,
+            destination_id: address.id,
+            products: checkoutItems.map((item) => ({
+              product_id: item.product_id ? item.product_id : item.id,
+              seller_id: item.user_id || 0,
+              quantity: item.quantity,
+              subtotal: item.price * item.quantity,
+            })),
+            isCartCheckout: true,
+          }
+        : {
+            userID: parseInt(userId),
+            totalPrice: totalPrice,
+            recipient_name: address.recipient_name,
+            phone: address.phone,
+            frontend_url: window.location.origin,
+            seller_id: checkoutItems[0].user_id || checkoutItems[0].id,
+            product_id: checkoutItems[0].id,
+            quantity: checkoutItems[0].quantity,
+            subtotal: subtotal,
+            courier: selectedCourier.name,
+            destination_id: address.id,
+            isCartCheckout: false,
+          };
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/snaptoken`,
@@ -133,15 +139,16 @@ const Payment = () => {
         window.snap.pay(snapToken, {
           onSuccess: function (result) {
             console.log("Payment Success:", result);
-            window.location.href = "/thanks";
+            window.location.href = "https://marketplace-xi-puce.vercel.app/thanks";
           },
           onPending: function (result) {
             console.log("Payment Pending:", result);
-            window.location.href = "/";
+            window.location.href = "https://marketplace-xi-puce.vercel.app/";
           },
           onError: function (result) {
             console.log("Payment Error:", result);
-            window.location.href = "/payment-failed";
+            window.location.href =
+              "https://marketplace-xi-puce.vercel.app/error";
           },
           onClose: function () {
             console.log("Payment popup closed");
@@ -189,11 +196,14 @@ const Payment = () => {
                 {checkoutItems.length} item
               </span>
             </div>
-            
+
             {/* Mini Progress */}
             <div className="flex items-center gap-2 text-xs">
               <div className="flex items-center gap-1 text-green-600">
-                <FaCheck size={12} className="bg-green-500 text-white rounded-full p-1" />
+                <FaCheck
+                  size={12}
+                  className="bg-green-500 text-white rounded-full p-1"
+                />
                 <span>Alamat</span>
               </div>
               <FaChevronRight className="text-gray-300" size={10} />
@@ -216,7 +226,9 @@ const Payment = () => {
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FaMapMarkerAlt className="text-green-500" size={16} />
-                <h3 className="font-semibold text-gray-800">Alamat Pengiriman</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Alamat Pengiriman
+                </h3>
               </div>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                 <div className="flex gap-2 mb-1">
@@ -229,9 +241,13 @@ const Payment = () => {
                     </span>
                   )}
                 </div>
-                <p className="font-medium text-gray-800 text-sm">{address?.recipient_name}</p>
+                <p className="font-medium text-gray-800 text-sm">
+                  {address?.recipient_name}
+                </p>
                 <p className="text-xs text-gray-600 mb-1">{address?.phone}</p>
-                <p className="text-sm text-gray-700">{address?.detail_address}</p>
+                <p className="text-sm text-gray-700">
+                  {address?.detail_address}
+                </p>
                 <p className="text-xs text-gray-600">
                   {address?.district}, {address?.city}, {address?.province}
                 </p>
@@ -291,7 +307,9 @@ const Payment = () => {
               <div className="p-4 border-b bg-gray-50">
                 <div className="flex items-center gap-2">
                   <FaBox className="text-green-500" size={16} />
-                  <h3 className="font-semibold text-gray-800">Ringkasan Pesanan</h3>
+                  <h3 className="font-semibold text-gray-800">
+                    Ringkasan Pesanan
+                  </h3>
                 </div>
               </div>
 
@@ -299,7 +317,10 @@ const Payment = () => {
                 {/* Compact Product List */}
                 <div className="space-y-2 mb-4 max-h-48 overflow-y-auto">
                   {checkoutItems.map((item, index) => (
-                    <div key={index} className="flex gap-3 p-2 bg-gray-50 rounded">
+                    <div
+                      key={index}
+                      className="flex gap-3 p-2 bg-gray-50 rounded"
+                    >
                       <img
                         src={item.image}
                         alt={item.name}
@@ -315,12 +336,15 @@ const Payment = () => {
                             {item.weight && (
                               <div className="flex items-center gap-1">
                                 <FaWeight size={8} />
-                                <span>{(item.weight * item.quantity)}g</span>
+                                <span>{item.weight * item.quantity}g</span>
                               </div>
                             )}
                           </div>
                           <span className="font-semibold text-green-600">
-                            Rp {(item.price * item.quantity).toLocaleString("id-ID")}
+                            Rp{" "}
+                            {(item.price * item.quantity).toLocaleString(
+                              "id-ID"
+                            )}
                           </span>
                         </div>
                       </div>
@@ -336,13 +360,17 @@ const Payment = () => {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Berat Total</span>
-                    <span>{Number(totalWeight).toLocaleString("id-ID")} gram</span>
+                    <span>
+                      {Number(totalWeight).toLocaleString("id-ID")} gram
+                    </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Ongkir</span>
                     <span>
                       {selectedCourier
-                        ? `Rp ${Number(selectedCourier.cost).toLocaleString("id-ID")}`
+                        ? `Rp ${Number(selectedCourier.cost).toLocaleString(
+                            "id-ID"
+                          )}`
                         : "Pilih kurir"}
                     </span>
                   </div>
