@@ -249,6 +249,7 @@ const Checkout = () => {
 
   // Calculate shipping price
   // Calculate shipping price dengan debugging lengkap
+  // Calculate shipping price dengan debugging lengkap
   const calculateShippingPrice = async (destinationId, weight) => {
     try {
       setIsCalculatingShipping(true);
@@ -275,6 +276,7 @@ const Checkout = () => {
         requestData,
         {
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
             Accept: "application/json",
             "X-Requested-With": "XMLHttpRequest",

@@ -18,7 +18,6 @@ Route::get('/product', [ProductController::class, 'search'])->name('product.sear
 Route::get('/categories', function () { return App\Models\Category::all();}); //Check
 
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');//Check
-Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');//Check
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->middleware('role:customer')->name('cart.index'); //Check
     Route::post('/cart', [CartController::class, 'store'])->middleware('role:customer')->name('cart.store'); //Check
     Route::delete('/cart', [CartController::class, 'destroy'])->middleware('role:customer')->name('cart.destroy'); //Check
+    Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');//Check
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('role:customer')->name('wishlist.index'); //Check
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('role:customer')->name('wishlist.store'); //Check
