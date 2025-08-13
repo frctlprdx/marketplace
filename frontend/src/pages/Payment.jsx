@@ -239,13 +239,12 @@ const Payment = () => {
               );
               console.log("Process result:", processResult);
 
-              // Force redirect to success page - gunakan window.location.replace untuk mencegah back button
+              // REDIRECT KE URL BERSIH TANPA QUERY PARAMETERS
               window.location.replace(
                 "https://marketplace-xi-puce.vercel.app/thanks"
               );
             } catch (error) {
               console.error("Error in onSuccess:", error);
-              // Show error message but don't redirect to thanks page
               alert(
                 "Terjadi kesalahan saat memproses pembayaran. Silakan hubungi customer service."
               );
@@ -253,10 +252,13 @@ const Payment = () => {
           },
           onPending: function (result) {
             console.log("Payment Pending:", result);
-            window.location.href = "https://marketplace-xi-puce.vercel.app/";
+            // Redirect tanpa query parameters
+            window.location.href =
+              "https://marketplace-xi-puce.vercel.app/pending";
           },
           onError: function (result) {
             console.log("Payment Error:", result);
+            // Redirect tanpa query parameters
             window.location.href =
               "https://marketplace-xi-puce.vercel.app/error";
           },

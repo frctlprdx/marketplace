@@ -122,7 +122,7 @@ class TransactionController extends Controller
         Config::$isSanitized = config('Midtrans.is_sanitized');
         Config::$is3ds = config('Midtrans.is_3ds');
 
-        // Validation
+        // Validation (hapus frontend_url dari validasi karena kita hardcode)
         $request->validate([
             'totalPrice' => 'required|numeric',
             'recipient_name' => 'required|string',
@@ -133,7 +133,6 @@ class TransactionController extends Controller
             'item_details' => 'required|array|min:1',
             'customer_details' => 'required|array',
             'products_data' => 'required|array|min:1',
-            'frontend_url' => 'required|string', // Tambahkan validasi ini
         ]);
 
         $userID = $request->input('userID');
@@ -142,7 +141,6 @@ class TransactionController extends Controller
         $phone = $request->input('phone');
         $itemDetails = $request->input('item_details');
         $customerDetails = $request->input('customer_details');
-        $frontendUrl = $request->input('frontend_url'); // Ambil frontend URL
 
         // Get user email
         $email = DB::table('users')->where('id', $userID)->value('email');
@@ -161,9 +159,9 @@ class TransactionController extends Controller
                 'phone' => $phone,
             ],
             'item_details' => $itemDetails,
-            // TAMBAHKAN KONFIGURASI CALLBACK URLs
+            // KONFIGURASI CALLBACK URLs TANPA QUERY PARAMETERS
             'callbacks' => [
-                'finish' => $frontendUrl . '/thanks?order_id=' . $orderId
+                'finish' => 'https://marketplace-xi-puce.vercel.app/thanks'
             ]
         ];
 
