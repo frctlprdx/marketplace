@@ -2,7 +2,6 @@ import { motion, useAnimation } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { useInView } from "framer-motion";
-import herobg from "../../../public/assets/herobg.png";
 
 const HeroSection = () => {
   const ref = useRef(null);
