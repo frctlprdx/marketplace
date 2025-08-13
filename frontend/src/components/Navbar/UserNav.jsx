@@ -82,6 +82,11 @@ const UserNav = () => {
     navigate("/profile");
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Notifikasi custom */}
@@ -101,6 +106,8 @@ const UserNav = () => {
         >
           {hoverHeart ? <FaHeart /> : <FiHeart />}
         </button>
+
+        <button onClick={handleLogout}>logout</button>
 
         <button
           className="text-primary text-2xl hover:text-black transition cursor-pointer"
