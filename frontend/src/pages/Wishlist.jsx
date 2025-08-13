@@ -15,8 +15,7 @@ const Wishlist = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const queryParams = new URLSearchParams(location.search);
-  const userId = queryParams.get("user_id");
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
     if (userId) {
