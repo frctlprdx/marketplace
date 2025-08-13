@@ -71,6 +71,27 @@ const Payment = () => {
     }
 
     try {
+      // Prepare item details for Midtrans
+      const itemDetails = [
+        // Add products
+        ...checkoutItems.map((item) => ({
+          id: `product_${item.product_id || item.id}`,
+          price: item.price,
+          quantity: item.quantity,
+          name: item.name,
+          category: item.category || "Product",
+          merchant_name: item.seller_name || "Go-Smile Marketplace",
+        })),
+        // Add shipping cost as separate item
+        {
+          id: "shipping_cost",
+          price: selectedCourier.cost,
+          quantity: 1,
+          name: `Ongkir ${selectedCourier.name} (${selectedCourier.service})`,
+          category: "Shipping",
+        },
+      ];
+
       const transactionData = isCartCheckout
         ? {
             userID: parseInt(userId),
@@ -87,6 +108,20 @@ const Payment = () => {
               subtotal: item.price * item.quantity,
             })),
             isCartCheckout: true,
+            // Add item details for Midtrans
+            item_details: itemDetails,
+            customer_details: {
+              first_name: address.recipient_name,
+              phone: address.phone,
+              shipping_address: {
+                first_name: address.recipient_name,
+                phone: address.phone,
+                address: address.detail_address,
+                city: address.city,
+                postal_code: address.postal_code || "",
+                country_code: "IDN",
+              },
+            },
           }
         : {
             userID: parseInt(userId),
@@ -101,6 +136,20 @@ const Payment = () => {
             courier: selectedCourier.name,
             destination_id: address.id,
             isCartCheckout: false,
+            // Add item details for Midtrans
+            item_details: itemDetails,
+            customer_details: {
+              first_name: address.recipient_name,
+              phone: address.phone,
+              shipping_address: {
+                first_name: address.recipient_name,
+                phone: address.phone,
+                address: address.detail_address,
+                city: address.city,
+                postal_code: address.postal_code || "",
+                country_code: "IDN",
+              },
+            },
           };
 
       const response = await axios.post(
@@ -131,17 +180,21 @@ const Payment = () => {
 
       const updateData = {
         order_id: orderId,
-        payment_status: 'paid',
+        payment_status: "paid",
         payment_result: paymentResult,
-        products: isCartCheckout 
+        products: isCartCheckout
           ? checkoutItems.map((item) => ({
               product_id: item.product_id ? item.product_id : item.id,
               quantity: item.quantity,
             }))
-          : [{
-              product_id: checkoutItems[0].product_id ? checkoutItems[0].product_id : checkoutItems[0].id,
-              quantity: checkoutItems[0].quantity,
-            }]
+          : [
+              {
+                product_id: checkoutItems[0].product_id
+                  ? checkoutItems[0].product_id
+                  : checkoutItems[0].id,
+                quantity: checkoutItems[0].quantity,
+              },
+            ],
       };
 
       console.log("Update data being sent:", updateData);
@@ -163,7 +216,7 @@ const Payment = () => {
       console.error("Error updating payment status:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
-      
+
       // Even if update fails, we still redirect to success page
       // This prevents user from being stuck on payment page
       return null;
@@ -189,19 +242,18 @@ const Payment = () => {
         window.snap.pay(snapToken, {
           onSuccess: async function (result) {
             console.log("Payment Success:", result);
-            
+
             try {
               // Update payment status and product stocks
               console.log("Calling updatePaymentStatus...");
               const updateResult = await updatePaymentStatus(order_id, result);
               console.log("Update result:", updateResult);
-              
+
               // Add small delay to ensure update completes
               setTimeout(() => {
                 window.location.href =
                   "https://marketplace-xi-puce.vercel.app/thanks";
               }, 2000);
-              
             } catch (error) {
               console.error("Error in onSuccess:", error);
               // Still redirect even if update fails

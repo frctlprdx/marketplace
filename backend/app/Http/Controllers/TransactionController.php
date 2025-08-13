@@ -139,6 +139,9 @@ class TransactionController extends Controller
                 'products.*.seller_id' => 'required|integer',
                 'products.*.quantity' => 'required|integer|min:1',
                 'products.*.subtotal' => 'required|numeric',
+                // Add validation for item_details
+                'item_details' => 'required|array|min:1',
+                'customer_details' => 'required|array',
             ]);
         } else {
             // Validation for single product checkout
@@ -153,6 +156,9 @@ class TransactionController extends Controller
                 'subtotal' => 'required|numeric',
                 'courier' => 'required|string',
                 'destination_id' => 'required|integer',
+                // Add validation for item_details
+                'item_details' => 'required|array|min:1',
+                'customer_details' => 'required|array',
             ]);
         }
 
@@ -162,6 +168,10 @@ class TransactionController extends Controller
         $userID = $request->input('userID');
         $courier = $request->input('courier');
         $destinationId = $request->input('destination_id');
+        
+        // *** TAMBAHAN PENTING: Ambil item_details dan customer_details dari frontend ***
+        $itemDetails = $request->input('item_details');
+        $customerDetails = $request->input('customer_details');
 
         // Get user email
         $email = DB::table('users')
@@ -171,19 +181,31 @@ class TransactionController extends Controller
         // Generate unique order ID
         $orderId = 'ORDER-' . date('YmdHis') . '-' . uniqid() . '-' . $userID;
 
-        // Prepare Midtrans parameters
+        // *** PERBAIKAN: Gunakan item_details dan customer_details dari frontend ***
         $params = [
             'transaction_details' => [
                 'order_id' => $orderId,
                 'gross_amount' => (int) $totalPrice,
             ],
-            'customer_details' => [
+            // Gunakan customer_details dari frontend atau fallback ke data manual
+            'customer_details' => $customerDetails ?: [
                 'first_name' => $recipientName,
                 'last_name' => '',
                 'email' => $email ?: 'customer@example.com',
                 'phone' => $phone,
             ],
+            // *** TAMBAHAN PENTING: Gunakan item_details dari frontend ***
+            'item_details' => $itemDetails,
         ];
+
+        // Log untuk debugging
+        Log::info('Midtrans Params:', [
+            'order_id' => $orderId,
+            'gross_amount' => $totalPrice,
+            'item_details_count' => count($itemDetails),
+            'item_details' => $itemDetails,
+            'customer_details' => $customerDetails
+        ]);
 
         try {
             // Get Snap token from Midtrans
@@ -294,6 +316,7 @@ class TransactionController extends Controller
             // Rollback database transaction on error
             DB::rollBack();
             Log::error('Transaction Creation Error: ' . $e->getMessage());
+            Log::error('Request data: ' . json_encode($request->all()));
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
