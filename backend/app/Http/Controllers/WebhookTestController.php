@@ -167,7 +167,6 @@ class WebhookTestController extends Controller
             DB::table('transactions')->insert([
                 'order_id' => $orderId,
                 'status' => 'pending',
-                'payment_type' => 'test',
                 'amount' => 50000,
                 'created_at' => now(),
                 'updated_at' => now(),
