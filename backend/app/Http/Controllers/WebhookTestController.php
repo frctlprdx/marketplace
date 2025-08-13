@@ -249,8 +249,8 @@ class WebhookTestController extends Controller
             $transaction = [
                 'order_id' => $orderId,
                 'status' => $request->input('status', 'pending'),
-                'payment_type' => $request->input('payment_type', 'bank_transfer'),
-                'amount' => $request->input('amount', 100000),
+                'user_id'=>1,
+                'seller_id'=>2,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
