@@ -302,44 +302,224 @@ class TransactionController extends Controller
     public function handleNotification(Request $request)
     {
         try {
-            $notification = new Notification();
-            $transaction = $notification->transaction_status;
-            $orderId = $notification->order_id;
-            $grossAmount = $notification->gross_amount;
+            // Ambil data dari request body
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$input) {
+                Log::error('Midtrans Notification: Invalid JSON input');
+                return response()->json(['error' => 'Invalid input'], 400);
+            }
 
-            Log::info('Midtrans Notification', [
-                'transaction_status' => $transaction,
-                'order_id' => $orderId,
-                'gross_amount' => $grossAmount,
+            $transaction_status = $input['transaction_status'] ?? null;
+            $order_id = $input['order_id'] ?? null;
+            $gross_amount = $input['gross_amount'] ?? null;
+            $fraud_status = $input['fraud_status'] ?? null;
+            $transaction_time = $input['transaction_time'] ?? null;
+            $payment_type = $input['payment_type'] ?? null;
+
+            Log::info('Midtrans Notification Received', [
+                'transaction_status' => $transaction_status,
+                'order_id' => $order_id,
+                'gross_amount' => $gross_amount,
+                'fraud_status' => $fraud_status,
+                'payment_type' => $payment_type,
+                'transaction_time' => $transaction_time,
             ]);
 
-            // Update status transaksi
-            DB::table('transactions')->where('order_id', $orderId)->update([
-                'status' => $transaction,
+            if (!$order_id || !$transaction_status) {
+                Log::error('Midtrans Notification: Missing required fields');
+                return response()->json(['error' => 'Missing required fields'], 400);
+            }
+
+            // Update status transaksi berdasarkan status dari Midtrans
+            $status = $this->getMappedStatus($transaction_status, $fraud_status);
+            
+            $updated = DB::table('transactions')->where('order_id', $order_id)->update([
+                'status' => $status,
+                'payment_type' => $payment_type,
+                'transaction_time' => $transaction_time ? date('Y-m-d H:i:s', strtotime($transaction_time)) : now(),
                 'updated_at' => now(),
             ]);
 
-            // Jika berhasil dibayar
-            if ($transaction === 'settlement' || $transaction === 'capture') {
-                $item = DB::table('transaction_items')->where('order_id', $orderId)->first();
+            if ($updated === 0) {
+                Log::warning('Midtrans Notification: Transaction not found', ['order_id' => $order_id]);
+                return response()->json(['message' => 'Transaction not found'], 404);
+            }
 
-                if ($item) {
-                    DB::table('products')->where('id', $item->product_id)->update([
-                        'sold' => DB::raw("sold + $item->quantity"),
-                        'stocks' => DB::raw("stocks - $item->quantity"),
+            Log::info('Transaction status updated', [
+                'order_id' => $order_id,
+                'new_status' => $status
+            ]);
+
+            // Jika pembayaran berhasil, update stok produk
+            if ($this->isSuccessfulPayment($transaction_status, $fraud_status)) {
+                $this->updateProductStock($order_id);
+            }
+
+            // Jika pembayaran gagal atau dibatalkan, kembalikan stok (jika diperlukan)
+            if ($this->isFailedPayment($transaction_status)) {
+                $this->restoreProductStock($order_id);
+            }
+
+            return response()->json(['message' => 'Notification processed successfully'], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Midtrans Notification Error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
+            return response()->json(['error' => 'Internal server error'], 500);
+        }
+    }
+
+    /**
+     * Map Midtrans status ke status aplikasi
+     */
+    private function getMappedStatus($transaction_status, $fraud_status = null)
+    {
+        switch ($transaction_status) {
+            case 'capture':
+                return ($fraud_status == 'accept') ? 'paid' : 'pending';
+            case 'settlement':
+                return 'paid';
+            case 'pending':
+                return 'pending';
+            case 'deny':
+            case 'cancel':
+            case 'expire':
+                return 'failed';
+            case 'refund':
+            case 'partial_refund':
+                return 'refunded';
+            default:
+                return 'unknown';
+        }
+    }
+
+    /**
+     * Cek apakah pembayaran berhasil
+     */
+    private function isSuccessfulPayment($transaction_status, $fraud_status = null)
+    {
+        return ($transaction_status === 'settlement') || 
+            ($transaction_status === 'capture' && $fraud_status === 'accept');
+    }
+
+    /**
+     * Cek apakah pembayaran gagal
+     */
+    private function isFailedPayment($transaction_status)
+    {
+        return in_array($transaction_status, ['deny', 'cancel', 'expire']);
+    }
+
+    /**
+     * Update stok produk setelah pembayaran berhasil
+     */
+    private function updateProductStock($order_id)
+    {
+        try {
+            $transaction_items = DB::table('transaction_items')
+                ->where('order_id', $order_id)
+                ->get();
+
+            foreach ($transaction_items as $item) {
+                $updated = DB::table('products')
+                    ->where('id', $item->product_id)
+                    ->where('stocks', '>=', $item->quantity) // Pastikan stok cukup
+                    ->update([
+                        'sold' => DB::raw('sold + ' . $item->quantity),
+                        'stocks' => DB::raw('stocks - ' . $item->quantity),
+                        'updated_at' => now(),
+                    ]);
+
+                if ($updated > 0) {
+                    Log::info('Product stock updated', [
+                        'product_id' => $item->product_id,
+                        'quantity_sold' => $item->quantity,
+                        'order_id' => $order_id
+                    ]);
+                } else {
+                    Log::warning('Failed to update product stock - insufficient stock or product not found', [
+                        'product_id' => $item->product_id,
+                        'quantity_requested' => $item->quantity,
+                        'order_id' => $order_id
                     ]);
                 }
             }
 
-            return response()->json(['message' => 'Notification handled'], 200);
+            // Hapus item dari cart jika checkout dari cart
+            $transaction = DB::table('transactions')->where('order_id', $order_id)->first();
+            if ($transaction && $transaction->user_id) {
+                $product_ids = $transaction_items->pluck('product_id')->toArray();
+                
+                $deleted = DB::table('carts')
+                    ->where('user_id', $transaction->user_id)
+                    ->whereIn('product_id', $product_ids)
+                    ->delete();
+
+                if ($deleted > 0) {
+                    Log::info('Cart items cleared after successful payment', [
+                        'user_id' => $transaction->user_id,
+                        'products_removed' => $product_ids,
+                        'order_id' => $order_id
+                    ]);
+                }
+            }
+
         } catch (\Exception $e) {
-            Log::error('Notification Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Notification failed'], 500);
+            Log::error('Error updating product stock', [
+                'order_id' => $order_id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
+    /**
+     * Kembalikan stok produk jika pembayaran gagal (opsional)
+     */
+    private function restoreProductStock($order_id)
+    {
+        try {
+            // Implementasi ini opsional - hanya jika Anda mengurangi stok saat order dibuat
+            // Biasanya stok baru dikurangi setelah pembayaran berhasil
+            
+            Log::info('Payment failed - stock restoration may be needed', [
+                'order_id' => $order_id
+            ]);
 
+        } catch (\Exception $e) {
+            Log::error('Error restoring product stock', [
+                'order_id' => $order_id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 
+        public function itemindex(Request $request, $id)
+        {
+            try {
+                $items = DB::table('transaction_items')
+                    ->join('products', 'transaction_items.product_id', '=', 'products.id')
+                    ->where('transaction_items.order_id', $id)
+                    ->select(
+                        'products.name',
+                        'products.image',
+                        'transaction_items.quantity',
+                        'transaction_items.total_price',
+                        'transaction_items.courier'
+                    )
+                    ->get();
 
+                if ($items->isEmpty()) {
+                    return response()->json(['message' => 'No items found for this transaction'], 404);
+                }
+
+                return response()->json($items);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+            }
+        }
 
 }
