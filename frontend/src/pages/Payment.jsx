@@ -115,9 +115,57 @@ const Payment = () => {
       );
 
       console.log("Midtrans Response:", response.data);
-      return response.data.token;
+      return response.data;
     } catch (error) {
       console.error("Error getting snap token:", error);
+      return null;
+    }
+  };
+
+  const updatePaymentStatus = async (orderId, paymentResult) => {
+    try {
+      console.log("Starting payment status update...");
+      console.log("Order ID:", orderId);
+      console.log("Checkout Items:", checkoutItems);
+      console.log("Is Cart Checkout:", isCartCheckout);
+
+      const updateData = {
+        order_id: orderId,
+        payment_status: 'paid',
+        payment_result: paymentResult,
+        products: isCartCheckout 
+          ? checkoutItems.map((item) => ({
+              product_id: item.product_id ? item.product_id : item.id,
+              quantity: item.quantity,
+            }))
+          : [{
+              product_id: checkoutItems[0].product_id ? checkoutItems[0].product_id : checkoutItems[0].id,
+              quantity: checkoutItems[0].quantity,
+            }]
+      };
+
+      console.log("Update data being sent:", updateData);
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/transaction/update-payment`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Payment status updated successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      // Even if update fails, we still redirect to success page
+      // This prevents user from being stuck on payment page
       return null;
     }
   };
@@ -128,18 +176,38 @@ const Payment = () => {
     setIsLoading(true);
 
     try {
-      const snapToken = await getSnapToken();
+      const snapResponse = await getSnapToken();
 
-      if (!snapToken) {
+      if (!snapResponse || !snapResponse.token) {
         setIsLoading(false);
         return;
       }
 
+      const { token: snapToken, order_id } = snapResponse;
+
       if (window.snap) {
         window.snap.pay(snapToken, {
-          onSuccess: function (result) {
+          onSuccess: async function (result) {
             console.log("Payment Success:", result);
-            window.location.href = "https://marketplace-xi-puce.vercel.app/thanks";
+            
+            try {
+              // Update payment status and product stocks
+              console.log("Calling updatePaymentStatus...");
+              const updateResult = await updatePaymentStatus(order_id, result);
+              console.log("Update result:", updateResult);
+              
+              // Add small delay to ensure update completes
+              setTimeout(() => {
+                window.location.href =
+                  "https://marketplace-xi-puce.vercel.app/thanks";
+              }, 2000);
+              
+            } catch (error) {
+              console.error("Error in onSuccess:", error);
+              // Still redirect even if update fails
+              window.location.href =
+                "https://marketplace-xi-puce.vercel.app/thanks";
+            }
           },
           onPending: function (result) {
             console.log("Payment Pending:", result);
@@ -152,14 +220,15 @@ const Payment = () => {
           },
           onClose: function () {
             console.log("Payment popup closed");
+            setIsLoading(false);
           },
         });
       } else {
         console.error("Midtrans tidak tersedia. Silakan refresh halaman.");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error creating order:", error);
-    } finally {
       setIsLoading(false);
     }
   };

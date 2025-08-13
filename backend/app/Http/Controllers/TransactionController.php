@@ -299,43 +299,179 @@ class TransactionController extends Controller
     }
 
 
-    public function handleNotification(Request $request)
+    public function updatePaymentStatus(Request $request)
     {
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = config('midtrans.is_sanitized');
-        Config::$is3ds = config('midtrans.is_3ds');
-
-        $notif = new Notification();
-
-        $orderId = $notif->order_id;
-        $transactionStatus = $notif->transaction_status;
-        $fraudStatus = $notif->fraud_status;
-        $paymentType = $notif->payment_type;
-        $transactionTime = $notif->transaction_time;
-
-        $status = match ($transactionStatus) {
-            'capture'     => $fraudStatus == 'accept' ? 'paid' : 'pending',
-            'settlement'  => 'paid',
-            'pending'     => 'pending',
-            'deny', 'cancel', 'expire' => 'failed',
-            default       => 'unknown',
-        };
-
-        DB::table('transactions')
-            ->where('order_id', $orderId)
-            ->update([
-                'status' => $status,
-                'payment_type' => $paymentType,
-                'transaction_time' => date('Y-m-d H:i:s', strtotime($transactionTime)),
-                'updated_at' => now(),
+        try {
+            // Log incoming request for debugging
+            Log::info('Payment Status Update Request', [
+                'request_data' => $request->all()
             ]);
 
-        if ($status === 'paid') {
-            $this->updateProductStock($orderId);
-        }
+            // Validasi input
+            $request->validate([
+                'order_id' => 'required|string',
+                'payment_status' => 'required|string|in:paid',
+                'products' => 'required|array|min:1',
+                'products.*.product_id' => 'required|integer',
+                'products.*.quantity' => 'required|integer|min:1',
+            ]);
 
-        return response()->json(['message' => 'Notification processed']);
+            $orderId = $request->input('order_id');
+            $paymentStatus = $request->input('payment_status');
+            $products = $request->input('products');
+            $paymentResult = $request->input('payment_result');
+
+            // Check if transaction exists
+            $transaction = DB::table('transactions')
+                ->where('order_id', $orderId)
+                ->first();
+
+            if (!$transaction) {
+                Log::error('Transaction not found', ['order_id' => $orderId]);
+                return response()->json([
+                    'error' => 'Transaction not found',
+                    'order_id' => $orderId
+                ], 404);
+            }
+
+            Log::info('Transaction found', [
+                'transaction_id' => $transaction->id,
+                'current_status' => $transaction->status
+            ]);
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // 1. Update transaction status
+            $transactionUpdated = DB::table('transactions')
+                ->where('order_id', $orderId)
+                ->update([
+                    'status' => $paymentStatus,
+                    'payment_result' => $paymentResult ? json_encode($paymentResult) : null,
+                    'updated_at' => now(),
+                ]);
+
+            if (!$transactionUpdated) {
+                DB::rollBack();
+                Log::error('Failed to update transaction', ['order_id' => $orderId]);
+                return response()->json([
+                    'error' => 'Failed to update transaction status'
+                ], 400);
+            }
+
+            Log::info('Transaction status updated', [
+                'order_id' => $orderId,
+                'new_status' => $paymentStatus
+            ]);
+
+            // 2. Update product stocks and sold count
+            foreach ($products as $productData) {
+                $productId = $productData['product_id'];
+                $quantityPurchased = $productData['quantity'];
+
+                Log::info('Processing product update', [
+                    'product_id' => $productId,
+                    'quantity' => $quantityPurchased
+                ]);
+
+                // Get current product data
+                $product = DB::table('products')
+                    ->where('id', $productId)
+                    ->first();
+
+                if (!$product) {
+                    DB::rollBack();
+                    Log::error('Product not found', ['product_id' => $productId]);
+                    return response()->json([
+                        'error' => "Product with ID {$productId} not found"
+                    ], 404);
+                }
+
+                Log::info('Current product data', [
+                    'product_id' => $productId,
+                    'current_stock' => $product->stocks,
+                    'current_sold' => $product->sold ?? 0
+                ]);
+
+                // Check if sufficient stock
+                if ($product->stocks < $quantityPurchased) {
+                    DB::rollBack();
+                    Log::error('Insufficient stock', [
+                        'product_id' => $productId,
+                        'available' => $product->stocks,
+                        'required' => $quantityPurchased
+                    ]);
+                    return response()->json([
+                        'error' => "Insufficient stock for product ID {$productId}. Available: {$product->stocks}, Required: {$quantityPurchased}"
+                    ], 400);
+                }
+
+                // Update product stocks and sold count
+                $newStock = $product->stocks - $quantityPurchased;
+                $newSold = ($product->sold ?? 0) + $quantityPurchased;
+
+                $productUpdated = DB::table('products')
+                    ->where('id', $productId)
+                    ->update([
+                        'stocks' => $newStock,
+                        'sold' => $newSold,
+                        'updated_at' => now(),
+                    ]);
+
+                if (!$productUpdated) {
+                    DB::rollBack();
+                    Log::error('Failed to update product', ['product_id' => $productId]);
+                    return response()->json([
+                        'error' => "Failed to update product ID {$productId}"
+                    ], 400);
+                }
+
+                Log::info("Product updated successfully", [
+                    'product_id' => $productId,
+                    'quantity_purchased' => $quantityPurchased,
+                    'old_stock' => $product->stocks,
+                    'new_stock' => $newStock,
+                    'old_sold' => $product->sold ?? 0,
+                    'new_sold' => $newSold
+                ]);
+            }
+
+            // Commit transaction
+            DB::commit();
+
+            // Log successful payment update
+            Log::info('Payment Status Updated Successfully', [
+                'order_id' => $orderId,
+                'status' => $paymentStatus,
+                'products_count' => count($products)
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment status and product stocks updated successfully',
+                'order_id' => $orderId,
+                'status' => $paymentStatus,
+                'updated_products' => count($products)
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Validation failed',
+                'details' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment Status Update Error: ' . $e->getMessage(), [
+                'order_id' => $request->input('order_id'),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
 

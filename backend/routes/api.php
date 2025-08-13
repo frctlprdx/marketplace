@@ -22,29 +22,8 @@ Route::get('/categories', function () { return App\Models\Category::all();});
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
+Route::put('/transaction/update-payment', [TransactionController::class, 'updatePaymentStatus']);
 
-Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification']);
-
-Route::prefix('test-webhook')->group(function () {
-    
-    // 1. Route untuk test basic connection
-    Route::get('/ping', [App\Http\Controllers\WebhookTestController::class, 'ping']);
-    
-    // 2. Route untuk simulasi webhook Midtrans (POST)
-    Route::post('/midtrans-simulation', [App\Http\Controllers\WebhookTestController::class, 'simulateMidtrans']);
-    
-    // 3. Route untuk test database update
-    Route::post('/test-db-update', [App\Http\Controllers\WebhookTestController::class, 'testDatabaseUpdate']);
-    
-    // 4. Route untuk cek status transaction
-    Route::get('/check-transaction/{orderId}', [App\Http\Controllers\WebhookTestController::class, 'checkTransaction']);
-    
-    // 5. Route untuk create dummy transaction
-    Route::post('/create-dummy-transaction', [App\Http\Controllers\WebhookTestController::class, 'createDummyTransaction']);
-    
-    // 6. Route yang sama seperti webhook asli tapi dengan logging lebih detail
-    Route::post('/midtrans-debug', [App\Http\Controllers\WebhookTestController::class, 'debugWebhook']);
-});
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
