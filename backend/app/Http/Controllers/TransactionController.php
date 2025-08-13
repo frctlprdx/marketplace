@@ -57,10 +57,10 @@ class TransactionController extends Controller
                 ->select(
                     'transactions.id as id',
                     'transaction_items.id as transaction_item', // Add this field that frontend expects
+                    'transaction_items.quantity',
                     'transactions.order_id',
                     'users.name as user_id', // frontend expects this key
                     'products.name as product_name',
-                    'products.stocks',
                     'categories.name as category_name',
                     'transaction_items.quantity as quantity',
                     'transactions.status as status',

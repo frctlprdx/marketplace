@@ -231,7 +231,7 @@ const AllTransactionTable = () => {
                       <td className="px-6 py-4 text-center">
                         <span className="inline-flex items-center px-3 py-1 bg-green-50 border border-green-200 rounded-full">
                           <span className="text-green-800 font-semibold">
-                            {trx.stocks}
+                            {trx.quantity}
                           </span>
                         </span>
                       </td>
@@ -326,7 +326,7 @@ const AllTransactionTable = () => {
                       <div className="flex items-center space-x-2">
                         <FiHash className="text-green-500 text-sm" />
                         <span className="text-sm text-gray-600">
-                          Jumlah: {trx.stocks}
+                          Jumlah: {trx.quantity}
                         </span>
                       </div>
                       <div className="flex items-center space-x-1 text-xs text-gray-500">
