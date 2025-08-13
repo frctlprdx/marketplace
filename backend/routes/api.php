@@ -22,10 +22,10 @@ Route::get('/categories', function () { return App\Models\Category::all();});
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
-// Midtrans Notification - HARUS BERADA DI LUAR MIDDLEWARE AUTH
-// Karena Midtrans server yang mengirim, bukan user yang login
+
 Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification'])
-    ->middleware(['throttle:60,1']) // Rate limiting untuk keamanan
+    ->withoutMiddleware('auth:sanctum') // biar Midtrans bisa akses tanpa login
+    ->middleware('throttle:60,1')
     ->name('midtrans.notification');
 
 // Authenticated Routes
