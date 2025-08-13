@@ -23,10 +23,7 @@ Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
 
-Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification'])
-    ->withoutMiddleware('auth:sanctum') // biar Midtrans bisa akses tanpa login
-    ->middleware('throttle:60,1')
-    ->name('midtrans.notification');
+Route::post('/midtrans/notification', [TransactionController::class, 'handleNotification']);
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
