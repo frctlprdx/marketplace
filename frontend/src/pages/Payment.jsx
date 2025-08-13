@@ -92,65 +92,46 @@ const Payment = () => {
         },
       ];
 
-      const transactionData = isCartCheckout
-        ? {
-            userID: parseInt(userId),
-            totalPrice: totalPrice,
-            recipient_name: address.recipient_name,
+      const transactionData = {
+        userID: parseInt(userId),
+        totalPrice: totalPrice,
+        recipient_name: address.recipient_name,
+        phone: address.phone,
+        frontend_url: window.location.origin,
+        courier: selectedCourier.name,
+        destination_id: address.id,
+        isCartCheckout: isCartCheckout,
+        // Add item details for Midtrans
+        item_details: itemDetails,
+        customer_details: {
+          first_name: address.recipient_name,
+          phone: address.phone,
+          shipping_address: {
+            first_name: address.recipient_name,
             phone: address.phone,
-            frontend_url: window.location.origin,
-            courier: selectedCourier.name,
-            destination_id: address.id,
-            products: checkoutItems.map((item) => ({
+            address: address.detail_address,
+            city: address.city,
+            postal_code: address.postal_code || "",
+            country_code: "IDN",
+          },
+        },
+        // Add products data for later processing (not stored in DB yet)
+        products_data: isCartCheckout
+          ? checkoutItems.map((item) => ({
               product_id: item.product_id ? item.product_id : item.id,
               seller_id: item.user_id || 0,
               quantity: item.quantity,
               subtotal: item.price * item.quantity,
-            })),
-            isCartCheckout: true,
-            // Add item details for Midtrans
-            item_details: itemDetails,
-            customer_details: {
-              first_name: address.recipient_name,
-              phone: address.phone,
-              shipping_address: {
-                first_name: address.recipient_name,
-                phone: address.phone,
-                address: address.detail_address,
-                city: address.city,
-                postal_code: address.postal_code || "",
-                country_code: "IDN",
+            }))
+          : [
+              {
+                product_id: checkoutItems[0].id,
+                seller_id: checkoutItems[0].user_id || checkoutItems[0].id,
+                quantity: checkoutItems[0].quantity,
+                subtotal: subtotal,
               },
-            },
-          }
-        : {
-            userID: parseInt(userId),
-            totalPrice: totalPrice,
-            recipient_name: address.recipient_name,
-            phone: address.phone,
-            frontend_url: window.location.origin,
-            seller_id: checkoutItems[0].user_id || checkoutItems[0].id,
-            product_id: checkoutItems[0].id,
-            quantity: checkoutItems[0].quantity,
-            subtotal: subtotal,
-            courier: selectedCourier.name,
-            destination_id: address.id,
-            isCartCheckout: false,
-            // Add item details for Midtrans
-            item_details: itemDetails,
-            customer_details: {
-              first_name: address.recipient_name,
-              phone: address.phone,
-              shipping_address: {
-                first_name: address.recipient_name,
-                phone: address.phone,
-                address: address.detail_address,
-                city: address.city,
-                postal_code: address.postal_code || "",
-                country_code: "IDN",
-              },
-            },
-          };
+            ],
+      };
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/snaptoken`,
@@ -171,37 +152,45 @@ const Payment = () => {
     }
   };
 
-  const updatePaymentStatus = async (orderId, paymentResult) => {
+  const processSuccessfulPayment = async (orderId, paymentResult) => {
     try {
-      console.log("Starting payment status update...");
+      console.log("Processing successful payment...");
       console.log("Order ID:", orderId);
       console.log("Checkout Items:", checkoutItems);
       console.log("Is Cart Checkout:", isCartCheckout);
 
-      const updateData = {
+      const processData = {
         order_id: orderId,
-        payment_status: "paid",
         payment_result: paymentResult,
+        user_id: parseInt(userId),
+        total_price: totalPrice,
+        recipient_name: address.recipient_name,
+        phone: address.phone,
+        courier: selectedCourier.name,
+        destination_id: address.id,
+        is_cart_checkout: isCartCheckout,
         products: isCartCheckout
           ? checkoutItems.map((item) => ({
               product_id: item.product_id ? item.product_id : item.id,
+              seller_id: item.user_id || 0,
               quantity: item.quantity,
+              subtotal: item.price * item.quantity,
             }))
           : [
               {
-                product_id: checkoutItems[0].product_id
-                  ? checkoutItems[0].product_id
-                  : checkoutItems[0].id,
+                product_id: checkoutItems[0].id,
+                seller_id: checkoutItems[0].user_id || checkoutItems[0].id,
                 quantity: checkoutItems[0].quantity,
+                subtotal: subtotal,
               },
             ],
       };
 
-      console.log("Update data being sent:", updateData);
+      console.log("Process data being sent:", processData);
 
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/transaction/update-payment`,
-        updateData,
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/transaction/process-payment`,
+        processData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,16 +199,13 @@ const Payment = () => {
         }
       );
 
-      console.log("Payment status updated successfully:", response.data);
+      console.log("Payment processed successfully:", response.data);
       return response.data;
     } catch (error) {
-      console.error("Error updating payment status:", error);
+      console.error("Error processing payment:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
-
-      // Even if update fails, we still redirect to success page
-      // This prevents user from being stuck on payment page
-      return null;
+      throw error;
     }
   };
 
@@ -244,21 +230,20 @@ const Payment = () => {
             console.log("Payment Success:", result);
 
             try {
-              // Update payment status and product stocks
-              console.log("Calling updatePaymentStatus...");
-              const updateResult = await updatePaymentStatus(order_id, result);
-              console.log("Update result:", updateResult);
+              // Process payment and create transaction in database
+              console.log("Calling processSuccessfulPayment...");
+              const processResult = await processSuccessfulPayment(order_id, result);
+              console.log("Process result:", processResult);
 
-              // Add small delay to ensure update completes
+              // Redirect to success page
               setTimeout(() => {
                 window.location.href =
                   "https://marketplace-xi-puce.vercel.app/thanks";
-              }, 2000);
+              }, 1000);
             } catch (error) {
               console.error("Error in onSuccess:", error);
-              // Still redirect even if update fails
-              window.location.href =
-                "https://marketplace-xi-puce.vercel.app/thanks";
+              // Show error message but don't redirect to thanks page
+              alert("Terjadi kesalahan saat memproses pembayaran. Silakan hubungi customer service.");
             }
           },
           onPending: function (result) {

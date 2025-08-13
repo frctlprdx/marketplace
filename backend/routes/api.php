@@ -22,9 +22,6 @@ Route::get('/categories', function () { return App\Models\Category::all();});
 Route::get('/destination', [RajaOngkirController::class, 'searchDestination'])->name('destination.search');
 Route::post('/countprice', [RajaOngkirController::class, 'countPrice'])->name('countPrice');
 
-Route::put('/transaction/update-payment', [TransactionController::class, 'updatePaymentStatus']);
-
-
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
     // Customer Routes
@@ -47,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Transaction Management
         Route::post('/snaptoken', [TransactionController::class, 'getSnapToken'])->name('transaction.store');
+        Route::post('/transaction/process-payment', [TransactionController::class, 'processPayment'])->name('transaction.process-payment');
         Route::get('/transactionhistory', [TransactionController::class, 'transactionIndex'])->name('transaction.index');
         Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->name('transaction.item');
     });
