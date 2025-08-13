@@ -232,18 +232,22 @@ const Payment = () => {
             try {
               // Process payment and create transaction in database
               console.log("Calling processSuccessfulPayment...");
-              const processResult = await processSuccessfulPayment(order_id, result);
+              const processResult = await processSuccessfulPayment(
+                order_id,
+                result
+              );
               console.log("Process result:", processResult);
 
-              // Redirect to success page
-              setTimeout(() => {
-                window.location.href =
-                  "https://marketplace-xi-puce.vercel.app/thanks";
-              }, 1000);
+              // Force redirect to success page - gunakan window.location.replace untuk mencegah back button
+              window.location.replace(
+                "https://marketplace-xi-puce.vercel.app/thanks"
+              );
             } catch (error) {
               console.error("Error in onSuccess:", error);
               // Show error message but don't redirect to thanks page
-              alert("Terjadi kesalahan saat memproses pembayaran. Silakan hubungi customer service.");
+              alert(
+                "Terjadi kesalahan saat memproses pembayaran. Silakan hubungi customer service."
+              );
             }
           },
           onPending: function (result) {
