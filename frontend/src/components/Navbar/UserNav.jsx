@@ -7,8 +7,6 @@ import { MdStorefront } from "react-icons/md";
 import { HiMenu, HiX } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const UserNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,6 +15,9 @@ const UserNav = () => {
   const [hoverHeart, setHoverHeart] = useState(false);
   const [hoverCart, setHoverCart] = useState(false);
   const [hoverHistory, setHoverHistory] = useState(false);
+
+  // Notifikasi custom state
+  const [notification, setNotification] = useState(null);
 
   const navigate = useNavigate();
 
@@ -34,12 +35,20 @@ const UserNav = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fungsi notifikasi custom
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
   const requireCustomer = (callback) => {
     const storedRole = localStorage.getItem("role");
     const storedUserId = localStorage.getItem("user_id");
 
     if (!storedUserId) {
-      toast.error("Silakan login terlebih dahulu.");
+      showNotification("Silakan login terlebih dahulu.");
       navigate("/login");
       return;
     }
@@ -47,7 +56,7 @@ const UserNav = () => {
     if (storedRole === "customer") {
       callback();
     } else {
-      toast.error("Fitur ini hanya untuk pelanggan.");
+      showNotification("Fitur ini hanya untuk pelanggan.");
     }
   };
 
@@ -66,7 +75,7 @@ const UserNav = () => {
   const handleClickProfile = () => {
     const storedUserId = localStorage.getItem("user_id");
     if (!storedUserId) {
-      toast.error("Silakan login terlebih dahulu.");
+      showNotification("Silakan login terlebih dahulu.");
       navigate("/login");
       return;
     }
@@ -75,6 +84,13 @@ const UserNav = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/* Notifikasi custom */}
+      {notification && (
+        <div className="fixed top-5 right-5 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50">
+          {notification}
+        </div>
+      )}
+
       {/* Desktop View */}
       <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
         <button
