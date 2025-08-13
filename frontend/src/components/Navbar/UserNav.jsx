@@ -35,10 +35,19 @@ const UserNav = () => {
   }, []);
 
   const requireCustomer = (callback) => {
-    if (role === "customer") {
+    const storedRole = localStorage.getItem("role");
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (!storedUserId) {
+      toast.error("Silakan login terlebih dahulu.");
+      navigate("/login");
+      return;
+    }
+
+    if (storedRole === "customer") {
       callback();
     } else {
-      toast.error("Fitur tersedia hanya untuk pelanggan.");
+      toast.error("Fitur ini hanya untuk pelanggan.");
     }
   };
 
@@ -55,6 +64,12 @@ const UserNav = () => {
   };
 
   const handleClickProfile = () => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (!storedUserId) {
+      toast.error("Silakan login terlebih dahulu.");
+      navigate("/login");
+      return;
+    }
     navigate("/profile");
   };
 
