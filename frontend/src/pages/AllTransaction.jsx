@@ -20,6 +20,24 @@ const AllTransactionTable = () => {
   const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
 
+  // Fungsi untuk memformat ke Waktu Indonesia Barat (UTC+7)
+  const formatToWIB = (dateString) => {
+    const date = new Date(dateString);
+    const wibTime = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+
+    return {
+      date: wibTime.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
+      time: wibTime.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
+
   useEffect(() => {
     const role = localStorage.getItem("role");
     const token = localStorage.getItem("user_token");
@@ -50,7 +68,6 @@ const AllTransactionTable = () => {
     switch (status.toLowerCase()) {
       case "paid":
       case "dibayar":
-        return <FiCheckCircle className="text-green-500" />;
       case "completed":
       case "selesai":
         return <FiCheckCircle className="text-green-500" />;
@@ -73,7 +90,6 @@ const AllTransactionTable = () => {
     switch (status.toLowerCase()) {
       case "paid":
       case "dibayar":
-        return "bg-green-100 text-green-800 border-green-200";
       case "completed":
       case "selesai":
         return "bg-green-100 text-green-800 border-green-200";
@@ -95,7 +111,7 @@ const AllTransactionTable = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -188,164 +204,144 @@ const AllTransactionTable = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {transactions.map((trx) => (
-                    <tr
-                      key={trx.id}
-                      onClick={() =>
-                        navigate(`/transactiondetail/${trx.transaction_item}`)
-                      }
-                      className="hover:bg-green-25 transition-colors duration-200 group cursor-pointer"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                            <span className="text-green-600 font-semibold text-sm">
-                              #{trx.id}
-                            </span>
+                  {transactions.map((trx) => {
+                    const { date, time } = formatToWIB(trx.created_at);
+                    return (
+                      <tr
+                        key={trx.id}
+                        onClick={() =>
+                          navigate(`/transactiondetail/${trx.transaction_item}`)
+                        }
+                        className="hover:bg-green-25 transition-colors duration-200 group cursor-pointer"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                              <span className="text-green-600 font-semibold text-sm">
+                                #{trx.id}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-400 rounded-full flex items-center justify-center">
-                            <FiUser className="text-white text-sm" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-400 rounded-full flex items-center justify-center">
+                              <FiUser className="text-white text-sm" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-800">
+                                {trx.user_id}
+                              </p>
+                              <p className="text-xs text-gray-500">Pembeli</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-gray-800">
-                              {trx.user_id}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="max-w-xs">
+                            <p className="font-medium text-gray-800 truncate">
+                              {trx.product_name}
                             </p>
-                            <p className="text-xs text-gray-500">Pembeli</p>
+                            <p className="text-xs text-gray-500">
+                              {trx.category_name || "Kategori tidak tersedia"}
+                            </p>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="max-w-xs">
-                          <p className="font-medium text-gray-800 truncate">
-                            {trx.product_name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {trx.category_name || "Kategori tidak tersedia"}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center px-3 py-1 bg-green-50 border border-green-200 rounded-full">
-                          <span className="text-green-800 font-semibold">
-                            {trx.quantity}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center px-3 py-1 bg-green-50 border border-green-200 rounded-full">
+                            <span className="text-green-800 font-semibold">
+                              {trx.quantity}
+                            </span>
                           </span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                            trx.status
-                          )}`}
-                        >
-                          {getStatusIcon(trx.status)}
-                          <span>{trx.status}</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="text-sm text-gray-600">
-                          <div className="font-medium">
-                            {new Date(trx.created_at).toLocaleDateString(
-                              "id-ID",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span
+                            className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                              trx.status
+                            )}`}
+                          >
+                            {getStatusIcon(trx.status)}
+                            <span>{trx.status}</span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="text-sm text-gray-600">
+                            <div className="font-medium">{date}</div>
+                            <div className="text-xs text-gray-500">{time}</div>
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {new Date(trx.created_at).toLocaleTimeString(
-                              "id-ID",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile Cards */}
             <div className="lg:hidden p-4 space-y-4">
-              {transactions.map((trx) => (
-                <div
-                  key={trx.id}
-                  onClick={() =>
-                    navigate(`/transactiondetail/${trx.transaction_item}`)
-                  }
-                  className="bg-gradient-to-r from-white to-green-25 border border-green-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <span className="text-green-600 font-semibold text-sm">
-                          #{trx.id}
-                        </span>
-                      </div>
-                      <span
-                        className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                          trx.status
-                        )}`}
-                      >
-                        {getStatusIcon(trx.status)}
-                        <span>{trx.status}</span>
-                      </span>
-                    </div>
-                    <FiEye className="text-green-500" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <FiUser className="text-green-500 text-sm" />
-                      <span className="text-sm font-medium text-gray-800">
-                        {trx.user_id}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <FiTag className="text-green-500 text-sm" />
-                      <span className="text-xs text-gray-500">
-                        {trx.category_name || "Kategori tidak tersedia"}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <FiPackage className="text-green-500 text-sm" />
-                      <span className="text-sm text-gray-600 truncate">
-                        {trx.product_name}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
+              {transactions.map((trx) => {
+                const { date, time } = formatToWIB(trx.created_at);
+                return (
+                  <div
+                    key={trx.id}
+                    onClick={() =>
+                      navigate(`/transactiondetail/${trx.transaction_item}`)
+                    }
+                    className="bg-gradient-to-r from-white to-green-25 border border-green-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-2">
-                        <FiHash className="text-green-500 text-sm" />
-                        <span className="text-sm text-gray-600">
-                          Jumlah: {trx.quantity}
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                          <span className="text-green-600 font-semibold text-sm">
+                            #{trx.id}
+                          </span>
+                        </div>
+                        <span
+                          className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                            trx.status
+                          )}`}
+                        >
+                          {getStatusIcon(trx.status)}
+                          <span>{trx.status}</span>
                         </span>
                       </div>
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <FiCalendar />
-                        <span>
-                          {new Date(trx.created_at).toLocaleDateString(
-                            "id-ID",
-                            {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            }
-                          )}
+                      <FiEye className="text-green-500" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <FiUser className="text-green-500 text-sm" />
+                        <span className="text-sm font-medium text-gray-800">
+                          {trx.user_id}
                         </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FiTag className="text-green-500 text-sm" />
+                        <span className="text-xs text-gray-500">
+                          {trx.category_name || "Kategori tidak tersedia"}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FiPackage className="text-green-500 text-sm" />
+                        <span className="text-sm text-gray-600 truncate">
+                          {trx.product_name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <FiHash className="text-green-500 text-sm" />
+                          <span className="text-sm text-gray-600">
+                            Jumlah: {trx.quantity}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-xs text-gray-500">
+                          <FiCalendar />
+                          <span>{date}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
