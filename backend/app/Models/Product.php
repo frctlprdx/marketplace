@@ -14,12 +14,11 @@ class Product extends Model
     'name',
     'category_id',
     'sold',
-    'weight',
-    'rating',
     'description',
     'stocks',
     'price',
     'image',
+    'product_url',
     'show'
     ];
 
@@ -35,20 +34,11 @@ class Product extends Model
     /**
      * Produk ini muncul di banyak transaksi
      */
-    public function transactionItems()
-    {
-        return $this->hasMany(TransactionItem::class);
-    }
 
     public function reduceStock($quantity)
     {
         $this->stocks -= $quantity;
         $this->save();
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
     }
 
     public function category()

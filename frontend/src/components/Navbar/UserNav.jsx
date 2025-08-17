@@ -261,40 +261,31 @@ const UserNav = () => {
 
       {/* Desktop View */}
       <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
-        <button
-          className="text-primary text-2xl hover:text-red-500 transition cursor-pointer"
-          onMouseEnter={() => setHoverHeart(true)}
-          onMouseLeave={() => setHoverHeart(false)}
-          onClick={handleClickWishlist}
-        >
-          {hoverHeart ? <FaHeart /> : <FiHeart />}
-        </button>
-
         {/* <button onClick={handleLogout}>logout</button> */}
-
-        <button
-          className="text-primary text-2xl hover:text-black transition cursor-pointer"
-          onMouseEnter={() => setHoverCart(true)}
-          onMouseLeave={() => setHoverCart(false)}
-          onClick={handleClickCart}
-        >
-          {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
-        </button>
-
         {role === "customer" && (
-          <button
-            className="text-primary text-2xl hover:text-black transition cursor-pointer"
-            onMouseEnter={() => setHoverHistory(true)}
-            onMouseLeave={() => setHoverHistory(false)}
-            onClick={handleClickHistory}
-          >
-            {hoverHistory ? <RiHistoryFill /> : <RiHistoryLine />}
-          </button>
+          <div className="items-center space-x-2 sm:space-x-4">
+            <button
+              className="text-primary text-2xl hover:text-red-500 transition cursor-pointer"
+              onMouseEnter={() => setHoverHeart(true)}
+              onMouseLeave={() => setHoverHeart(false)}
+              onClick={handleClickWishlist}
+            >
+              {hoverHeart ? <FaHeart /> : <FiHeart />}
+            </button>
+            <button
+              className="text-primary text-2xl hover:text-black transition cursor-pointer"
+              onMouseEnter={() => setHoverCart(true)}
+              onMouseLeave={() => setHoverCart(false)}
+              onClick={handleClickCart}
+            >
+              {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
+            </button>
+          </div>
         )}
 
         {role === "seller" && (
           <button
-            className="text-primary text-2xl hover:text-black transition cursor-pointer"
+            className="text-primary mb-2 text-2xl hover:text-black transition cursor-pointer"
             onMouseEnter={() => setHoverHistory(true)}
             onMouseLeave={() => setHoverHistory(false)}
             onClick={() => navigate("/allproducts")}
@@ -305,7 +296,7 @@ const UserNav = () => {
 
         <button
           onClick={handleClickProfile}
-          className="text-primary text-2xl hover:text-primary cursor-pointer"
+          className="text-primary mb-2 text-2xl hover:text-primary cursor-pointer"
         >
           <AiOutlineUser />
         </button>

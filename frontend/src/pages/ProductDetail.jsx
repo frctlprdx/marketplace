@@ -4,8 +4,8 @@ import {
   FiShoppingCart,
   FiCheck,
   FiArrowLeft,
-  FiMinus,
-  FiPlus,
+  FiExternalLink,
+  FiUser,
 } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
@@ -13,7 +13,6 @@ import axios from "axios";
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +99,7 @@ const ProductDetail = () => {
       } else {
         await axios.post(
           `${import.meta.env.VITE_API_URL}/cart`,
-          { user_id: userId, product_id: pid, quantity },
+          { user_id: userId, product_id: pid, quantity: 1 },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCartIds((prev) => [...prev, pid]);
@@ -155,8 +154,11 @@ const ProductDetail = () => {
     }
   };
 
-  const subtotal = product ? product.price * quantity : 0;
-  const totalweight = product ? product.weight * quantity : 0;
+  const handleVisitProductUrl = () => {
+    if (product.product_url) {
+      window.open(product.product_url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   if (loading) {
     return (
@@ -283,6 +285,19 @@ const ProductDetail = () => {
                   Rp {Number(product.price).toLocaleString("id-ID")}
                 </p>
 
+                {/* Seller Info */}
+                {product.seller_name && (
+                  <div className="flex items-center space-x-2 mb-4">
+                    <FiUser className="text-gray-500" size={16} />
+                    <span className="text-sm text-gray-600">
+                      Dijual oleh:{" "}
+                      <span className="font-medium text-gray-800">
+                        {product.seller_name}
+                      </span>
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex items-center space-x-2 mb-6">
                   <span
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -295,79 +310,61 @@ const ProductDetail = () => {
                   >
                     Stok: {product.stocks}
                   </span>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-soft text-primary">
-                    Berat: {product.weight} gram
-                  </span>
                 </div>
               </div>
 
               <div className="border-t border-gray-100 my-6"></div>
 
-              {/* Quantity Selector */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Jumlah
-                </label>
-                <div className="flex items-center">
-                  <button
-                    onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                    className="w-10 h-10 rounded-l-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"
-                    disabled={quantity <= 1}
-                  >
-                    <FiMinus size={16} />
-                  </button>
-                  <div className="w-16 h-10 flex items-center justify-center border-t border-b border-gray-200 text-center text-gray-800">
-                    {quantity}
-                  </div>
-                  <button
-                    onClick={() =>
-                      quantity < product.stocks && setQuantity(quantity + 1)
-                    }
-                    className="w-10 h-10 rounded-r-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"
-                    disabled={quantity >= product.stocks}
-                  >
-                    <FiPlus size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Subtotal */}
+              {/* Price Display */}
               <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600">Harga</span>
                   <span className="text-lg font-bold text-gray-800">
-                    Rp {Number(subtotal).toLocaleString("id-ID")}
-                  </span>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Berat Total</span>
-                  <span className="text-lg font-bold text-gray-800">
-                    {Number(totalweight).toLocaleString("id-ID")} gram
+                    Rp {Number(product.price).toLocaleString("id-ID")}
                   </span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="grid  w-full ">
+              <div className="space-y-3">
                 <button
                   onClick={handleCart}
-                  disabled={cartLoading}
-                  className={`col-span-1 h-12 flex items-center justify-center rounded-lg transition-all duration-300 ${
+                  disabled={cartLoading || product.stocks === 0}
+                  className={`w-full h-12 flex items-center justify-center rounded-lg transition-all duration-300 ${
                     cartIds.includes(Number(product.id))
                       ? "bg-green-500 text-white"
+                      : product.stocks === 0
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   {cartLoading ? (
                     <div className="w-5 h-5 border-2 border-t-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : cartIds.includes(Number(product.id)) ? (
-                    <FiCheck size={20} />
+                    <>
+                      <FiCheck size={20} className="mr-2" />
+                      Sudah di Keranjang
+                    </>
+                  ) : product.stocks === 0 ? (
+                    "Stok Habis"
                   ) : (
-                    <FiShoppingCart size={20} />
+                    <>
+                      <FiShoppingCart size={20} className="mr-2" />
+                      Tambah ke Keranjang
+                    </>
                   )}
                 </button>
+
+                {/* Visit Product URL Button */}
+                {product.product_url && (
+                  <button
+                    onClick={handleVisitProductUrl}
+                    className="w-full h-12 flex items-center justify-center rounded-lg bg-[#507969] hover:bg-[#2d5847] text-white transition-all duration-300"
+                  >
+                    <FiExternalLink size={20} className="mr-2" />
+                    Kunjungi Halaman Produk
+                  </button>
+                )}
               </div>
             </div>
           </div>

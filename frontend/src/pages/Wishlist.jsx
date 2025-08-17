@@ -11,7 +11,6 @@ const Wishlist = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cart, setCart] = useState([]);
-  const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -139,11 +138,11 @@ const Wishlist = () => {
       return;
     }
 
-    const quantity = quantities[productId] || 1;
+    const quantity = 1; // Fixed quantity of 1
 
     const item = wishlist.find((item) => item.product_id === productId);
-    if (item && quantity > item.stocks) {
-      toast.error(`Stok tidak mencukupi! Hanya tersedia ${item.stocks} item.`);
+    if (item && item.stocks === 0) {
+      toast.error("Stok habis!");
       return;
     }
 
@@ -216,9 +215,6 @@ const Wishlist = () => {
 
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {wishlist.map((item) => {
-                const quantity = quantities[item.product_id] || 1;
-                const totalPrice = Number(item.price) * quantity;
-
                 return (
                   <div
                     key={item.id}
@@ -244,58 +240,12 @@ const Wishlist = () => {
                         alt={item.name}
                       />
                     </div>
-                    <div className="py-3 space-y-4 ">
+                    <div className="py-2 space-y-2">
                       <p>{item.name}</p>
                       <p className="text-primary font-bold">
-                        Rp {totalPrice.toLocaleString("id-ID")}
+                        Rp {Number(item.price).toLocaleString("id-ID")}
                       </p>
-                      <p className="text-sm"> Stocks: {item.stocks}</p>
-                      <p className="text-xs">Di Post pada {item.created_at}</p>
-                    </div>
-
-                    <div
-                      className="flex items-center gap-3 sm:my-2 mb-2 text-center"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() =>
-                          setQuantities((prev) => ({
-                            ...prev,
-                            [item.product_id]: Math.max(
-                              (prev[item.product_id] || 1) - 1,
-                              1
-                            ),
-                          }))
-                        }
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xl"
-                      >
-                        -
-                      </button>
-                      <span className="text-lg">{quantity}</span>
-                      <button
-                        onClick={() => {
-                          const currentQty = quantities[item.product_id] || 1;
-                          if (currentQty < item.stocks) {
-                            setQuantities((prev) => ({
-                              ...prev,
-                              [item.product_id]: currentQty + 1,
-                            }));
-                          } else {
-                            toast.warning(
-                              `Maksimal ${item.stocks} item tersedia!`
-                            );
-                          }
-                        }}
-                        disabled={quantity >= item.stocks}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xl
-                          ${
-                            quantity >= item.stocks
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-gray-200 hover:bg-gray-300"
-                          }`}
-                      >
-                        +
-                      </button>
+                      <p className="text-sm">Stocks: {item.stocks}</p>
                     </div>
 
                     <button

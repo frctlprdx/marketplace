@@ -64,15 +64,23 @@ const SellerSidebar = () => {
           </Link>
 
           <Link
+            to="/addcategory"
+            className="group flex items-center gap-4 p-4 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:translate-x-1"
+            onClick={() => setOpen(false)}
+          >
+            {/* <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center group-hover:from-green-200 group-hover:to-green-300 transition-all duration-200">
+              <div className="w-5 h-5 bg-green-500 rounded"></div>
+            </div> */}
+            <span className="font-medium">Tambah Kategori</span>
+          </Link>
+
+          {/* <Link
             to="/alltransaction"
             className="group flex items-center gap-4 p-4 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:translate-x-1"
             onClick={() => setOpen(false)}
           >
-            {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-200">
-              <div className="w-5 h-5 bg-blue-500 rounded"></div>
-            </div> */}
             <span className="font-medium">Lihat Transaksi</span>
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Decorative element */}

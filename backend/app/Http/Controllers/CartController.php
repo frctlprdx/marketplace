@@ -51,7 +51,6 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1'
         ]);
 
         $cart = Cart::updateOrCreate(
@@ -59,7 +58,6 @@ class CartController extends Controller
                 'user_id' => $request->user()->id,
                 'product_id' => $request->product_id,
             ],
-            ['quantity' => $request->quantity]
         );
 
         return response()->json($cart, 201);

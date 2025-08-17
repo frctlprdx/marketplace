@@ -11,19 +11,12 @@ import Product from "./pages/Product";
 import Wishlist from "./pages/Wishlist";
 import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
-import Checkout from "./pages/Checkout";
-import Payment from "./pages/Payment";
-import TransactionHistory from "./pages/TransactionHistory";
-import Thanks from "./pages/Thanks";
-import Error from "./pages/Error";
 import AddProduct from "./pages/AddProduct";
 import SellerLayout from "./components/Layouts/SellerLayout";
 import SellerProducts from "./pages/SellerProducts";
 import EditProduct from "./pages/EditProduct";
-import AllTransaction from "./pages/AllTransaction";
-import TransactionDetail from "./pages/TransactionDetail";
 import Profile from "./pages/Profile";
-import History from "./pages/TransactionHistory";``
+import AddCategory from "./pages/AddCategory";
 import "react-toastify/dist/ReactToastify.css";
 
 // Component to handle conditional navbar rendering
@@ -52,14 +45,8 @@ function AppContent() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/productdetail/:id" element={<ProductDetail />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/transactionhistory" element={<TransactionHistory />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/history" element={<History />} />
         {/* Halaman khusus */}
-        <Route path="/thanks" element={<Thanks />} />
-        <Route path="/error" element={<Error />} />
 
         {/* Halaman seller */}
         <Route
@@ -67,6 +54,14 @@ function AppContent() {
           element={
             <SellerLayout>
               <AddProduct />
+            </SellerLayout>
+          }
+        />
+        <Route
+          path="/addcategory"
+          element={
+            <SellerLayout>
+              <AddCategory />
             </SellerLayout>
           }
         />
@@ -83,22 +78,6 @@ function AppContent() {
           element={
             <SellerLayout>
               <EditProduct />
-            </SellerLayout>
-          }
-        />
-        <Route
-          path="/alltransaction"
-          element={
-            <SellerLayout>
-              <AllTransaction />
-            </SellerLayout>
-          }
-        />
-        <Route
-          path="/transactiondetail/:id"
-          element={
-            <SellerLayout>
-              <TransactionDetail />
             </SellerLayout>
           }
         />

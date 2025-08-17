@@ -36,17 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
         Route::delete('/wishlist', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
-        // Address Management
-        Route::get('/addresses', [UserAddressController::class, 'index'])->name('addresses.index');
-        Route::post('/addresses', [UserAddressController::class, 'store'])->name('addresses.store');
-        Route::put('/addresses/{id}', [UserAddressController::class, 'update'])->name('addresses.update');
-        Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->name('addresses.delete');
-
-        // Transaction Management
-        Route::post('/snaptoken', [TransactionController::class, 'getSnapToken'])->name('transaction.store');
-        Route::post('/transaction/process-payment', [TransactionController::class, 'processPayment'])->name('transaction.process-payment');
-        Route::get('/transactionhistory', [TransactionController::class, 'transactionIndex'])->name('transaction.index');
-        Route::get('/transactionitem/{id}', [TransactionController::class, 'itemindex'])->name('transaction.item');
     });
 
     // Profile Routes (Both customer & seller)
@@ -66,10 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/product', [ProductController::class, 'store'])->name('product.store');
         Route::get('/product/{id}', [ProductController::class, 'showSeller'])->name('product.show');
         Route::put('/product/{id}', [ProductController::class, 'update'])->name('product.update');
+        Route::post('/addcategory', [ProductController::class, 'addCategory'])->name('addCategory');
 
-        // Payment & Transaction Management
-        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-        Route::get('/sellertransactionpage', [TransactionController::class, 'sellerindex'])->name('seller.transaction.index');
-        Route::get('/transactiondetail/{id}', [TransactionController::class, 'getDetail'])->name('seller.transaction.detail');
     });
 });

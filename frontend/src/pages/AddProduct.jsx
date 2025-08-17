@@ -14,8 +14,8 @@ import {
   FiUpload,
   FiCheck,
   FiLoader,
+  FiLink,
 } from "react-icons/fi";
-import { RiWeightLine } from "react-icons/ri";
 
 function AddProduct() {
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ function AddProduct() {
     description: "",
     stocks: "",
     price: "",
-    weight: "",
+    product_url: "",
   });
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -62,6 +62,10 @@ function AddProduct() {
   const handleUpload = async (show) => {
     if (!file) return alert("Pilih gambar terlebih dahulu");
     if (!selectedCategory) return alert("Pilih kategori terlebih dahulu");
+    if (!formData.name) return alert("Nama produk harus diisi");
+    if (!formData.stocks) return alert("Stok harus diisi");
+    if (!formData.price) return alert("Harga harus diisi");
+
     setLoading(true);
 
     const fileExt = file.name.split(".").pop();
@@ -97,10 +101,10 @@ function AddProduct() {
           name: formData.name,
           category_id: selectedCategory,
           description: formData.description,
-          stocks: formData.stocks,
-          price: formData.price,
-          weight: formData.weight,
+          stocks: parseInt(formData.stocks),
+          price: parseFloat(formData.price),
           image: publicUrl.publicUrl,
+          product_url: formData.product_url || null,
           show: show,
         },
         {
@@ -115,7 +119,7 @@ function AddProduct() {
         description: "",
         stocks: "",
         price: "",
-        weight: "",
+        product_url: "",
       });
       setFile(null);
       setSelectedCategory("");
@@ -128,7 +132,7 @@ function AddProduct() {
   };
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-8 bg-gray-50">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -151,7 +155,7 @@ function AddProduct() {
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                   <FiPackage className="mr-2 text-green-500" />
-                  Nama Produk
+                  Nama Produk *
                 </label>
                 <div className="relative">
                   <input
@@ -160,6 +164,7 @@ function AddProduct() {
                     placeholder="Masukkan nama produk yang menarik"
                     onChange={handleChange}
                     value={formData.name}
+                    required
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
@@ -169,13 +174,14 @@ function AddProduct() {
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                   <FiTag className="mr-2 text-green-500" />
-                  Kategori Produk
+                  Kategori Produk *
                 </label>
                 <div className="relative">
                   <select
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 bg-white appearance-none cursor-pointer"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
+                    required
                   >
                     <option value="" className="text-gray-400">
                       Pilih kategori yang sesuai
@@ -208,6 +214,27 @@ function AddProduct() {
                 </div>
               </div>
 
+              {/* Product URL */}
+              <div className="group">
+                <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
+                  <FiLink className="mr-2 text-green-500" />
+                  URL Produk
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    name="product_url"
+                    placeholder="https://contoh.com/produk-anda"
+                    onChange={handleChange}
+                    value={formData.product_url}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-700 placeholder-gray-400"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Link ke halaman produk eksternal atau toko online lainnya
+                </p>
+              </div>
+
               {/* Description */}
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
@@ -225,11 +252,11 @@ function AddProduct() {
               </div>
 
               {/* Stock and Price Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiHash className="mr-2 text-green-500" />
-                    Jumlah Stok
+                    Jumlah Stok *
                   </label>
                   <input
                     type="number"
@@ -238,6 +265,7 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.stocks}
                     min="0"
+                    required
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
@@ -245,7 +273,7 @@ function AddProduct() {
                 <div className="group">
                   <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                     <FiDollarSign className="mr-2 text-green-500" />
-                    Harga (Rp)
+                    Harga (Rp) *
                   </label>
                   <input
                     type="number"
@@ -254,22 +282,8 @@ function AddProduct() {
                     onChange={handleChange}
                     value={formData.price}
                     min="0"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
-                  />
-                </div>
-
-                <div className="group">
-                  <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                    <RiWeightLine className="mr-2 text-green-500" />
-                    Berat (Gram)
-                  </label>
-                  <input
-                    type="number"
-                    name="weight"
-                    placeholder="0"
-                    onChange={handleChange}
-                    value={formData.weight}
-                    min="0"
+                    step="0.01"
+                    required
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none text-gray-700 placeholder-gray-400"
                   />
                 </div>
@@ -279,7 +293,7 @@ function AddProduct() {
               <div className="group">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-3">
                   <FiImage className="mr-2 text-green-500" />
-                  Gambar Produk
+                  Gambar Produk *
                 </label>
                 <div className="relative">
                   <div className="flex items-center justify-center w-full">
@@ -305,8 +319,8 @@ function AddProduct() {
                     </label>
                   </div>
                   {file && (
-                    <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                      <p className="text-sm text-indigo-700 flex items-center">
+                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-700 flex items-center">
                         <FiCheck className="mr-2" />
                         File terpilih: {file.name}
                       </p>
@@ -323,7 +337,7 @@ function AddProduct() {
               <button
                 onClick={() => handleUpload(true)}
                 disabled={loading}
-                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 {loading ? (
                   <FiLoader className="animate-spin mr-2" />
@@ -336,7 +350,7 @@ function AddProduct() {
               <button
                 onClick={() => handleUpload(false)}
                 disabled={loading}
-                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl hover:from-gray-600 hover:to-gray-700 focus:ring-4 focus:ring-gray-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl hover:from-gray-600 hover:to-gray-700 focus:ring-4 focus:ring-gray-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 {loading ? (
                   <FiLoader className="animate-spin mr-2" />
@@ -351,10 +365,30 @@ function AddProduct() {
 
         {/* Success/Error Message */}
         {message && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+          <div
+            className={`mt-6 p-4 rounded-xl ${
+              message.includes("berhasil")
+                ? "bg-green-50 border border-green-200"
+                : "bg-red-50 border border-red-200"
+            }`}
+          >
             <div className="flex items-center">
-              <FiCheck className="text-green-500 mr-3" />
-              <p className="text-green-700 font-medium">{message}</p>
+              <FiCheck
+                className={`mr-3 ${
+                  message.includes("berhasil")
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              />
+              <p
+                className={`font-medium ${
+                  message.includes("berhasil")
+                    ? "text-green-700"
+                    : "text-red-700"
+                }`}
+              >
+                {message}
+              </p>
             </div>
           </div>
         )}

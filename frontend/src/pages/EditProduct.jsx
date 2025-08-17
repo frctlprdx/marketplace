@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { supabase } from "../supabase";
-import { Eye, EyeOff, Save, Upload, CheckCircle, XCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Save,
+  Upload,
+  CheckCircle,
+  XCircle,
+  Link,
+} from "lucide-react";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -14,6 +22,7 @@ const EditProduct = () => {
     price: "",
     stocks: "",
     image: "",
+    product_url: "", // ✅ tambahkan product_url
     show: true, // ✅ gunakan show, bukan status
   });
 
@@ -77,6 +86,7 @@ const EditProduct = () => {
           stocks: formData.stocks,
           price: formData.price,
           image: imageUrl,
+          product_url: formData.product_url, // ✅ kirim product_url ke backend
           show: formData.show, // ✅ kirim 'show' ke backend
         },
         {
@@ -214,6 +224,29 @@ const EditProduct = () => {
                   rows={4}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
                 />
+              </div>
+
+              {/* Product URL */}
+              <div className="sm:col-span-2 space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  URL Produk <span className="text-gray-500 font-normal"></span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Link size={20} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="url"
+                    name="product_url"
+                    placeholder="https://example.com/produk-saya"
+                    value={formData.product_url}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Link ke toko online atau marketplace lain untuk produk ini
+                </p>
               </div>
 
               {/* Stock */}
