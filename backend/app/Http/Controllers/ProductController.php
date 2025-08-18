@@ -88,7 +88,8 @@ class ProductController extends Controller
             ->select(
                 'products.*',
                 'categories.name as category_name',
-                'users.name as seller_name'
+                'users.name as seller_name',
+                'users.phone_number'
             )
             ->where('products.id', $id)
             ->first();

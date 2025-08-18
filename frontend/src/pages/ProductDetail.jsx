@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
-  FiShoppingCart,
   FiCheck,
   FiArrowLeft,
   FiExternalLink,
   FiUser,
+  FiMessageCircle,
 } from "react-icons/fi";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import axios from "axios";
@@ -19,8 +19,7 @@ const ProductDetail = () => {
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [notifMessage, setNotifMessage] = useState(null);
   const [showNotif, setShowNotif] = useState(false);
-  const [cartIds, setCartIds] = useState([]);
-  const [cartLoading, setCartLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("user_id");
@@ -52,22 +51,6 @@ const ProductDetail = () => {
   }, [token]);
 
   useEffect(() => {
-    if (!token) return;
-
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/cart`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        const ids = res.data.map((item) => Number(item.product_id));
-        setCartIds(ids);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch cart:", err);
-      });
-  }, [token]);
-
-  useEffect(() => {
     if (showNotif) {
       const timer = setTimeout(() => {
         setShowNotif(false);
@@ -76,43 +59,57 @@ const ProductDetail = () => {
     }
   }, [showNotif]);
 
-  const handleCart = async () => {
-    if (!userId || !token || !product) {
-      setNotifMessage("Login terlebih dahulu untuk menambahkan ke keranjang");
+  // Function to normalize phone number for WhatsApp
+  const normalizePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return null;
+
+    // Remove all non-digit characters
+    let cleaned = phoneNumber.replace(/\D/g, "");
+
+    // Handle different formats
+    if (cleaned.startsWith("08")) {
+      // Convert 08xxx to 628xxx
+      cleaned = "62" + cleaned.substring(1);
+    } else if (cleaned.startsWith("8")) {
+      // Convert 8xxx to 628xxx
+      cleaned = "62" + cleaned;
+    } else if (cleaned.startsWith("62")) {
+      // Already in correct format
+      cleaned = cleaned;
+    } else if (cleaned.startsWith("0")) {
+      // Remove leading 0 and add 62
+      cleaned = "62" + cleaned.substring(1);
+    }
+
+    return cleaned;
+  };
+
+  const handleWhatsAppContact = () => {
+    if (!product.phone_number) {
+      setNotifMessage("Nomor telepon penjual tidak tersedia");
       setShowNotif(true);
       return;
     }
 
-    const pid = Number(product.id);
-    const isInCart = cartIds.includes(pid);
-    setCartLoading(true);
+    const normalizedNumber = normalizePhoneNumber(product.phone_number);
 
-    try {
-      if (isInCart) {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/cart`, {
-          headers: { Authorization: `Bearer ${token}` },
-          data: { user_id: userId, product_id: pid },
-        });
-        setCartIds((prev) => prev.filter((id) => id !== pid));
-        setNotifMessage("Produk dihapus dari keranjang");
-        setShowNotif(true);
-      } else {
-        await axios.post(
-          `${import.meta.env.VITE_API_URL}/cart`,
-          { user_id: userId, product_id: pid, quantity: 1 },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setCartIds((prev) => [...prev, pid]);
-        setNotifMessage("Produk ditambahkan ke keranjang");
-        setShowNotif(true);
-      }
-    } catch (err) {
-      console.error("Cart toggle error:", err);
-      setNotifMessage("Gagal memperbarui keranjang");
+    if (!normalizedNumber) {
+      setNotifMessage("Format nomor telepon tidak valid");
       setShowNotif(true);
-    } finally {
-      setCartLoading(false);
+      return;
     }
+
+    // Create WhatsApp message
+    const message = encodeURIComponent(
+      `Halo, saya tertarik dengan produk "${product.name}" seharga Rp ${Number(
+        product.price
+      ).toLocaleString("id-ID")}. Apakah produk ini masih tersedia?`
+    );
+
+    const whatsappUrl = `https://wa.me/${normalizedNumber}?text=${message}`;
+
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleWishlist = async () => {
@@ -327,33 +324,16 @@ const ProductDetail = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <button
-                  onClick={handleCart}
-                  disabled={cartLoading || product.stocks === 0}
-                  className={`w-full h-12 flex items-center justify-center rounded-lg transition-all duration-300 ${
-                    cartIds.includes(Number(product.id))
-                      ? "bg-green-500 text-white"
-                      : product.stocks === 0
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  {cartLoading ? (
-                    <div className="w-5 h-5 border-2 border-t-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : cartIds.includes(Number(product.id)) ? (
-                    <>
-                      <FiCheck size={20} className="mr-2" />
-                      Sudah di Keranjang
-                    </>
-                  ) : product.stocks === 0 ? (
-                    "Stok Habis"
-                  ) : (
-                    <>
-                      <FiShoppingCart size={20} className="mr-2" />
-                      Tambah ke Keranjang
-                    </>
-                  )}
-                </button>
+                {/* WhatsApp Contact Button */}
+                {product.phone_number && (
+                  <button
+                    onClick={handleWhatsAppContact}
+                    className="w-full h-12 flex items-center justify-center rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300"
+                  >
+                    <FiMessageCircle size={20} className="mr-2" />
+                    Hubungi Penjual via WhatsApp
+                  </button>
+                )}
 
                 {/* Visit Product URL Button */}
                 {product.product_url && (
