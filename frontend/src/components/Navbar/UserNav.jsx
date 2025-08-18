@@ -264,7 +264,7 @@ const UserNav = () => {
         {/* <button onClick={handleLogout}>logout</button> */}
         {role === "customer" && (
           <div className="items-center space-x-2 sm:space-x-4">
-            <button
+            {/* <button
               className="text-primary text-2xl hover:text-red-500 transition cursor-pointer"
               onMouseEnter={() => setHoverHeart(true)}
               onMouseLeave={() => setHoverHeart(false)}
@@ -279,7 +279,7 @@ const UserNav = () => {
               onClick={handleClickCart}
             >
               {hoverCart ? <FaShoppingCart /> : <FiShoppingCart />}
-            </button>
+            </button> */}
           </div>
         )}
 
@@ -313,7 +313,7 @@ const UserNav = () => {
 
         {isMenuOpen && (
           <div className="absolute top-14 right-4 bg-white shadow-md rounded-lg p-4 flex flex-col space-y-3 z-50 w-64">
-            <button
+            {/* <button
               onClick={() => {
                 handleClickWishlist();
                 setIsMenuOpen(false);
@@ -331,9 +331,9 @@ const UserNav = () => {
               className="flex items-center gap-2 text-primary text-lg cursor-pointer"
             >
               <FiShoppingCart /> Cart
-            </button>
+            </button> */}
 
-            {role === "customer" && (
+            {/* {role === "customer" && (
               <button
                 onClick={() => {
                   handleClickHistory();
@@ -343,7 +343,7 @@ const UserNav = () => {
               >
                 <RiHistoryLine /> History Transaksi
               </button>
-            )}
+            )} */}
 
             <button
               onClick={() => {
@@ -368,7 +368,7 @@ const UserNav = () => {
             )}
 
             {/* Logout button untuk mobile */}
-            <button
+            {/* <button
               onClick={() => {
                 handleLogout();
                 setIsMenuOpen(false);
@@ -376,7 +376,7 @@ const UserNav = () => {
               className="flex items-center gap-2 text-red-600 text-lg cursor-pointer border-t pt-3"
             >
               Logout
-            </button>
+            </button> */}
           </div>
         )}
       </div>
