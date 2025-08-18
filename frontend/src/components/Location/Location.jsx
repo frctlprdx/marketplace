@@ -30,7 +30,7 @@ const Location = () => {
       <div className="flex items-center w-full h-screen z-0">
         <MapContainer
           center={center}
-          zoom={6``}
+          zoom={6}
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >
