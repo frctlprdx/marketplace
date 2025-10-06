@@ -4,14 +4,14 @@ import { ChevronDown } from "lucide-react";
 
 const faqList = [
   {
-    question: "Apa itu Marketplace Desa?",
+    question: "Apa itu GO-SMILE Commerce ?",
     answer:
-      "Marketplace Desa adalah platform digital untuk membantu warga desa melakukan jual beli secara online.",
+      "GO-SMILE Commerce adalah platform web yang digunakan penduduk desa untuk menjual dan mempromosikan berbagai macam produk hasil susu",
   },
   {
     question: "Siapa yang bisa bergabung di platform ini?",
     answer:
-      "Semua warga desa yang memiliki produk untuk dijual dapat bergabung.",
+      "Semua warga desa yang memiliki produk untuk dijual dan dipromosikan dapat bergabung.",
   },
   {
     question: "Bagaimana cara mendaftar sebagai penjual?",
@@ -19,9 +19,14 @@ const faqList = [
       "Anda dapat mendaftar melalui menu pendaftaran di halaman utama.",
   },
   {
-    question: "Apakah penggunaan platform ini berbayar?",
+    question: "Bagaimana cara membeli produknya ?",
     answer:
-      "Saat ini, platform dapat digunakan secara gratis oleh warga desa.",
+      "Pilih produk yang kamu suka lalu lakukan transaksinya melalui TikTokShop",
+  },
+  {
+    question: "Bagaimana jika ingin tanya lebih lanjut terkait produknya ?",
+    answer:
+      "Pilih Produk yang akan kamu tanyakan dan klik tombol Whatsapp sehingga kamu akan diarahkan ke personal chat penjual",
   },
 ];
 
@@ -41,10 +46,10 @@ const FAQ = () => {
         {faqList.map((item, index) => (
           <div
             key={index}
-            className="rounded-xl bg-transparent backdrop-blur-sm transition-all border-b-2 border-gray-500 shadow-sm"
+            className=" rounded-xl bg-transparent backdrop-blur-sm transition-all border-b-2 border-gray-500 shadow-sm"
           >
             <button
-              className="w-full flex justify-between items-center px-6 py-4 font-medium text-left hover:bg-gray-100/20 transition"
+              className="cursor-pointer w-full flex justify-between items-center px-6 py-4 font-medium text-left hover:bg-gray-100/20 transition"
               onClick={() => toggleFAQ(index)}
             >
               <span className="text-sm sm:text-base">{item.question}</span>

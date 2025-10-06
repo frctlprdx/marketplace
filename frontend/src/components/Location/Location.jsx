@@ -30,13 +30,14 @@ const Location = () => {
       <div className="flex items-center w-full h-screen z-0">
         <MapContainer
           center={center}
-          zoom={6}
+          zoom={7}
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >
+          {/* Pilihan 4: Esri WorldImagery (Satelit) */}
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri"
           />
 
           <Marker position={start}>
@@ -44,7 +45,7 @@ const Location = () => {
           </Marker>
 
           <Marker position={destination}>
-            <Popup>JCQG+9GQ Nagasaren (Tujuan)</Popup>
+            <Popup>Desa Nogosaren</Popup>
           </Marker>
         </MapContainer>
       </div>

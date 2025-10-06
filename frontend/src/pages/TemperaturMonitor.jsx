@@ -1,37 +1,50 @@
 import { useEffect, useState } from "react";
-import { ref, onValue } from "firebase/database";
-import { db } from "../firebase/FirebaseConfig";
+import { ref, onValue, set } from "firebase/database";
+import { dbRealtime } from "../firebase/FirebaseConfig";
 
 export default function TemperatureMonitor() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
   const [heater, setHeater] = useState(null);
+  const [manualRelay, setManualRelay] = useState("AUTO");
 
   useEffect(() => {
     // ambil suhu
-    const tempRef = ref(db, "sensor/suhu");
+    const tempRef = ref(dbRealtime, "sensor/suhu");
     const unsubscribeTemp = onValue(tempRef, (snapshot) => {
       setTemperature(snapshot.val());
     });
 
     // ambil kelembapan
-    const humRef = ref(db, "sensor/kelembapan");
+    const humRef = ref(dbRealtime, "sensor/kelembapan");
     const unsubscribeHum = onValue(humRef, (snapshot) => {
       setHumidity(snapshot.val());
     });
 
     // ambil heater
-    const heaterRef = ref(db, "sensor/heater");
+    const heaterRef = ref(dbRealtime, "sensor/heater");
     const unsubscribeHeater = onValue(heaterRef, (snapshot) => {
       setHeater(snapshot.val());
+    });
+
+    // ambil mode manualRelay
+    const relayRef = ref(dbRealtime, "command/manualRelay");
+    const unsubscribeRelay = onValue(relayRef, (snapshot) => {
+      setManualRelay(snapshot.val());
     });
 
     return () => {
       unsubscribeTemp();
       unsubscribeHum();
       unsubscribeHeater();
+      unsubscribeRelay();
     };
   }, []);
+
+  // Fungsi kirim perintah ke RTDB
+  const sendCommand = async (command) => {
+    await set(ref(dbRealtime, "command/manualRelay"), command);
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-screen-xl mx-auto min-h-screen">
@@ -58,7 +71,6 @@ export default function TemperatureMonitor() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
         </div>
 
         {/* Humidity Circle */}
@@ -74,7 +86,6 @@ export default function TemperatureMonitor() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
         </div>
 
         {/* Heater Circle */}
@@ -90,59 +101,47 @@ export default function TemperatureMonitor() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
         </div>
       </div>
 
-      {/* Mobile/Tablet Layout - 3 circles vertical */}
-      <div className="lg:hidden flex flex-col items-center space-y-8">
-        {/* Temperature Circle */}
-        <div className="relative group">
-          <div className="w-40 h-40 sm:w-48 sm:h-48 bg-gradient-to-br from-[#507969] to-[#00a867] rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
-              <div className="text-3xl sm:text-4xl mb-2">🌡️</div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-800">
-                {temperature !== null ? `${temperature}°C` : "Loading..."}
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-[#507969] mt-1">
-                Suhu
-              </div>
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+      {/* Kontrol Tombol */}
+      <div className="mt-10 flex flex-col items-center space-y-4">
+        <h2 className="text-lg font-bold text-gray-700 mb-2">Kontrol Manual</h2>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => sendCommand("ON")}
+            className={`px-6 py-2 rounded-full shadow-md font-semibold transition ${
+              manualRelay === "ON"
+                ? "bg-green-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-green-300"
+            }`}
+          >
+            ON
+          </button>
+          <button
+            onClick={() => sendCommand("OFF")}
+            className={`px-6 py-2 rounded-full shadow-md font-semibold transition ${
+              manualRelay === "OFF"
+                ? "bg-red-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-red-300"
+            }`}
+          >
+            OFF
+          </button>
+          <button
+            onClick={() => sendCommand("AUTO")}
+            className={`px-6 py-2 rounded-full shadow-md font-semibold transition ${
+              manualRelay === "AUTO"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-blue-300"
+            }`}
+          >
+            AUTO
+          </button>
         </div>
-
-        {/* Humidity Circle */}
-        <div className="relative group">
-          <div className="w-40 h-40 sm:w-48 sm:h-48 bg-gradient-to-br from-[#507969] to-[#00a867] rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
-              <div className="text-3xl sm:text-4xl mb-2">💧</div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-800">
-                {humidity !== null ? `${humidity}%` : "Loading..."}
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-[#507969] mt-1">
-                Kelembapan
-              </div>
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-        </div>
-
-        {/* Heater Circle */}
-        <div className="relative group">
-          <div className="w-40 h-40 sm:w-48 sm:h-48 bg-gradient-to-br from-[#507969] to-[#00a867] rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
-              <div className="text-3xl sm:text-4xl mb-2">🔥</div>
-              <div className="text-xl sm:text-2xl font-bold text-gray-800">
-                {heater !== null ? heater : "Loading..."}
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-[#507969] mt-1">
-                Heater
-              </div>
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-        </div>
+        <p className="mt-2 text-sm text-gray-600">
+          Mode saat ini: <span className="font-bold">{manualRelay}</span>
+        </p>
       </div>
 
       {/* Status Indicator */}

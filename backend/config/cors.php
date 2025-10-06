@@ -6,6 +6,7 @@ return [
 
     'allowed_origins' => array_filter([
         env('FRONTEND_URL'), // dari .env
+        'https://gosmilenogosaren.hmtiudinus.org',
         'https://*.vercel.app',
         'http://localhost:5173',
         'http://localhost:3000',

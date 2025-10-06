@@ -18,6 +18,7 @@ import EditProduct from "./pages/EditProduct";
 import Profile from "./pages/Profile";
 import AddCategory from "./pages/AddCategory";
 import TemperatureMonitor from "./pages/TemperaturMonitor";
+import TemperatureHistory from "./pages/TemperatureHistory";
 import "react-toastify/dist/ReactToastify.css";
 
 // Component to handle conditional navbar rendering
@@ -88,6 +89,14 @@ function AppContent() {
           element={
             <SellerLayout>
               <TemperatureMonitor />
+            </SellerLayout>
+          }
+        />
+        <Route
+          path="temphistory"
+          element={
+            <SellerLayout>
+              <TemperatureHistory />
             </SellerLayout>
           }
         />
