@@ -47,7 +47,7 @@ function AppContent() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/productdetail/:id" element={<ProductDetail />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} /> 
         {/* Halaman khusus */}
 
         {/* Halaman seller */}
